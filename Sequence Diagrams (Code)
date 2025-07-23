@@ -1,0 +1,36 @@
+## Event: Login
+
+  sequenceDiagram
+      participant CheckLogin
+      participant UserDAO
+      participant index.html
+      participant Session
+      participant GoToHomeDocente
+      participant GoToHomeStudente
+  
+      CheckLogin->>UserDAO: checkCredentials
+      UserDAO->>CheckLogin: user | | null
+      
+      CheckLogin->>index.html: [user == null] redirect
+      
+      CheckLogin->>Session: [user != null] setAttribute("user", user)
+   
+      CheckLogin->>GoToHomeDocente: [user.role == "Docente"] redirect
+      CheckLogin->>GoToHomeStudente: [user.role == "Studente"] redirect
+
+## Role based access control
+
+  sequenceDiagram
+      participant ...
+      participant GoToHomeDocente
+      participant index.html
+      participant Session
+      participant HomeDocente.html
+  
+      ...->>GoToHomeDocente: GET /GoToHomeDocente
+      GoToHomeDocente->>index.html: [session isNew || user == null] redirect
+      GoToHomeDocente->>Session: getAttribute ("user")
+      GoToHomeDocente->>index.html: [user.role != "docente"] redirect
+      GoToHomeDocente->>HomeAdmin.html: [user.role == "docente"] redirect
+      
+          
