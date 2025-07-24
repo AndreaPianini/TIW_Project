@@ -33,15 +33,24 @@ COMPONENTI
   1. CheckLogin
   2. Logout
   3. Torna alla Homepage (docente)
+    - GetCorsi GET
   4. Vedi Verbali (docente)
+    - GetVerbali GET
   5. Vedi Iscritti (docente)
+    - GetAppelliByCorso GET
+    - GetIscritti GET
   6. Pubblica (docente)
-  7. Modifica (docente)
-  8. Modifica Voto (docente)
-  9. Riordina (docente)
-  10. Verbalizza (docente)
-  11. Vedi Voto (studente)
-  12. Rifiuta (studente)
+    - PubblicaVoti POST
+  7. Modifica Voto (docente)
+    - ModificaVoto GET+POST
+  8. Riordina (docente)
+  9. Verbalizza (docente)
+    - VerbalizzaVoti GET+POST
+  10. Vedi Voto (studente)
+    - (si riutilizza GetAppelliByCorso)
+    - getVoto GET
+  11. Rifiuta (studente)
+    - RifiutaVoto POST
 
 ##Views
   1. Login page
@@ -66,16 +75,30 @@ COMPONENTI
 
 ##Model objects (Beans)
   1. User
-  2. ...
+  2. Docente
+  3. Corso
+  4. Studente
+  5. Appello
+  6. Verbale
 
 ##DAO
 1. UserDao
   - checkCredential
 2. DocenteDAO
-  - 
-3. StudenteDAO
-  - 
-4....
+  - getCorsiOfDocente
+  - getVerbali
+3. CorsoDAO
+  - getAppelliByCorso
+4. StudenteDAO
+  - getCorsiOfStudente
+5. AppelloDAO
+  - getIscrittiByAppello
+  - modificaVoto
+  - getVotiInseriti
+  - rifiutaVoto
+  - getVotiVerbalizzabili
+6. VerbaleDAO
+  - getStudentiVerbalizzati (?)
 
 
 
