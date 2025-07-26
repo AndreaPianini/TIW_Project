@@ -104,7 +104,6 @@ CREATE TABLE `Iscrizioni` (
   `data` date NOT NULL,
   `voto` varchar(32) DEFAULT NULL,
   `stato_valutazione` varchar(32) NOT NULL DEFAULT 'NON INSERITO',
-  `Iscrizionicol` varchar(45) DEFAULT NULL,
   `verbale` int DEFAULT NULL,
   PRIMARY KEY (`studente`,`corso`,`data`),
   KEY `appello_idx` (`corso`,`data`),
