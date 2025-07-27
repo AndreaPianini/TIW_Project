@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import BEANS.Corso;
+
 
 public class CorsoDAO {
 	private Connection con;
@@ -15,8 +17,8 @@ public class CorsoDAO {
 		this.con = connection;
 	}
 	
-	public List<Corsi> GetCorsiByStudente(int studID) throws SQLException {
-		List<Corsi> corsi = new ArrayList<>();
+	public List<Corso> GetCorsiByStudente(int studID) throws SQLException {
+		List<Corso> corsi = new ArrayList<>();
 		String query = "SELECT * FROM StudSegueCorso, Corsi WHERE Corso=id AND Studente = ? ORDER BY nome DESC";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
@@ -25,8 +27,8 @@ public class CorsoDAO {
 			pstatement.setInt(1, studID);
 			result = pstatement.executeQuery();
 			while (result.next()) {
-				Corsi c = new Corsi();
-				c.setId(result.getInt("id"));
+				Corso c = new Corso();
+				c.setID(result.getInt("id"));
 				c.setNome(result.getString("nome"));
 				corsi.add(c);
 			}
@@ -51,5 +53,9 @@ public class CorsoDAO {
 		}
 		return corsi;
 	}
-
+	
+	
+	public ArrayList<Corso> GetCorsiByDocente(int docenteID) throws SQLException {
+		return null;
+	}
 }
