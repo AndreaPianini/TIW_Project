@@ -15,6 +15,11 @@ import java.sql.SQLException;
 
 import BEANS.Utente;
 import DAO.UtenteDAO;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
+import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 
 @WebServlet("/CheckLogin")
@@ -22,7 +27,8 @@ public class CheckLogin extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-  
+	private TemplateEngine templateEngine;
+
 	public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
@@ -32,6 +38,14 @@ public class CheckLogin extends HttpServlet {
 			String password = context.getInitParameter("dbPassword");
 			Class.forName(driver);
 			connection = DriverManager.getConnection(url, user, password);
+
+			// Thymeleaf setup
+			JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(context);
+			WebApplicationTemplateResolver templateResolver = new WebApplicationTemplateResolver(webApplication);
+			templateResolver.setTemplateMode(TemplateMode.HTML);
+			templateResolver.setSuffix(".html");
+			this.templateEngine = new TemplateEngine();
+			this.templateEngine.setTemplateResolver(templateResolver);
 		} 
 		catch (ClassNotFoundException e) {
 			throw new UnavailableException("Can't load database driver");
@@ -48,7 +62,6 @@ public class CheckLogin extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 		Integer ID = null;
 		try {
 			ID = Integer.parseInt(request.getParameter("id"));
@@ -58,12 +71,10 @@ public class CheckLogin extends HttpServlet {
 		}
         String password = request.getParameter("password");
         
-        if ( ID == null || ID < 0 || ID > 99999999 || password.isEmpty() || password == null ) {
-        	request.setAttribute("error", "Credenziali non valide");
-            request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
+        if ( ID == null || ID < 0 || ID > 99999999 || password == null || password.isEmpty() ) {
+        	renderLoginError(request, response, "ID o Password non validi. Riprovare");
 			return;
 		}
-        
         
         UtenteDAO dao = new UtenteDAO(this.connection);
         Utente user = null;
@@ -72,33 +83,49 @@ public class CheckLogin extends HttpServlet {
         }
         catch (SQLException e) {
         	System.out.println("Failure in database credential checking");
-        	request.setAttribute("error", "Si è verificato un errore, riprovare");
-            request.setAttribute("id", ID);
-            request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
+        	renderLoginError(request, response, "Si è verificato un errore, riprovare");
 			return;
 		}
 
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("utente", user);
+            String path = getServletContext().getContextPath() + "/index.html";
 
             if (user.getRole().equals("Studente")) {
-                response.sendRedirect(request.getContextPath() + "/StudenteHome");
+                response.sendRedirect(path + "/VaiHomeStudente");
             } 
             else if (user.getRole().equals("Docente")) {
-                response.sendRedirect(request.getContextPath() + "/DocenteHome");
+                response.sendRedirect(path + "/VaiHomeDocente");
             } 
             else {
-                // utente senza ruolo
-                request.setAttribute("error", "Utente senza ruolo definito");
-                request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
+                renderLoginError(request, response, "Utente senza ruolo definito");
+                return;
             }
         } 
         else {
-            request.setAttribute("error", "ID o Password errati. Riprovare");
-            request.setAttribute("id", ID);
-            request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
+        	renderLoginError(request, response, "ID o Password errati. Riprovare");
         }
+	}
+	
+	
+	private void renderLoginError(HttpServletRequest request, HttpServletResponse response, 
+			String errorMessage) throws IOException {
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+		ctx.setVariable("error", errorMessage);
+		templateEngine.process("/WEB-INF/login.html", ctx, response.getWriter());
+	}
+	
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} 
+		catch (SQLException sqle) {
+		}
 	}
 
 }
