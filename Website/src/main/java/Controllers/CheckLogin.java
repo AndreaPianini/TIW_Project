@@ -49,35 +49,56 @@ public class CheckLogin extends HttpServlet {
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		int ID = Integer.parseInt(request.getParameter("id"));
+		Integer ID = null;
+		try {
+			ID = Integer.parseInt(request.getParameter("id"));
+		}
+		catch(NumberFormatException e) {
+			ID = null;
+		}
         String password = request.getParameter("password");
-
+        
+        if ( ID == null || ID < 0 || ID > 99999999 || password.isEmpty() || password == null ) {
+        	request.setAttribute("error", "Credenziali non valide");
+            request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
+			return;
+		}
+        
+        
         UtenteDAO dao = new UtenteDAO(this.connection);
-        Utente user = dao.checkCredenziali(ID, password);
+        Utente user = null;
+        try {
+        	user = dao.checkCredenziali(ID, password);
+        }
+        catch (SQLException e) {
+        	System.out.println("Failure in database credential checking");
+        	request.setAttribute("error", "Si è verificato un errore, riprovare");
+            request.setAttribute("id", ID);
+            request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
+			return;
+		}
 
         if (user != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("user", user);
+            session.setAttribute("utente", user);
 
             if (user.getRole().equals("Studente")) {
-                response.sendRedirect(request.getContextPath() + "/studente/home");
+                response.sendRedirect(request.getContextPath() + "/StudenteHome");
             } 
             else if (user.getRole().equals("Docente")) {
-                response.sendRedirect(request.getContextPath() + "/docente/home");
+                response.sendRedirect(request.getContextPath() + "/DocenteHome");
             } 
             else {
-                // fallback per utente senza ruolo
+                // utente senza ruolo
                 request.setAttribute("error", "Utente senza ruolo definito");
-                request.setAttribute("id", ID);
                 request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
             }
         } 
         else {
-            request.setAttribute("error", "Credenziali non valide");
+            request.setAttribute("error", "ID o Password errati. Riprovare");
             request.setAttribute("id", ID);
             request.getRequestDispatcher("/WEB-INF/login.html").forward(request, response);
         }
-    }
 	}
 
 }
