@@ -1,5 +1,0 @@
-package BEANS;
-
-public enum StatoValutazione {
-	NON_INSERITO, INSERITO, PUBBLICATO, RIFIUTATO, VERBALIZZATO;
-}

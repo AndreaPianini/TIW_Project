@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Docente</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>Benvenuto nella Home Docente</h2>
+
+        <div th:if="${error}" class="error-message">
+            <p th:text="${error}"></p>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Corso</th>
+                    <th>Appelli disponibili</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="corso, iterStat : ${corsi}">
+                    <td th:text="${corso.nome}"></td>
+                    <td>
+                        <ul>
+                            <li th:each="appello : ${appelli[iterStat.index]}" th:text="${#dates.format(appello.data, 'dd/MM/yyyy')}"></li>
+                            <li th:if="${appelli[iterStat.index].isEmpty()}" style="color:gray;">Nessun appello disponibile</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
