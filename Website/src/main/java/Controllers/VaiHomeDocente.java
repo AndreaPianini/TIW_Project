@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -22,6 +21,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
+import BEANS.Appello;
 import BEANS.Corso;
 import BEANS.Docente;
 import DAO.AppelloDAO;
@@ -60,6 +60,7 @@ public class VaiHomeDocente extends HttpServlet {
 		}
 	}
 	
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
@@ -67,8 +68,10 @@ public class VaiHomeDocente extends HttpServlet {
 		CorsoDAO corsoDAO = new CorsoDAO(connection);
 		AppelloDAO appelloDAO = new AppelloDAO(connection);
 		ArrayList<Corso> corsi = null;
+		ArrayList<ArrayList<Appello>> appelli = null;
 		try {
 			corsi = corsoDAO.GetCorsiByDocente(docente.getID());
+			appelli = appelloDAO.GetAppelliByDocente(docente.getID());
 		} 
 		catch (SQLException e) {
 			// throw new ServletException(e);
@@ -79,7 +82,24 @@ public class VaiHomeDocente extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("corsi", corsi);
+        ctx.setVariable("appelli", appelli);
 		templateEngine.process(path, ctx, response.getWriter());
+	}
+	
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
 	}
 	
 }
