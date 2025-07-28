@@ -25,11 +25,12 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import BEANS.Appello;
 import BEANS.Corso;
 import BEANS.Docente;
+import BEANS.Studente;
 import DAO.AppelloDAO;
 import DAO.CorsoDAO;
 
-@WebServlet("/VaiHomeDocente")
-public class VaiHomeDocente extends HttpServlet {
+@WebServlet("/VaiHomeStudente")
+public class VaiHomeStudente extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -65,14 +66,16 @@ public class VaiHomeDocente extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		Docente docente = (Docente) session.getAttribute("user");
+		Studente studente = (Studente) session.getAttribute("user");
 		CorsoDAO corsoDAO = new CorsoDAO(connection);
 		AppelloDAO appelloDAO = new AppelloDAO(connection);
 		ArrayList<Corso> corsi = null;
 		ArrayList<ArrayList<Appello>> appelli = null;
 		try {
-			corsi = corsoDAO.GetCorsiByDocente(docente.getID());
-			appelli = appelloDAO.GetAppelliByDocente(docente.getID());
+			corsi = corsoDAO.GetCorsiByStudente(studente.getID());
+			for(int i=0; i<corsi.size(); i++) {
+				appelli[i]=appelloDAO.GetAppelliByCorsoAndStudente(corsi[i], studente.getID());
+			}
 		} 
 		catch (SQLException e) {
 			// throw new ServletException(e);

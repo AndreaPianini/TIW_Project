@@ -1,12 +1,15 @@
 package DAO;
 
 import java.sql.Connection;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import BEANS.Valutazione;
 
 public class DocenteDAO {
 	private Connection con;
@@ -24,7 +27,7 @@ public class DocenteDAO {
 		PreparedStatement pstatement = null;
 		try{
 			pstatement = con.prepareStatement(query);
-			pstatement.setString(1, voto);
+			pstatement.setString(1, voto.getVoto());
 			pstatement.setInt(2, corso);
 			pstatement.setDate(3, data);
 			pstatement.setInt(4, studID);

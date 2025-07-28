@@ -1,14 +1,17 @@
 package DAO;
 
 import java.sql.Connection;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import BEANS.Studente;
+import BEANS.Verbale;
 
 public class VerbaleDAO {
 	private Connection con;
@@ -17,8 +20,8 @@ public class VerbaleDAO {
 		this.con=connection;
 	}
 	
-	public List<Verbali> GetVerbaliByDocente(int docID) throws SQLException {
-		List<Verbali> verbali = new ArrayList<>();
+	public List<Verbale> GetVerbaliByDocente(int docID) throws SQLException {
+		List<Verbale> verbali = new ArrayList<>();
 		String query = "SELECT DISTINCT verbale, data_ora_creazione FROM Docente AS D, Iscrizioni AS I, Verbali AS V "
 				+ "WHERE I.docente=D.id AND V.id=I.verbale AND I.docente=?";
 		ResultSet result = null;
@@ -28,9 +31,9 @@ public class VerbaleDAO {
 			pstatement.setInt(1, docID);
 			result = pstatement.executeQuery();
 			while (result.next()) {
-				Verbali v = new Verbali();
-				v.setIdCorso(result.getInt("verbale"));
-				v.setData(result.getTimestamp("data_ora_creazione"));
+				Verbale v = new Verbale();
+				v.setId(result.getInt("verbale"));
+				v.setData_Ora(result.getTimestamp("data_ora_creazione"));
 				verbali.add(v);
 			}
 		} catch (SQLException e) {
@@ -56,8 +59,8 @@ public class VerbaleDAO {
 		
 	}
 	
-	public Verbali GetVerbaleInfo(int verID) throws SQLException {
-		Verbali verbale = new Verbali();
+	public Verbale GetVerbaleInfo(int verID) throws SQLException {
+		Verbale verbale = new Verbale();
 		String query = "SELECT * FROM Verbali WHERE id = ?";
 		PreparedStatement pstatement = null;
 		ResultSet result = null;
@@ -72,7 +75,7 @@ public class VerbaleDAO {
 				return null;
 			
 			verbale.setId(result.getInt("codice"));
-			verbale.setOra(result.getTimestamp("data_ora_creazione"));
+			verbale.setData_Ora(result.getTimestamp("data_ora_creazione"));
 			
 			
 		} catch (SQLException e) {

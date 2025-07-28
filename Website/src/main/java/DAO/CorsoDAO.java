@@ -17,8 +17,8 @@ public class CorsoDAO {
 		this.con = connection;
 	}
 	
-	public List<Corso> GetCorsiByStudente(int studID) throws SQLException {
-		List<Corso> corsi = new ArrayList<>();
+	public ArrayList<Corso> GetCorsiByStudente(int studID) throws SQLException {
+		ArrayList<Corso> corsi = new ArrayList<>();
 		String query = "SELECT * FROM StudSegueCorso, Corsi WHERE Corso=id AND Studente = ? ORDER BY nome DESC";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
