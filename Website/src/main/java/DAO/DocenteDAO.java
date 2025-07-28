@@ -104,30 +104,19 @@ public class DocenteDAO {
 	
 	
  	public void ModificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
-		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') AND "
+ 		
+		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
+				+ "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') AND "
 				+ "corso = ? AND data = ? AND studente = ?";
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
-		try{
-			pstatement = connection.prepareStatement(query);
-			pstatement.setString(1, voto.getVoto());
-			pstatement.setInt(2, corso);
-			pstatement.setDate(3, data);
-			pstatement.setInt(4, studID);
-			pstatement.executeUpdate();
-			
-		}catch(SQLException e) {
-			connection.rollback();
-		}finally {
-			connection.setAutoCommit(true);
-			try {
-				if (pstatement != null) {
-					pstatement.close();
-				}
-			} catch (Exception e1) {
-				throw new SQLException("Cannot close statement");
-			}
-		}
+		pstatement = connection.prepareStatement(query);
+		pstatement.setString(1, voto.getVoto().toString());
+		pstatement.setInt(2, corso);
+		pstatement.setDate(3, data);
+		pstatement.setInt(4, studID);
+		pstatement.executeUpdate();
+		pstatement.close();
 		
 	}
 	
