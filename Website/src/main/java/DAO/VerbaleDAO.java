@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public class VerbaleDAO {
 			while (result.next()) {
 				Verbale v = new Verbale();
 				v.setId(result.getInt("verbale"));
-				v.setData_Ora(result.getTimestamp("data_ora_creazione"));
+				v.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
 				verbali.add(v);
 			}
 		} catch (SQLException e) {

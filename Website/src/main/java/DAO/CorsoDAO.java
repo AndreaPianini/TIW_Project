@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import BEANS.Corso;
 
@@ -54,8 +53,4 @@ public class CorsoDAO {
 		return corsi;
 	}
 	
-	
-	public ArrayList<Corso> GetCorsiByDocente(int docenteID) throws SQLException {
-		return null;
-	}
 }

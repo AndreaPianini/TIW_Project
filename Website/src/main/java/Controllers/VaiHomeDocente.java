@@ -25,8 +25,7 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import BEANS.Appello;
 import BEANS.Corso;
 import BEANS.Docente;
-import DAO.AppelloDAO;
-import DAO.CorsoDAO;
+import DAO.DocenteDAO;
 
 @WebServlet("/VaiHomeDocente")
 public class VaiHomeDocente extends HttpServlet {
@@ -66,19 +65,21 @@ public class VaiHomeDocente extends HttpServlet {
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
-		CorsoDAO corsoDAO = new CorsoDAO(connection);
-		AppelloDAO appelloDAO = new AppelloDAO(connection);
+		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		ArrayList<Corso> corsi = null;
 		ArrayList<ArrayList<Appello>> appelli = null;
 		try {
-			corsi = corsoDAO.GetCorsiByDocente(docente.getID());
-			appelli = appelloDAO.GetAppelliByDocente(docente.getID());
+			docenteDAO.getCorsiAndAppelliByDocente(corsi, appelli);
+			if (corsi == null || corsi.isEmpty() ) {
+				renderPageError(request, response, "Nessun corso trovato per il docente.");
+				return;
+			}
 		} 
 		catch (SQLException e) {
-			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in worker's project database extraction");
+			renderPageError(request, response, "Si è verificato un errore durante il recupero dei corsi ed appelli.");
 			return;
 		}
+		@SuppressWarnings("unused")
 		String path = "/WEB-INF/HomeDocente.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
@@ -91,6 +92,15 @@ public class VaiHomeDocente extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
+	}
+	
+	
+	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
+			String errorMessage) throws IOException {
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+		ctx.setVariable("error", errorMessage);
+		templateEngine.process("/WEB-INF/DocenteHome.html", ctx, response.getWriter());
 	}
 
 	

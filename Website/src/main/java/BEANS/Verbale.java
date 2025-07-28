@@ -1,8 +1,10 @@
 package BEANS;
 
+import java.time.LocalDateTime;
+
 public class Verbale {
 	private int id;
-	private Timestamp data_ora_creaz;
+	private LocalDateTime data_ora_creaz;
 	
 	public int getId() {
 		return id;
@@ -10,10 +12,10 @@ public class Verbale {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Timestamp getData_Ora() {
+	public LocalDateTime getData_Ora() {
 		return data_ora_creaz;
 	}
-	public void setData_Ora(Timestamp dataOra) {
+	public void setData_Ora(LocalDateTime dataOra) {
 		this.data_ora_creaz = dataOra;
 	}
 
