@@ -102,8 +102,8 @@ CREATE TABLE `Iscrizioni` (
   `studente` int NOT NULL,
   `corso` int NOT NULL,
   `data` date NOT NULL,
-  `voto` varchar(32) DEFAULT NULL,
-  `stato_valutazione` varchar(32) NOT NULL DEFAULT 'NON INSERITO',
+  `voto` enum('assente','rimandato','riprovato','18','19','20','21','22','23','24','25','26','27','28','29','30','30L') DEFAULT NULL,
+  `stato_valutazione` enum('non_inserito','inserito','pubblicato','rifiutato','verbalizzato') NOT NULL DEFAULT 'non_inserito',
   `verbale` int DEFAULT NULL,
   PRIMARY KEY (`studente`,`corso`,`data`),
   KEY `appello_idx` (`corso`,`data`),
@@ -238,4 +238,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-25 13:08:05
+-- Dump completed on 2025-07-28 18:21:20
