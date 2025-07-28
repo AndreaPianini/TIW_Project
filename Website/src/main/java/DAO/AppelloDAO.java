@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import BEANS.Appello;
 
@@ -51,20 +50,15 @@ public class AppelloDAO {
 					newAppelli.add(a);
 				}
 			}
-			if (result != null) {
-				result.close();
-			
-			if (pstatement != null) {
-				pstatement.close();
-			}
+			result.close();
+			pstatement.close();
 			return appelli;
 		}
 		else {
 			return null;
 		}
-		
-		
 	}
+	
 	
 	public Appello GetAppelloByVerbale(int verID) throws SQLException {
 		Appello appello = new Appello();
