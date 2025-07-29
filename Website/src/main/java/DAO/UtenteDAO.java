@@ -21,14 +21,14 @@ public class UtenteDAO {
 	
 	public Utente checkCredenziali(int ID, String pwd) throws SQLException{
 		
-	    String query1 = "SELECT * FROM Utente WHERE id = ? AND password = ?";
+	    String query1 = "SELECT * FROM Utenti WHERE id = ? AND password = ?";
         PreparedStatement pstmt = connection.prepareStatement(query1);
-        pstmt.setString(1, ((Integer) ID).toString());
+        pstmt.setInt(1, ID);
         pstmt.setString(2, pwd);
         ResultSet resultSet = pstmt.executeQuery();
         // Check if the result set has any rows
         if (resultSet.next()) {
-        	String query2 = "SELECT * FROM Studente WHERE id = '" + ID +"'";
+        	String query2 = "SELECT * FROM Studenti WHERE id = '" + ID +"'";
             Statement stmt2 = connection.createStatement();
             ResultSet resultSet2 = stmt2.executeQuery(query2);
             //The user is a student
@@ -44,7 +44,7 @@ public class UtenteDAO {
 			}
             //The user should be a teacher
             else {
-            	String query3 = "SELECT * FROM Docente WHERE id = '" + ID +"'";
+            	String query3 = "SELECT * FROM Docenti WHERE id = '" + ID +"'";
                 Statement stmt3 = connection.createStatement();
                 ResultSet resultSet3 = stmt3.executeQuery(query3);
 				if (resultSet3.next()) {

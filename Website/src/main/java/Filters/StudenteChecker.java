@@ -42,12 +42,12 @@ public class StudenteChecker implements Filter {
 		System.out.print("Studente filter executing \n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String loginpath = req.getServletContext().getContextPath() + "/index.html";
+		String loginpath = req.getServletContext().getContextPath() + "/login.html";
 		HttpSession s = req.getSession();
 		Utente u = null;
         // check if the client is a worker
 		u = (Utente) s.getAttribute("user");
-		if (!u.getRole().equals("worker")) {
+		if (!u.getRole().equals("Studente")) {
 			res.sendRedirect(loginpath);
 			return;
 		}

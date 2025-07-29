@@ -84,19 +84,19 @@ public class VediVoto extends HttpServlet {
 		try {
 			corsoID = Integer.parseInt(request.getParameter("id"));
 		}
-		catch(NumberFormatException e) {
+		catch(IllegalArgumentException e) {
 			corsoID = null;
 		}
 		try {
 			dataAppello = Date.valueOf(request.getParameter("data"));
 		}
-		catch(NumberFormatException e) {
+		catch(IllegalArgumentException e) {
 			dataAppello = null;
 		}
 		
 		if (corsoID != null && dataAppello != null) {
 			try {
-				if (!studenteDAO.CheckRegistrazione(corsoID, dataAppello)) {
+				if (!studenteDAO.checkRegistrazione(corsoID, dataAppello)) {
 					renderPageError(request, response, "Lo studente non è iscritto all'appello.");
 					return;
 				}
@@ -107,7 +107,7 @@ public class VediVoto extends HttpServlet {
 			}
 			
 			try {
-				voto = studenteDAO.GetVotoByAppello(corsoID, dataAppello);
+				voto = studenteDAO.getVotoByAppello(corsoID, dataAppello);
 				
 				if(voto == null) {
 					renderPageError(request, response, "Nessuna valutazione trovata per questo appello.");
@@ -129,9 +129,9 @@ public class VediVoto extends HttpServlet {
 		} else {
 			renderPageError(request, response,
 					"Corso o data appello non validi.");
+			return;
 		}
 		
-		@SuppressWarnings("unused")
 		String path = "/WEB-INF/Valutazione.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());

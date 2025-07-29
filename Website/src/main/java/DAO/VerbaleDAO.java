@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import BEANS.Studente;
 import BEANS.Valutazione;
@@ -101,6 +103,7 @@ public class VerbaleDAO {
 			pstatement.close();
 			return;
 		}
+			
 		do {
 			Studente studente = new Studente();
 			studente.setID(result.getInt("id"));

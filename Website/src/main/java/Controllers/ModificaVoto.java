@@ -1,4 +1,5 @@
 package Controllers;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
@@ -10,26 +11,39 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import BEANS.Utente;
-import DAO.UtenteDAO;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
+import BEANS.Docente;
+import BEANS.Valutazione;
+import DAO.DocenteDAO;
+import DAO.StudenteDAO;
 
-@WebServlet("/CheckLogin")
-public class CheckLogin extends HttpServlet {
-	
+/**
+ * Servlet implementation class ModificaVoto
+ */
+@WebServlet("/ModificaVoto")
+public class ModificaVoto extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-
-	public void init() throws ServletException {
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public ModificaVoto() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
 			String driver = context.getInitParameter("dbDriver");
@@ -55,78 +69,93 @@ public class CheckLogin extends HttpServlet {
 		}
 	}
 
-	
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
-	
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		Docente docente = (Docente) session.getAttribute("user");
+		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+		Integer studID = null;
+		Integer corsoID = null;
+		Date dataAppello = null;
+		Valutazione voto = null;
 		
-		Integer ID = null;
 		try {
-			ID = Integer.parseInt(request.getParameter("id"));
+			studID = Integer.parseInt(request.getParameter("studId"));
 		}
 		catch(NumberFormatException e) {
-			ID = null;
+			studID = null;
 		}
-        String password = request.getParameter("password");
-        
-        if ( ID == null || ID < 0 || ID > 99999999 || password == null || password.isEmpty() ) {
-        	renderPageError(request, response, "ID o Password non validi. Riprovare");
-			return;
+		try {
+			corsoID = Integer.parseInt(request.getParameter("corsoId"));
 		}
-        
-        UtenteDAO dao = new UtenteDAO(this.connection);
-        Utente user = null;
-        try {
-        	user = dao.checkCredenziali(ID, password);
-        }
-        catch (SQLException e) {
-        	System.out.println("Failure in database credential checking");
-        	renderPageError(request, response, "Si è verificato un errore, riprovare");
-			return;
+		catch(NumberFormatException e) {
+			corsoID = null;
 		}
-
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-            String path = getServletContext().getContextPath();
-
-            if (user.getRole().equals("Studente")) {
-                response.sendRedirect(path + "/VaiHomeStudente");
-            } 
-            else if (user.getRole().equals("Docente")) {
-                response.sendRedirect(path + "/VaiHomeDocente");
-            } 
-            else {
-                renderPageError(request, response, "Utente senza ruolo definito");
-                return;
-            }
-        } 
-        else {
-        	renderPageError(request, response, "ID o Password errati. Riprovare");
-        }
-        
+		try {
+			dataAppello = Date.valueOf(request.getParameter("data"));
+		}
+		catch(NumberFormatException e) {
+			dataAppello = null;
+		}
+		try {
+			String valutazione = request.getParameter("voto");
+			//controlla che il voto sia valido e poi assegnalo a voto
+		}
+		catch(NumberFormatException e) {
+			voto = null;
+		}
+		
+		if(studID != null && corsoID != null && dataAppello != null && voto != null) {
+			//controlla che il professore insegni il corso
+			
+			StudenteDAO studenteDao = new StudenteDAO(connection, studID);
+			try {
+				if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
+					renderPageError(request, response, "Studente non iscritto all'appello.");
+					return;
+				} 
+			} catch (SQLException e) {
+				renderPageError(request, response, "Si è verificato un errore durante il controllo dell'iscrizione.");
+				return;
+			}
+			try {
+				docenteDAO.modificaVoto(voto, corsoID, dataAppello, studID);
+			} catch (SQLException e) {
+				renderPageError(request, response, "Si è verificato un errore durante la modifica del voto.");
+				return;
+			}
+		}
+		
+		String ctxpath = getServletContext().getContextPath();
+		String path = ctxpath + "/VediIscritti?corsoAppello=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
+		response.sendRedirect(path);
 	}
-	
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
 			String errorMessage) throws IOException {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("login.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/Modifica.html", ctx, response.getWriter());
 	}
-	
+
 	
 	public void destroy() {
 		try {
 			if (connection != null) {
 				connection.close();
 			}
-		} 
-		catch (SQLException sqle) {
+		} catch (SQLException sqle) {
 		}
 	}
 

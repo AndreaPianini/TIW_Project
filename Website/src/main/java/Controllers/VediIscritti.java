@@ -95,7 +95,7 @@ public class VediIscritti extends HttpServlet {
 		}
 		
 		try {
-			docenteDAO.getIscrittiByAppello(iscritti, voti);
+			docenteDAO.getIscrittiByAppello(corsoID, dataAppello, iscritti, voti);
 			if (iscritti == null || iscritti.isEmpty() ) {
 				renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
 				return;
