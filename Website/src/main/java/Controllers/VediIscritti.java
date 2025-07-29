@@ -1,12 +1,5 @@
 package Controllers;
 
-import java.io.IOException;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
@@ -16,29 +9,42 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import BEANS.Appello;
-import BEANS.Corso;
 import BEANS.Docente;
 import BEANS.Studente;
-import DAO.AppelloDAO;
-import DAO.CorsoDAO;
+import BEANS.Valutazione;
 import DAO.DocenteDAO;
-import DAO.StudenteDAO;
 
-@WebServlet("/VaiHomeStudente")
-public class VaiHomeStudente extends HttpServlet {
-
+/**
+ * Servlet implementation class VediIscritti
+ */
+@WebServlet("/VediIscritti")
+public class VediIscritti extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-	
-	public void init() throws ServletException {
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public VediIscritti() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
 			String driver = context.getInitParameter("dbDriver");
@@ -63,39 +69,58 @@ public class VaiHomeStudente extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-	
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		Studente studente = (Studente) session.getAttribute("user");
-		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
-		ArrayList<Corso> corsi = null;
-		ArrayList<ArrayList<Appello>> appelli = null;
+		Docente docente = (Docente) session.getAttribute("user");
+		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+		ArrayList<Studente> iscritti = null;
+		ArrayList<Valutazione> voti = null;
+		Integer corsoID = null;
+		Date dataAppello = null;
+		
 		try {
-			studenteDAO.getCorsiAndAppelliByStudente(corsi, appelli);
-			if (corsi == null || corsi.isEmpty() ) {
-				renderPageError(request, response, "Nessun corso trovato per lo studente.");
+			corsoID = Integer.parseInt(request.getParameter("id"));
+		}
+		catch(NumberFormatException e) {
+			corsoID = null;
+		}
+		try {
+			dataAppello = Date.valueOf(request.getParameter("data"));
+		}
+		catch(NumberFormatException e) {
+			dataAppello = null;
+		}
+		
+		if (corsoID != null && dataAppello != null) {
+			
+		} else {
+			renderPageError(request, response,
+					"Corso o data appello non validi.");
+		}
+		
+		try {
+			docenteDAO.getIscrittiByAppello(iscritti, voti);
+			if (iscritti == null || iscritti.isEmpty() ) {
+				renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
 				return;
 			}
+			//controllo per i voti??
 		} 
 		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore durante il recupero dei corsi ed appelli.");
+			renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
 			return;
 		}
 		@SuppressWarnings("unused")
-		String path = "/WEB-INF/HomeStudente.html";
+		String path = "/WEB-INF/Iscritti.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("corsi", corsi);
-        ctx.setVariable("appelli", appelli);
+        ctx.setVariable("iscritti", iscritti);
+        ctx.setVariable("voti", voti);
 		templateEngine.process(path, ctx, response.getWriter());
-	}
-	
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doGet(request, response);
 	}
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
@@ -103,9 +128,16 @@ public class VaiHomeStudente extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/StudenteHome.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/Iscritti.html", ctx, response.getWriter());
 	}
 
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
 	
 	public void destroy() {
 		try {
@@ -115,5 +147,5 @@ public class VaiHomeStudente extends HttpServlet {
 		} catch (SQLException sqle) {
 		}
 	}
-	
+
 }

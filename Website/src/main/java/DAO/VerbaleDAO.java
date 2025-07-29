@@ -27,35 +27,26 @@ public class VerbaleDAO {
 				+ "WHERE I.docente=D.id AND V.id=I.verbale AND I.docente=?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
-		try {
-			pstatement = con.prepareStatement(query);
-			pstatement.setInt(1, docID);
-			result = pstatement.executeQuery();
-			while (result.next()) {
-				Verbale v = new Verbale();
-				v.setId(result.getInt("verbale"));
-				v.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
-				verbali.add(v);
-			}
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null) {
-					result.close();
-				}
-			} catch (Exception e1) {
-				throw new SQLException("Cannot close result");
-			}
-			try {
-				if (pstatement != null) {
-					pstatement.close();
-				}
-			} catch (Exception e1) {
-				throw new SQLException("Cannot close statement");
-			}
+		
+		pstatement = con.prepareStatement(query);
+		pstatement.setInt(1, docID);
+		result = pstatement.executeQuery();
+		while (result.next()) {
+			Verbale v = new Verbale();
+			v.setId(result.getInt("verbale"));
+			v.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
+			verbali.add(v);
 		}
+		
+		if (result != null) {
+			result.close();
+		}
+			
+		if (pstatement != null) {
+			pstatement.close();
+		}
+			
+	
 		return verbali;
 		
 	}
@@ -65,34 +56,26 @@ public class VerbaleDAO {
 		String query = "SELECT * FROM Verbali WHERE id = ?";
 		PreparedStatement pstatement = null;
 		ResultSet result = null;
-		
-		try {
+					
+		pstatement = con.prepareStatement(query);
+		pstatement.setInt(1, verID);
+		result = pstatement.executeQuery();
 			
-			pstatement = con.prepareStatement(query);
-			pstatement.setInt(1, verID);
-			result = pstatement.executeQuery();
-			
-			if (!result.next())// non ci sono verbali
-				return null;
-			
-			verbale.setId(result.getInt("codice"));
-			verbale.setData_Ora(result.getTimestamp("data_ora_creazione"));
-			
-			
-		} catch (SQLException e) {
+		if (!result.next())// non ci sono verbali
 			return null;
-		} finally {
-			try {
-				if (result != null) {
-					result.close();
-				}
-				if (pstatement != null) {
-					pstatement.close();
-				}
-			} catch (Exception e1) {
-			}
-
+			
+		verbale.setId(result.getInt("codice"));
+		verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
+		
+			
+		
+		if (result != null) {
+			result.close();
 		}
+		if (pstatement != null) {
+			pstatement.close();
+		}
+			
 		return verbale;
 		
 	}

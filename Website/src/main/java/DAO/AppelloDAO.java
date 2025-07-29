@@ -33,31 +33,22 @@ public class AppelloDAO {
 		String query = "SELECT DISTINCT corso, data FROM iscrizioni WHERE verbale = ?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
-		try  {
-			pstatement = con.prepareStatement(query);
-			pstatement.setInt(1, verID);
-			result = pstatement.executeQuery();
-			appello.setCorso(result.getInt("corso"));
-			appello.setData(result.getDate("data"));			
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null) {
-					result.close();
-				}
-			} catch (Exception e1) {
-				throw new SQLException("Cannot close result");
+		
+		pstatement = con.prepareStatement(query);
+		pstatement.setInt(1, verID);
+		result = pstatement.executeQuery();
+		appello.setCorso(result.getInt("corso"));
+		appello.setData(result.getDate("data"));			
+		
+			if (result != null) {
+				result.close();
 			}
-			try {
-				if (pstatement != null) {
-					pstatement.close();
-				}
-			} catch (Exception e1) {
-				throw new SQLException("Cannot close statement");
+			
+			if (pstatement != null) {
+				pstatement.close();
 			}
-		}
+			
+		
 		return appello;
 	}
 }
