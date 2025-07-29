@@ -31,7 +31,7 @@ public class DocenteDAO {
 		String query = "SELECT c.id AS corso_id, c.nome AS nome_corso, c.cfu AS cfu_corso, a.data AS data_appello "
 					 + "FROM Corsi c LEFT JOIN Appelli a ON c.id = a.corso "
 				     + "WHERE c.docente = ? "
-				     + "ORDER BY c.nome, a.data;";
+				     + "ORDER BY c.nome, a.data DESC;";
 		PreparedStatement pstatement = connection.prepareStatement(query);
 		pstatement.setInt(1, docenteID);
 		ResultSet result = pstatement.executeQuery();
