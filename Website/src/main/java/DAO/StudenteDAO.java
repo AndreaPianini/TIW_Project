@@ -7,14 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import BEANS.Studente;
+import BEANS.Valutazione;
 
 public class StudenteDAO {
 	private Connection con;
 	private int id;
 	
-	public StudenteDAO(Connection connection, int i) {
+	public StudenteDAO(Connection connection, int id) {
 		this.con = connection;
-		this.id = i;
+		this.id = id;
 	}
 	
 	public Studente getStudenteInfo() throws SQLException{
@@ -73,7 +74,8 @@ public class StudenteDAO {
 	}
 	
 	public void RifiutaVoto(int corso, Date data) throws SQLException{
-		String query = "UPDATE iscrizioni SET stato_valutazione = 'RIFIUTATO' WHERE statovalutazione = 'PUBBLICATO' AND studente = ? AND corso = ? AND data = ?";
+		String query = "UPDATE iscrizioni SET stato_valutazione = 'RIFIUTATO' "
+					 + "WHERE statovalutazione = 'PUBBLICATO' AND studente = ? AND corso = ? AND data = ?";
 		PreparedStatement pstatement = null;
 		pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, this.id);
@@ -88,5 +90,27 @@ public class StudenteDAO {
 		
 	}
 		
-
+	
+	public Valutazione getVotoByAppello(int corso, Date data) throws SQLException {
+		
+		String query = "SELECT voto, stato_valutazione "
+					 + "FROM iscrizioni "
+					 + "WHERE studente = ? AND corso = ? AND data = ?";
+		PreparedStatement pstatement = con.prepareStatement(query);
+		pstatement.setInt(1, this.id);
+		pstatement.setInt(2, corso);
+		pstatement.setDate(3, data);
+		ResultSet result = pstatement.executeQuery();
+		
+		Valutazione valutazione = null;
+		if (result.next()) {
+			valutazione = new Valutazione();
+			valutazione.setVoto(result.getString("voto"));
+			valutazione.setStatoValutazione(result.getString("stato_valutazione"));
+		}
+		pstatement.close();
+		return valutazione;
+		
+	}
+	
 }

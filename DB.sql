@@ -78,7 +78,7 @@ DROP TABLE IF EXISTS `Docenti`;
 CREATE TABLE `Docenti` (
   `id` int NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `doc` FOREIGN KEY (`id`) REFERENCES `Utente` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `doc` FOREIGN KEY (`id`) REFERENCES `Utenti` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -109,7 +109,7 @@ CREATE TABLE `Iscrizioni` (
   KEY `appello_idx` (`corso`,`data`),
   KEY `verbale_idx` (`verbale`),
   CONSTRAINT `appello` FOREIGN KEY (`corso`, `data`) REFERENCES `Appelli` (`corso`, `data`) ON UPDATE CASCADE,
-  CONSTRAINT `studente` FOREIGN KEY (`studente`) REFERENCES `Studente` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `studente` FOREIGN KEY (`studente`) REFERENCES `Studenti` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `verbale` FOREIGN KEY (`verbale`) REFERENCES `Verbali` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -124,29 +124,29 @@ LOCK TABLES `Iscrizioni` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Studente`
+-- Table structure for table `Studenti`
 --
 
-DROP TABLE IF EXISTS `Studente`;
+DROP TABLE IF EXISTS `Studenti`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Studente` (
+CREATE TABLE `Studenti` (
   `id` int NOT NULL,
   `matricola` varchar(45) NOT NULL,
   `corso_laurea` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `matricola_UNIQUE` (`matricola`),
-  CONSTRAINT `stud` FOREIGN KEY (`id`) REFERENCES `Utente` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `stud` FOREIGN KEY (`id`) REFERENCES `Utenti` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Studente`
+-- Dumping data for table `Studenti`
 --
 
-LOCK TABLES `Studente` WRITE;
-/*!40000 ALTER TABLE `Studente` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Studente` ENABLE KEYS */;
+LOCK TABLES `Studenti` WRITE;
+/*!40000 ALTER TABLE `Studenti` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Studenti` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -162,7 +162,7 @@ CREATE TABLE `StudSegueCorso` (
   PRIMARY KEY (`Studente`,`Corso`),
   KEY `cors_idx` (`Corso`),
   CONSTRAINT `cors` FOREIGN KEY (`Corso`) REFERENCES `Corsi` (`id`) ON UPDATE CASCADE,
-  CONSTRAINT `stu` FOREIGN KEY (`Studente`) REFERENCES `Studente` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `stu` FOREIGN KEY (`Studente`) REFERENCES `Studenti` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -176,13 +176,13 @@ LOCK TABLES `StudSegueCorso` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Utente`
+-- Table structure for table `Utenti`
 --
 
-DROP TABLE IF EXISTS `Utente`;
+DROP TABLE IF EXISTS `Utenti`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Utente` (
+CREATE TABLE `Utenti` (
   `id` int NOT NULL,
   `password` varchar(32) NOT NULL,
   `nome` varchar(32) NOT NULL,
@@ -194,12 +194,12 @@ CREATE TABLE `Utente` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Utente`
+-- Dumping data for table `Utenti`
 --
 
-LOCK TABLES `Utente` WRITE;
-/*!40000 ALTER TABLE `Utente` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Utente` ENABLE KEYS */;
+LOCK TABLES `Utenti` WRITE;
+/*!40000 ALTER TABLE `Utenti` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Utenti` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -238,4 +238,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-28 18:47:46
+-- Dump completed on 2025-07-29 15:17:57
