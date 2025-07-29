@@ -76,13 +76,13 @@ public class VediIscritti extends HttpServlet {
 		Date dataAppello = null;
 		
 		try {
-			corsoID = Integer.parseInt(request.getParameter("id"));
+			corsoID = Integer.parseInt(request.getParameter("corsoID"));
 		}
 		catch(NumberFormatException e) {
 			corsoID = null;
 		}
 		try {
-			dataAppello = Date.valueOf(request.getParameter("data"));
+			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
 		}
 		catch(Exception e) {
 			dataAppello = null;
