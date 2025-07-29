@@ -1,0 +1,196 @@
+-- Disabilita i controlli delle chiavi esterne per permettere l'inserimento dei dati in qualsiasi ordine.
+SET FOREIGN_KEY_CHECKS=0;
+
+-- Svuota le tabelle esistenti prima di popolarle per evitare conflitti di chiavi duplicate.
+TRUNCATE TABLE Utente;
+TRUNCATE TABLE Docenti;
+TRUNCATE TABLE Studente;
+TRUNCATE TABLE Corsi;
+TRUNCATE TABLE Appelli;
+TRUNCATE TABLE StudSegueCorso;
+TRUNCATE TABLE Verbali;
+TRUNCATE TABLE Iscrizioni;
+
+--
+-- Popolamento della tabella `Utente`
+-- Creiamo 25 utenti: i primi 5 saranno docenti, i restanti 20 saranno studenti.
+--
+LOCK TABLES `Utente` WRITE;
+INSERT INTO `Utente` (`id`, `password`, `nome`, `cognome`, `email`) VALUES
+(1, 'pass_doc_1', 'Mario', 'Rossi', 'mario.rossi@unidoc.it'),
+(2, 'pass_doc_2', 'Luca', 'Bianchi', 'luca.bianchi@unidoc.it'),
+(3, 'pass_doc_3', 'Anna', 'Verdi', 'anna.verdi@unidoc.it'),
+(4, 'pass_doc_4', 'Paolo', 'Neri', 'paolo.neri@unidoc.it'),
+(5, 'pass_doc_5', 'Serena', 'Gialli', 'serena.gialli@unidoc.it'),
+(6, 'pass_stud_1', 'Marco', 'Bruno', 'marco.bruno@unistud.it'),
+(7, 'pass_stud_2', 'Giulia', 'Russo', 'giulia.russo@unistud.it'),
+(8, 'pass_stud_3', 'Alessandro', 'Ferrari', 'alessandro.ferrari@unistud.it'),
+(9, 'pass_stud_4', 'Chiara', 'Esposito', 'chiara.esposito@unistud.it'),
+(10, 'pass_stud_5', 'Francesco', 'Romano', 'francesco.romano@unistud.it'),
+(11, 'pass_stud_6', 'Sara', 'Gallo', 'sara.gallo@unistud.it'),
+(12, 'pass_stud_7', 'Matteo', 'Conti', 'matteo.conti@unistud.it'),
+(13, 'pass_stud_8', 'Valentina', 'Marino', 'valentina.marino@unistud.it'),
+(14, 'pass_stud_9', 'Davide', 'Greco', 'davide.greco@unistud.it'),
+(15, 'pass_stud_10', 'Elisa', 'Lombardi', 'elisa.lombardi@unistud.it'),
+(16, 'pass_stud_11', 'Simone', 'Ricci', 'simone.ricci@unistud.it'),
+(17, 'pass_stud_12', 'Federica', 'Moretti', 'federica.moretti@unistud.it'),
+(18, 'pass_stud_13', 'Lorenzo', 'Barbieri', 'lorenzo.barbieri@unistud.it'),
+(19, 'pass_stud_14', 'Martina', 'Fontana', 'martina.fontana@unistud.it'),
+(20, 'pass_stud_15', 'Andrea', 'Santoro', 'andrea.santoro@unistud.it'),
+(21, 'pass_stud_16', 'Giorgia', 'Rinaldi', 'giorgia.rinaldi@unistud.it'),
+(22, 'pass_stud_17', 'Riccardo', 'Caruso', 'riccardo.caruso@unistud.it'),
+(23, 'pass_stud_18', 'Alice', 'Leone', 'alice.leone@unistud.it'),
+(24, 'pass_stud_19', 'Tommaso', 'D_Amico', 'tommaso.damico@unistud.it'),
+(25, 'pass_stud_20', 'Sofia', 'Martinelli', 'sofia.martinelli@unistud.it');
+UNLOCK TABLES;
+
+--
+-- Popolamento della tabella `Docenti`
+-- Inseriamo gli ID degli utenti che sono docenti.
+--
+LOCK TABLES `Docenti` WRITE;
+INSERT INTO `Docenti` (`id`) VALUES
+(1), (2), (3), (4), (5);
+UNLOCK TABLES;
+
+--
+-- Popolamento della tabella `Studente`
+-- Inseriamo gli ID degli utenti che sono studenti, con matricola e corso di laurea.
+--
+LOCK TABLES `Studente` WRITE;
+INSERT INTO `Studente` (`id`, `matricola`, `corso_laurea`) VALUES
+(6, '100001', 'Ingegneria Informatica'),
+(7, '100002', 'Ingegneria Informatica'),
+(8, '100003', 'Ingegneria Gestionale'),
+(9, '100004', 'Ingegneria Gestionale'),
+(10, '100005', 'Matematica'),
+(11, '100006', 'Matematica'),
+(12, '100007', 'Fisica'),
+(13, '100008', 'Fisica'),
+(14, '100009', 'Ingegneria Meccanica'),
+(15, '100010', 'Ingegneria Meccanica'),
+(16, '100011', 'Ingegneria Informatica'),
+(17, '100012', 'Ingegneria Gestionale'),
+(18, '100013', 'Matematica'),
+(19, '100014', 'Fisica'),
+(20, '100015', 'Ingegneria Meccanica'),
+(21, '100016', 'Ingegneria Informatica'),
+(22, '100017', 'Ingegneria Gestionale'),
+(23, '100018', 'Matematica'),
+(24, '100019', 'Fisica'),
+(25, '100020', 'Ingegneria Meccanica');
+UNLOCK TABLES;
+
+--
+-- Popolamento della tabella `Corsi`
+-- Creiamo 10 corsi assegnando un docente a ciascuno.
+--
+LOCK TABLES `Corsi` WRITE;
+INSERT INTO `Corsi` (`id`, `nome`, `cfu`, `docente`) VALUES
+(101, 'Analisi Matematica I', 12, 1),
+(102, 'Programmazione ad Oggetti', 9, 2),
+(103, 'Basi di Dati', 9, 2),
+(104, 'Fisica Generale', 12, 3),
+(105, 'Economia e Organizzazione Az.', 6, 4),
+(106, 'Geometria e Algebra Lineare', 9, 1),
+(107, 'Sistemi Operativi', 9, 5),
+(108, 'Reti di Calcolatori', 9, 5),
+(109, 'Statistica', 6, 4),
+(110, 'Analisi Matematica II', 9, 1);
+UNLOCK TABLES;
+
+--
+-- Popolamento della tabella `Appelli`
+-- Creiamo 2 appelli per ogni corso.
+--
+LOCK TABLES `Appelli` WRITE;
+INSERT INTO `Appelli` (`corso`, `data`) VALUES
+(101, '2025-06-15'), (101, '2025-07-10'),
+(102, '2025-06-16'), (102, '2025-07-11'),
+(103, '2025-06-17'), (103, '2025-07-12'),
+(104, '2025-06-18'), (104, '2025-07-13'),
+(105, '2025-06-19'), (105, '2025-07-14'),
+(106, '2025-06-20'), (106, '2025-07-15'),
+(107, '2025-06-21'), (107, '2025-07-16'),
+(108, '2025-06-22'), (108, '2025-07-17'),
+(109, '2025-06-23'), (109, '2025-07-18'),
+(110, '2025-06-24'), (110, '2025-07-19');
+UNLOCK TABLES;
+
+--
+-- Popolamento della tabella `StudSegueCorso`
+-- Associazione tra studenti e corsi.
+--
+LOCK TABLES `StudSegueCorso` WRITE;
+INSERT INTO `StudSegueCorso` (`Studente`, `Corso`) VALUES
+(6, 101), (6, 102), (6, 103), (6, 106),
+(7, 101), (7, 102), (7, 103), (7, 107),
+(8, 101), (8, 105), (8, 109),
+(9, 101), (9, 105), (9, 109),
+(10, 101), (10, 106), (10, 110),
+(11, 101), (11, 106), (11, 110),
+(12, 101), (12, 104),
+(13, 101), (13, 104),
+(14, 101), (14, 105),
+(15, 101), (15, 105),
+(16, 102), (16, 103), (16, 107), (16, 108),
+(17, 105), (17, 109);
+UNLOCK TABLES;
+
+--
+-- Popolamento della tabella `Verbali`
+-- Creiamo 10 verbali, l'ID è AUTO_INCREMENT quindi non lo specifichiamo.
+--
+LOCK TABLES `Verbali` WRITE;
+INSERT INTO `Verbali` (`data_ora_creaz`) VALUES
+('2025-07-01 10:00:00'),
+('2025-07-02 11:30:00'),
+('2025-07-03 09:45:00'),
+('2025-07-04 14:00:00'),
+('2025-07-05 16:20:00'),
+('2025-07-15 10:00:00'),
+('2025-07-16 11:30:00'),
+('2025-07-17 09:45:00'),
+('2025-07-18 14:00:00'),
+('2025-07-19 16:20:00');
+UNLOCK TABLES;
+
+--
+-- Popolamento della tabella `Iscrizioni`
+-- Iscrizione degli studenti agli appelli, con voti e stati differenti.
+-- Includiamo valori NULL sia per `voto` che per `verbale`.
+--
+LOCK TABLES `Iscrizioni` WRITE;
+INSERT INTO `Iscrizioni` (`studente`, `corso`, `data`, `voto`, `stato_valutazione`, `verbale`) VALUES
+-- Esami con voto verbalizzato
+(6, 101, '2025-06-15', '28', 'VERBALIZZATO', 1),
+(7, 101, '2025-06-15', '30', 'VERBALIZZATO', 1),
+(8, 101, '2025-06-15', '25', 'VERBALIZZATO', 1),
+(10, 106, '2025-06-20', '30L', 'VERBALIZZATO', 2),
+(12, 104, '2025-06-18', '22', 'VERBALIZZATO', 3),
+-- Esami con voto pubblicato (studente può accettare/rifiutare)
+(9, 105, '2025-06-19', '26', 'PUBBLICATO', NULL),
+(11, 106, '2025-06-20', '18', 'PUBBLICATO', NULL),
+-- Esame con voto rifiutato dallo studente
+(13, 104, '2025-06-18', '19', 'RIFIUTATO', NULL),
+-- Esami con voto inserito dal docente ma non ancora pubblicato
+(6, 102, '2025-06-16', '24', 'INSERITO', NULL),
+(7, 102, '2025-06-16', '27', 'INSERITO', NULL),
+-- Iscrizioni senza voto inserito (appena dopo l'esame)
+(16, 103, '2025-07-12', NULL, 'NON_INSERITO', NULL),
+(17, 105, '2025-07-14', NULL, 'NON_INSERITO', NULL),
+-- Casi particolari (assente, rimandato)
+(14, 101, '2025-06-15', 'ASSENTE', 'VERBALIZZATO', 4),
+(15, 101, '2025-06-15', 'RIMANDATO', 'VERBALIZZATO', 4),
+-- Altre iscrizioni dalla sessione più recente
+(6, 103, '2025-07-12', '29', 'VERBALIZZATO', 6),
+(7, 107, '2025-07-16', '26', 'VERBALIZZATO', 7),
+(8, 105, '2025-07-14', '28', 'VERBALIZZATO', 8),
+(10, 110, '2025-07-19', '27', 'INSERITO', NULL),
+(16, 108, '2025-07-17', NULL, 'NON_INSERITO', NULL),
+(9, 101, '2025-07-10', 'RIMANDATO', 'VERBALIZZATO', 9);
+UNLOCK TABLES;
+
+
+-- Riabilita i controlli delle chiavi esterne.
+SET FOREIGN_KEY_CHECKS=1;
