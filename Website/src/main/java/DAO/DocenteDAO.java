@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import BEANS.Appello;
@@ -146,11 +147,12 @@ public class DocenteDAO {
 	}
 	
 	
- 	public void ModificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
+ 	public void modificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
  		
 		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
 				+ "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') AND "
 				+ "corso = ? AND data = ? AND studente = ?";
+		
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
 		try {
@@ -160,6 +162,7 @@ public class DocenteDAO {
 			pstatement.setDate(3, data);
 			pstatement.setInt(4, studID);
 			pstatement.executeUpdate();
+			connection.commit();
 		}
 		catch(SQLException e) {
 			connection.rollback();
@@ -169,16 +172,15 @@ public class DocenteDAO {
 			connection.setAutoCommit(true);
 			pstatement.close();
 		}
-		connection.setAutoCommit(true);
-		pstatement.close();
 		
 	}
 	
  	
-	public void PubblicaValutazioni(int corso, Date data) throws SQLException{
+	public void pubblicaValutazioni(int corso, Date data) throws SQLException{
 		
 		String query = "UPDATE Iscrizioni SET stato_valutazione = 'PUBBLICATO' "
 				+ "WHERE stato_valutazione = 'INSERITO' AND corso = ' AND data = ?";
+		
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
 		try{
@@ -186,6 +188,7 @@ public class DocenteDAO {
 			pstatement.setInt(1, corso);
 			pstatement.setDate(2, data);
 			pstatement.executeUpdate();
+			connection.commit();
 		}
 		catch(SQLException e) {
 			connection.rollback();
@@ -193,8 +196,47 @@ public class DocenteDAO {
 		}
 		finally {
 			connection.setAutoCommit(true);
-			pstatement.close();
-				
+			pstatement.close();	
+		}
+		
+	}
+	
+	
+	public void verbalizzaValutazioni(int corso, Date data) throws SQLException{
+		
+		connection.setAutoCommit(false);
+		try {
+		    String insertVerbale = "INSERT INTO Verbali (data_ora_creaz) VALUES (NOW())";
+		    PreparedStatement psVerbale = connection.prepareStatement(insertVerbale, Statement.RETURN_GENERATED_KEYS);
+		    psVerbale.executeUpdate();
+		    ResultSet rs = psVerbale.getGeneratedKeys();
+		    int idVerbale = -1;
+		    if (rs.next()) {
+		        idVerbale = rs.getInt(1);
+		    } 
+		    else {
+		        throw new SQLException("Creazione verbale fallita, nessun ID ottenuto.");
+		    }
+
+		    String updateIscrizioni = "UPDATE Iscrizioni SET stato_valutazione = 'VERBALIZZATO', verbale = ? "
+		                            + "WHERE (stato_valutazione = 'PUBBLICATO' OR stato_valutazione = 'RIFIUTATO') "
+		                            + "AND corso = ? AND data = ?";
+		    PreparedStatement psUpdate = connection.prepareStatement(updateIscrizioni);
+		    psUpdate.setInt(1, idVerbale);
+		    psUpdate.setInt(2, corso);
+		    psUpdate.setDate(3, data);
+		    psUpdate.executeUpdate();
+
+		    connection.commit();
+		    psVerbale.close();
+		    psUpdate.close();
+		} 
+		catch (SQLException e) {
+		    connection.rollback();
+		    throw e; 
+		} 
+		finally {
+		    connection.setAutoCommit(true);
 		}
 		
 	}
