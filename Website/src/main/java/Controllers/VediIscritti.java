@@ -32,17 +32,11 @@ import DAO.DocenteDAO;
  */
 @WebServlet("/VediIscritti")
 public class VediIscritti extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public VediIscritti() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
     public void init() throws ServletException {
 		try {
@@ -70,10 +64,9 @@ public class VediIscritti extends HttpServlet {
 		}
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
@@ -83,37 +76,36 @@ public class VediIscritti extends HttpServlet {
 		Date dataAppello = null;
 		
 		try {
-			corsoID = Integer.parseInt(request.getParameter("id"));
+			corsoID = Integer.parseInt(request.getParameter("corsoID"));
 		}
 		catch(NumberFormatException e) {
 			corsoID = null;
 		}
 		try {
-			dataAppello = Date.valueOf(request.getParameter("data"));
+			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
 		}
-		catch(NumberFormatException e) {
+		catch(Exception e) {
 			dataAppello = null;
 		}
 		
-		if (corsoID != null && dataAppello != null) {
-			try {
-				docenteDAO.getIscrittiByAppello(corsoID, dataAppello, iscritti, voti);
-				if (iscritti == null || iscritti.isEmpty() ) {
-					renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
-					return;
-				}
-				//controllo per i voti??
-			} 
-			catch (SQLException e) {
-				renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
-				return;
-			}
-		} else {
+		if (corsoID == null || dataAppello == null) {
 			renderPageError(request, response,
 					"Corso o data appello non validi.");
+			return;
 		}
 		
-		
+		try {
+			docenteDAO.getIscrittiByAppello(iscritti, voti);
+			if (iscritti == null || iscritti.isEmpty() ) {
+				renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
+				return;
+			}
+			//controllo per i voti??
+		} 
+		catch (SQLException e) {
+			renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
+			return;
+		}
 		@SuppressWarnings("unused")
 		String path = "/WEB-INF/Iscritti.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
