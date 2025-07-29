@@ -23,7 +23,7 @@ public class VerbaleDAO {
 	
 	public List<Verbale> GetVerbaliByDocente(int docID) throws SQLException {
 		List<Verbale> verbali = new ArrayList<>();
-		String query = "SELECT DISTINCT verbale, data_ora_creazione FROM Docente AS D, Iscrizioni AS I, Verbali AS V "
+		String query = "SELECT DISTINCT verbale, data_ora_creazione FROM Docenti AS D, Iscrizioni AS I, Verbali AS V "
 				+ "WHERE I.docente=D.id AND V.id=I.verbale AND I.docente=?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
@@ -84,7 +84,7 @@ public class VerbaleDAO {
 		Map<Studente,String> datiVerbale = new HashMap<>();
 		Studente studente;
 		String voto;
-		String query = "SELECT id, matricola, nome, cognome, voto FROM iscrizioni, Studente "
+		String query = "SELECT id, matricola, nome, cognome, voto FROM Iscrizioni, Studenti "
 				+ "WHERE verbale = ? AND studente=id";
 		PreparedStatement pstatement = null;
 		ResultSet result = null;

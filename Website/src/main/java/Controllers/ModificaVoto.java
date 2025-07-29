@@ -22,16 +22,15 @@ import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import BEANS.Docente;
-import BEANS.Studente;
 import BEANS.Valutazione;
 import DAO.DocenteDAO;
 import DAO.StudenteDAO;
 
 /**
- * Servlet implementation class VediVoto
+ * Servlet implementation class ModificaVoto
  */
-@WebServlet("/VediVoto")
-public class VediVoto extends HttpServlet {
+@WebServlet("/ModificaVoto")
+public class ModificaVoto extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
@@ -39,7 +38,7 @@ public class VediVoto extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public VediVoto() {
+    public ModificaVoto() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -74,70 +73,72 @@ public class VediVoto extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		Studente studente = (Studente) session.getAttribute("user");
-		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
+		Docente docente = (Docente) session.getAttribute("user");
+		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+		Integer studID = null;
 		Integer corsoID = null;
 		Date dataAppello = null;
 		Valutazione voto = null;
-		Studente studInfo = null;
+		
 		try {
-			corsoID = Integer.parseInt(request.getParameter("id"));
+			studID = Integer.parseInt(request.getParameter("studId"));
 		}
-		catch(IllegalArgumentException e) {
+		catch(NumberFormatException e) {
+			studID = null;
+		}
+		try {
+			corsoID = Integer.parseInt(request.getParameter("corsoId"));
+		}
+		catch(NumberFormatException e) {
 			corsoID = null;
 		}
 		try {
 			dataAppello = Date.valueOf(request.getParameter("data"));
 		}
-		catch(IllegalArgumentException e) {
+		catch(NumberFormatException e) {
 			dataAppello = null;
 		}
-		
-		if (corsoID != null && dataAppello != null) {
-			try {
-				if (!studenteDAO.checkRegistrazione(corsoID, dataAppello)) {
-					renderPageError(request, response, "Lo studente non è iscritto all'appello.");
-					return;
-				}
-			} catch (SQLException e) {
-				renderPageError(request, response,
-						"Si è verificato un errore nel controllare l'iscrizione dello studente all'appello.");
-				return;
-			}
-			
-			try {
-				voto = studenteDAO.getVotoByAppello(corsoID, dataAppello);
-				
-				if(voto == null) {
-					renderPageError(request, response, "Nessuna valutazione trovata per questo appello.");
-					return;
-				}
-				
-				studInfo = studenteDAO.getStudenteInfo();
-				
-				if(studInfo == null) {
-					renderPageError(request, response, "Nessuna informazione trovata per lo studente.");
-					return;
-				}
-				
-			} catch (SQLException e) {
-				renderPageError(request, response,
-						"Si è verificato un errore nel trovare le informazioni relative alla valutazione.");
-				return;
-			} 
-		} else {
-			renderPageError(request, response,
-					"Corso o data appello non validi.");
-			return;
+		try {
+			String valutazione = request.getParameter("voto");
+			//controlla che il voto sia valido e poi assegnalo a voto
+		}
+		catch(NumberFormatException e) {
+			voto = null;
 		}
 		
-		String path = "/WEB-INF/Valutazione.html";
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("voto", voto);
-        ctx.setVariable("studInfo", studInfo);
-		templateEngine.process(path, ctx, response.getWriter());
+		if(studID != null && corsoID != null && dataAppello != null && voto != null) {
+			//controlla che il professore insegni il corso
+			
+			StudenteDAO studenteDao = new StudenteDAO(connection, studID);
+			try {
+				if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
+					renderPageError(request, response, "Studente non iscritto all'appello.");
+					return;
+				} 
+			} catch (SQLException e) {
+				renderPageError(request, response, "Si è verificato un errore durante il controllo dell'iscrizione.");
+				return;
+			}
+			try {
+				docenteDAO.modificaVoto(voto, corsoID, dataAppello, studID);
+			} catch (SQLException e) {
+				renderPageError(request, response, "Si è verificato un errore durante la modifica del voto.");
+				return;
+			}
+		}
+		
+		String ctxpath = getServletContext().getContextPath();
+		String path = ctxpath + "/VediIscritti?corsoAppello=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
+		response.sendRedirect(path);
 	}
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
@@ -145,15 +146,17 @@ public class VediVoto extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/StudenteHome.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/Modifica.html", ctx, response.getWriter());
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
 	}
 
 }

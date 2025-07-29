@@ -96,24 +96,24 @@ public class VediIscritti extends HttpServlet {
 		}
 		
 		if (corsoID != null && dataAppello != null) {
-			
+			try {
+				docenteDAO.getIscrittiByAppello(corsoID, dataAppello, iscritti, voti);
+				if (iscritti == null || iscritti.isEmpty() ) {
+					renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
+					return;
+				}
+				//controllo per i voti??
+			} 
+			catch (SQLException e) {
+				renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
+				return;
+			}
 		} else {
 			renderPageError(request, response,
 					"Corso o data appello non validi.");
 		}
 		
-		try {
-			docenteDAO.getIscrittiByAppello(iscritti, voti);
-			if (iscritti == null || iscritti.isEmpty() ) {
-				renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
-				return;
-			}
-			//controllo per i voti??
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
-			return;
-		}
+		
 		@SuppressWarnings("unused")
 		String path = "/WEB-INF/Iscritti.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());

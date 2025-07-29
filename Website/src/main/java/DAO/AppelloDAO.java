@@ -30,7 +30,7 @@ public class AppelloDAO {
 	
 	public Appello GetAppelloByVerbale(int verID) throws SQLException {
 		Appello appello = new Appello();
-		String query = "SELECT DISTINCT corso, data FROM iscrizioni WHERE verbale = ?";
+		String query = "SELECT DISTINCT corso, data FROM Iscrizioni WHERE verbale = ?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
 		
