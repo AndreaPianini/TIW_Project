@@ -20,7 +20,7 @@ public class VerbaleDAO {
 	}
 	
 	//Da controllare la query
-	public ArrayList<Verbale> getVerbaliByDocente(int docID) throws SQLException {
+	public void getVerbaliByDocente(int docID, ArrayList<Verbale> verbali) throws SQLException {
 		
 		String query = "SELECT DISTINCT verbale, data_ora_creazione "
 					 + "FROM Docente AS D, Iscrizioni AS I, Verbali AS V "
@@ -29,7 +29,7 @@ public class VerbaleDAO {
 		pstatement.setInt(1, docID);
 		ResultSet result = pstatement.executeQuery();
 		
-		ArrayList<Verbale> verbali = new ArrayList<>();
+		verbali = new ArrayList<>();
 		while (result.next()) {
 			Verbale v = new Verbale();
 			v.setId(result.getInt("verbale"));
@@ -38,7 +38,6 @@ public class VerbaleDAO {
 		}
 		result.close();
 		pstatement.close();
-		return verbali;
 		
 	}
 	
