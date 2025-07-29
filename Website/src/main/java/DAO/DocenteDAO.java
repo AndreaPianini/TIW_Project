@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import BEANS.Appello;
@@ -38,10 +39,14 @@ public class DocenteDAO {
 		
 		int currCorso = -1;
 		int newCorso = -1;
+		
 		Corso c = null;
 		Appello a = null;
 		ArrayList<Appello> newAppelli = null;
-		if(result.next()){
+		
+		corsi.clear();
+		appelli.clear();
+		if (result.next()) {
 			currCorso = result.getInt("corso_id");
 			c = new Corso();
 			c.setID(currCorso);
@@ -60,6 +65,13 @@ public class DocenteDAO {
 			else {
 				newAppelli = new ArrayList<>();
 				appelli.add(newAppelli);
+		}
+		else {
+			result.close();
+			pstatement.close();
+			return;
+		}
+		do{
 			}
 			while (result.next()) {
 				newCorso = result.getInt("corso_id");
@@ -202,15 +214,15 @@ public class DocenteDAO {
 	}
 	
 	
-	public void verbalizzaValutazioni(int corso, Date data) throws SQLException{
+	public int verbalizzaValutazioni(int corso, Date data) throws SQLException{
 		
-		connection.setAutoCommit(false);
+		int idVerbale = -1;
 		try {
+			connection.setAutoCommit(false);
 		    String insertVerbale = "INSERT INTO Verbali (data_ora_creaz) VALUES (NOW())";
 		    PreparedStatement psVerbale = connection.prepareStatement(insertVerbale, Statement.RETURN_GENERATED_KEYS);
 		    psVerbale.executeUpdate();
 		    ResultSet rs = psVerbale.getGeneratedKeys();
-		    int idVerbale = -1;
 		    if (rs.next()) {
 		        idVerbale = rs.getInt(1);
 		    } 
@@ -230,13 +242,13 @@ public class DocenteDAO {
 		    connection.commit();
 		    psVerbale.close();
 		    psUpdate.close();
+		    connection.setAutoCommit(true);
+		    return idVerbale;
 		} 
 		catch (SQLException e) {
 		    connection.rollback();
-		    throw e; 
-		} 
-		finally {
 		    connection.setAutoCommit(true);
+		    throw e; 
 		}
 		
 	}

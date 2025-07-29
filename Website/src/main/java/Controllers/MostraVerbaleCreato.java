@@ -11,9 +11,9 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -21,18 +21,21 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import BEANS.Docente;
-import DAO.DocenteDAO;
+import BEANS.Appello;
+import BEANS.Corso;
+import BEANS.Studente;
+import BEANS.Valutazione;
+import BEANS.Verbale;
+import DAO.VerbaleDAO;
 
 
-@WebServlet("/Pubblica")
-public class Pubblica extends HttpServlet {
+@WebServlet("/MostraVerbaleCreato")
+public class MostraVerbaleCreato extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-    
-	
+
 	public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
@@ -60,42 +63,38 @@ public class Pubblica extends HttpServlet {
 	}
 
 	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		VerbaleDAO verbaleDAO = new VerbaleDAO(connection);
+		Verbale verbale = new Verbale();
+		ArrayList<Studente> studenti = new ArrayList<>();
+		ArrayList<Valutazione> valutazioni = new ArrayList<>();
+		verbale.setId(Integer.parseInt(request.getParameter("verbaleID")));
+		
+		try {
+			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
+		} 
+		catch (SQLException | NumberFormatException e) {
+			renderPageError(request, response, "Si è verificato un errore durante il recupero dei corsi ed appelli.");
+			return;
+		}
+		if (studenti.isEmpty() || valutazioni.isEmpty()) {
+			renderPageError(request, response, "Nessun studente trovato per il verbale selezionato.");
+			return;
+		}
+		String path = "/WEB-INF/VerbaleCreato.html";
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        ctx.setVariable("studenti", studenti);
+        ctx.setVariable("valutazioni", valutazioni);
+		templateEngine.process(path, ctx, response.getWriter());
 	}
-
 	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session = request.getSession();
-		Docente docente = (Docente) session.getAttribute("user");
-		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		
-		Integer corsoID = null;
-		Date dataAppello = null;
-		try {
-			corsoID = Integer.parseInt(request.getParameter("corsoID"));
-			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-		} 
-		catch (Exception e) {
-			corsoID = null;
-			dataAppello = null;
-		}
-		if( corsoID == null || dataAppello == null || corsoID < 0 || corsoID > 9999) {
-			renderPageError(request, response, "Corso o data dell'appello non validi. Riprovare.");
-			return;
-		}
-		
-		try {
-			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Errore durante la pubblicazione dell'appello. Riprovare.");
-			return;
-		}
-		String path = request.getContextPath();
-		response.sendRedirect(path + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello);
-		
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
 	}
 	
 	
@@ -106,15 +105,14 @@ public class Pubblica extends HttpServlet {
 		ctx.setVariable("error", errorMessage);
 		templateEngine.process("/WEB-INF/DocenteHome.html", ctx, response.getWriter());
 	}
-	
+
 	
 	public void destroy() {
 		try {
 			if (connection != null) {
 				connection.close();
 			}
-		} 
-		catch (SQLException sqle) {
+		} catch (SQLException sqle) {
 		}
 	}
 

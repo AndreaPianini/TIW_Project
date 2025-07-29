@@ -25,8 +25,8 @@ import BEANS.Docente;
 import DAO.DocenteDAO;
 
 
-@WebServlet("/Pubblica")
-public class Pubblica extends HttpServlet {
+@WebServlet("/Verbalizza")
+public class Verbalizza extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -86,15 +86,20 @@ public class Pubblica extends HttpServlet {
 			return;
 		}
 		
+		int verbaleID = -1;
 		try {
-			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
+			verbaleID = docenteDAO.verbalizzaValutazioni(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {
-			renderPageError(request, response, "Errore durante la pubblicazione dell'appello. Riprovare.");
+			renderPageError(request, response, "Errore durante la verbalizzazione dell'appello. Riprovare.");
+			return;
+		}
+		if (verbaleID < 0) {
+			renderPageError(request, response, "Errore durante la verbalizzazione dell'appello. Riprovare.");
 			return;
 		}
 		String path = request.getContextPath();
-		response.sendRedirect(path + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello);
+		response.sendRedirect(path + "/MostraVerbaleCreato?verbaleID=" + verbaleID);
 		
 	}
 	
@@ -117,5 +122,4 @@ public class Pubblica extends HttpServlet {
 		catch (SQLException sqle) {
 		}
 	}
-
 }

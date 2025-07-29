@@ -7,11 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import BEANS.Studente;
+import BEANS.Valutazione;
 import BEANS.Verbale;
 
 public class VerbaleDAO {
@@ -21,7 +20,7 @@ public class VerbaleDAO {
 		this.con=connection;
 	}
 	
-	public List<Verbale> GetVerbaliByDocente(int docID) throws SQLException {
+	public List<Verbale> getVerbaliByDocente(int docID) throws SQLException {
 		List<Verbale> verbali = new ArrayList<>();
 		String query = "SELECT DISTINCT verbale, data_ora_creazione FROM Docente AS D, Iscrizioni AS I, Verbali AS V "
 				+ "WHERE I.docente=D.id AND V.id=I.verbale AND I.docente=?";
@@ -51,7 +50,7 @@ public class VerbaleDAO {
 		
 	}
 	
-	public Verbale GetVerbaleInfo(int verID) throws SQLException {
+	public Verbale getVerbaleInfo(int verID) throws SQLException {
 		Verbale verbale = new Verbale();
 		String query = "SELECT * FROM Verbali WHERE id = ?";
 		PreparedStatement pstatement = null;
@@ -80,28 +79,44 @@ public class VerbaleDAO {
 		
 	}
 	
-	public Map<Studente, String> findDatiVerbale(int codiceVerbale) throws SQLException{
-		Map<Studente,String> datiVerbale = new HashMap<>();
-		Studente studente;
-		String voto;
-		String query = "SELECT id, matricola, nome, cognome, voto FROM iscrizioni, Studente "
-				+ "WHERE verbale = ? AND studente=id";
-		PreparedStatement pstatement = null;
-		ResultSet result = null;
+	public void getStudentiAndInfoByVerbale(Verbale verbale, 
+			ArrayList<Studente> studenti, ArrayList<Valutazione> valutazioni) throws SQLException{
 		
-		pstatement = con.prepareStatement(query);
-		pstatement.setInt(1, codiceVerbale);
-		result = pstatement.executeQuery();
+		String query = "SELECT id, matricola, nome, cognome, voto , stato_valutazione, data_ora_creaz "
+				 + "FROM Iscrizioni, Studenti, Verbali "
+				 + "WHERE verbale = ? AND Iscrizioni.studente = Studenti.id AND Iscrizioni.verbale = Verbali.id";
 		
-		while(result.next()) {
-			studente = new Studente();
+		PreparedStatement pstatement = con.prepareStatement(query);
+		pstatement.setInt(1, verbale.getId());
+		ResultSet result = pstatement.executeQuery();
+		
+		studenti.clear();
+		valutazioni.clear();
+		if (result.next()) {
+			verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
+		}
+		else {
+			// Se non ci sono studenti iscritti al verbale, ritorno
+			result.close();
+			pstatement.close();
+			return;
+		}
+		do {
+			Studente studente = new Studente();
 			studente.setID(result.getInt("id"));
 			studente.setMatricola(result.getString("matricola"));
 			studente.setNome(result.getString("nome"));
 			studente.setCognome(result.getString("cognome"));
-			voto = result.getString("voto");
-			datiVerbale.put(studente, voto);
-		}
-		return datiVerbale;
+			studenti.add(studente);
+			
+			Valutazione valutazione = new Valutazione();
+			valutazione.setVoto(result.getString("voto"));
+			valutazione.setStatoValutazione(result.getString("stato_valutazione"));
+			valutazioni.add(valutazione);
+		} while(result.next());
+
+		result.close();
+		pstatement.close();
 	}
+
 }
