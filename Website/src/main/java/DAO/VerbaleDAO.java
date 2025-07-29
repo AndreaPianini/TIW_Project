@@ -7,9 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import BEANS.Studente;
 import BEANS.Valutazione;
@@ -53,47 +51,38 @@ public class VerbaleDAO {
 	}
 	
 	public Verbale getVerbaleInfo(int verID) throws SQLException {
+		
 		Verbale verbale = new Verbale();
 		String query = "SELECT * FROM Verbali WHERE id = ?";
-		PreparedStatement pstatement = null;
-		ResultSet result = null;
-					
-		pstatement = con.prepareStatement(query);
+		PreparedStatement pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, verID);
-		result = pstatement.executeQuery();
+		ResultSet result = pstatement.executeQuery();
 			
-		if (!result.next())// non ci sono verbali
+		if (!result.next()){// non ci sono verbali
 			return null;
-			
+		}
 		verbale.setId(result.getInt("codice"));
 		verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
-		
-			
-		
-		if (result != null) {
-			result.close();
-		}
-		if (pstatement != null) {
-			pstatement.close();
-		}
-			
+		result.close();
+		pstatement.close();	
 		return verbale;
 		
 	}
+	
 	
 	public void getStudentiAndInfoByVerbale(Verbale verbale, 
 			ArrayList<Studente> studenti, ArrayList<Valutazione> valutazioni) throws SQLException{
 		
 		String query = "SELECT id, matricola, nome, cognome, voto , stato_valutazione, data_ora_creaz "
-				 + "FROM Iscrizioni, Studenti, Verbali "
-				 + "WHERE verbale = ? AND Iscrizioni.studente = Studenti.id AND Iscrizioni.verbale = Verbali.id";
+				 	 + "FROM Iscrizioni, Studenti, Verbali "
+				 	 + "WHERE verbale = ? AND Iscrizioni.studente = Studenti.id AND Iscrizioni.verbale = Verbali.id";
 		
 		PreparedStatement pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, verbale.getId());
 		ResultSet result = pstatement.executeQuery();
 		
-		studenti.clear();
-		valutazioni.clear();
+		studenti = new ArrayList<>();
+		valutazioni = new ArrayList<>();
 		if (result.next()) {
 			verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
 		}

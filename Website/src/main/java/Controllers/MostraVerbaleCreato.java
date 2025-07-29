@@ -7,7 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -21,8 +21,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import BEANS.Appello;
-import BEANS.Corso;
 import BEANS.Studente;
 import BEANS.Valutazione;
 import BEANS.Verbale;
@@ -86,6 +84,7 @@ public class MostraVerbaleCreato extends HttpServlet {
 		String path = "/WEB-INF/VerbaleCreato.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        ctx.setVariable("verbale", verbale);
         ctx.setVariable("studenti", studenti);
         ctx.setVariable("valutazioni", valutazioni);
 		templateEngine.process(path, ctx, response.getWriter());

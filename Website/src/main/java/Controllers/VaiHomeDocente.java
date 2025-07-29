@@ -67,26 +67,26 @@ public class VaiHomeDocente extends HttpServlet {
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		ArrayList<Corso> corsi = new ArrayList();
-		ArrayList<ArrayList<Appello>> appelli = new ArrayList();
+		ArrayList<Corso> corsi = new ArrayList<>();
+		ArrayList<ArrayList<Appello>> appelli = new ArrayList<>();
 		try {
 			docenteDAO.getCorsiAndAppelliByDocente(corsi, appelli);
-			if (corsi == null || corsi.isEmpty() ) {
-				renderPageError(request, response, "Nessun corso trovato per il docente.");
-				return;
-			}
 		} 
 		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero dei corsi ed appelli.");
 			return;
 		}
-		@SuppressWarnings("unused")
+		if (corsi.isEmpty() ) {
+			renderPageError(request, response, "Nessun corso trovato per il docente.");
+			return;
+		}
 		String path = "/WEB-INF/DocenteHome.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("corsi", corsi);
         ctx.setVariable("appelli", appelli);
 		templateEngine.process(path, ctx, response.getWriter());
+		
 	}
 	
 	
