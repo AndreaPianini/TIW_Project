@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import BEANS.Appello;
 import BEANS.Corso;
+import BEANS.Studente;
 import BEANS.Valutazione;
 
 public class DocenteDAO {
@@ -103,6 +104,48 @@ public class DocenteDAO {
 	}
 	
 	
+	public void getIscrittiByAppello(int corsoID, Date dataAppello, ArrayList<Studente> iscritti, 
+			ArrayList<Valutazione> voti) throws SQLException {
+		
+		String query = "SELECT s.matricola AS stud_matricola, u.nome AS stud_nome, u.cognome AS stud_cognome, "
+				+ "u.email AS stud_email, s.corso_laurea AS stud_corso_laurea, i.id AS stud_id, "
+				+ "i.voto AS voto, i.stato_valutazione AS stato_valutazione "
+				+ "FROM Iscrizioni i, Studenti s, Utenti u "
+				+ "WHERE u.id = s.id AND i.studente = u.id AND "
+				+ "i.corso = ? AND i.data = ? "
+				+ "ORDER BY s.cognome, s.nome;";
+		
+		PreparedStatement pstatement = connection.prepareStatement(query);
+		pstatement.setInt(1, corsoID);
+		pstatement.setDate(2, dataAppello);
+		ResultSet result = pstatement.executeQuery();
+		
+		iscritti = new ArrayList<>();
+		voti = new ArrayList<>();
+		
+		while (result.next()) {
+			Studente studente = new Studente();
+			studente.setID(result.getInt("stud_id"));
+			studente.setNome(result.getString("stud_nome"));
+			studente.setCognome(result.getString("stud_cognome"));
+			studente.setMatricola(result.getString("stud_matricola"));
+			studente.setEmail(result.getString("stud_email"));
+			studente.setCorsoLaurea(result.getString("stud_corso_laurea"));
+			
+			Valutazione voto = new Valutazione();
+			voto.setVoto(result.getString("voto"));
+			voto.setStatoValutazione(result.getString("stato_valutazione"));
+			
+			iscritti.add(studente);
+			voti.add(voto);
+		}
+		
+		result.close();
+		pstatement.close();
+		
+	}
+	
+	
  	public void ModificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
  		
 		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
@@ -110,19 +153,32 @@ public class DocenteDAO {
 				+ "corso = ? AND data = ? AND studente = ?";
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
-		pstatement = connection.prepareStatement(query);
-		pstatement.setString(1, voto.getVoto().toString());
-		pstatement.setInt(2, corso);
-		pstatement.setDate(3, data);
-		pstatement.setInt(4, studID);
-		pstatement.executeUpdate();
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setString(1, voto.getVoto().toString());
+			pstatement.setInt(2, corso);
+			pstatement.setDate(3, data);
+			pstatement.setInt(4, studID);
+			pstatement.executeUpdate();
+		}
+		catch(SQLException e) {
+			connection.rollback();
+			throw new SQLException("Error updating the vote: " + e.getMessage());
+		}
+		finally {
+			connection.setAutoCommit(true);
+			pstatement.close();
+		}
+		connection.setAutoCommit(true);
 		pstatement.close();
 		
 	}
 	
  	
 	public void PubblicaValutazioni(int corso, Date data) throws SQLException{
-		String query = "UPDATE Iscrizioni SET stato_valutazione = 'PUBBLICATO' WHERE stato_valutazione = 'INSERITO' AND corso = ' AND data = ?";
+		
+		String query = "UPDATE Iscrizioni SET stato_valutazione = 'PUBBLICATO' "
+				+ "WHERE stato_valutazione = 'INSERITO' AND corso = ' AND data = ?";
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
 		try{
@@ -130,21 +186,18 @@ public class DocenteDAO {
 			pstatement.setInt(1, corso);
 			pstatement.setDate(2, data);
 			pstatement.executeUpdate();
-			
-		}catch(SQLException e) {
-			connection.rollback();
-		}finally {
-			connection.setAutoCommit(true);
-			try {
-				if (pstatement != null) {
-					pstatement.close();
-				}
-			} catch (Exception e1) {
-				throw new SQLException("Cannot close statement");
-			}
 		}
+		catch(SQLException e) {
+			connection.rollback();
+			throw new SQLException("Error updating the vote: " + e.getMessage());
+		}
+		finally {
+			connection.setAutoCommit(true);
+			pstatement.close();
+				
+		}
+		
 	}
-	
 	
 	
 }

@@ -53,15 +53,41 @@ public class Valutazione {
 	public Voto getVoto() {
 		return voto;
 	}
-	public void setVoto(Voto voto) {
-		this.voto = voto;
+	public void setVoto(String voto) {
+		switch (voto) {
+			case "18": this.voto = Voto._18; break;
+			case "19": this.voto = Voto._19; break;
+			case "20": this.voto = Voto._20; break;
+			case "21": this.voto = Voto._21; break;
+			case "22": this.voto = Voto._22; break;
+			case "23": this.voto = Voto._23; break;
+			case "24": this.voto = Voto._24; break;
+			case "25": this.voto = Voto._25; break;
+			case "26": this.voto = Voto._26; break;
+			case "27": this.voto = Voto._27; break;
+			case "28": this.voto = Voto._28; break;
+			case "29": this.voto = Voto._29; break;
+			case "30": this.voto = Voto._30; break;
+			case "30L": this.voto = Voto._30L; break;
+			case "ASSENTE": this.voto = Voto.ASSENTE; break;
+			case "RIMANDATO": this.voto = Voto.RIMANDATO; break;
+			case "RIPROVATO": this.voto = Voto.RIPROVATO; break;
+			default: throw new IllegalArgumentException("Unknown Voto: " + voto);
+		}
 	}
 
 	public StatoValutazione getStatoValutazione() {
 		return statoValutazione;
 	}
-	public void setStatoValutazione(StatoValutazione statoValutazione) {
-		this.statoValutazione = statoValutazione;
+	public void setStatoValutazione(String statoValutazione) {
+		switch (statoValutazione) {
+			case "NON_INSERITO": this.statoValutazione = StatoValutazione.NON_INSERITO; break;
+			case "INSERITO": this.statoValutazione = StatoValutazione.INSERITO; break;
+			case "PUBBLICATO": this.statoValutazione = StatoValutazione.PUBBLICATO; break;
+			case "RIFIUTATO": this.statoValutazione = StatoValutazione.RIFIUTATO; break;
+			case "VERBALIZZATO": this.statoValutazione = StatoValutazione.VERBALIZZATO; break;
+			default: throw new IllegalArgumentException("Unknown StatoValutazione: " + statoValutazione);
+		}
 	}
 	
 	public boolean rifiutabile() {
