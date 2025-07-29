@@ -53,7 +53,7 @@ public class Valutazione {
 	public Voto getVoto() {
 		return voto;
 	}
-	public void setVoto(String voto) {
+	public void setVoto(String voto) throws IllegalArgumentException {
 		switch (voto) {
 			case "18": this.voto = Voto._18; break;
 			case "19": this.voto = Voto._19; break;
@@ -79,7 +79,7 @@ public class Valutazione {
 	public StatoValutazione getStatoValutazione() {
 		return statoValutazione;
 	}
-	public void setStatoValutazione(String statoValutazione) {
+	public void setStatoValutazione(String statoValutazione) throws IllegalArgumentException {
 		switch (statoValutazione) {
 			case "NON_INSERITO": this.statoValutazione = StatoValutazione.NON_INSERITO; break;
 			case "INSERITO": this.statoValutazione = StatoValutazione.INSERITO; break;
