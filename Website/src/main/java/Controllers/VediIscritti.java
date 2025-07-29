@@ -32,17 +32,11 @@ import DAO.DocenteDAO;
  */
 @WebServlet("/VediIscritti")
 public class VediIscritti extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public VediIscritti() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
     public void init() throws ServletException {
 		try {
@@ -70,10 +64,9 @@ public class VediIscritti extends HttpServlet {
 		}
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
@@ -91,15 +84,14 @@ public class VediIscritti extends HttpServlet {
 		try {
 			dataAppello = Date.valueOf(request.getParameter("data"));
 		}
-		catch(NumberFormatException e) {
+		catch(Exception e) {
 			dataAppello = null;
 		}
 		
-		if (corsoID != null && dataAppello != null) {
-			
-		} else {
+		if (corsoID == null || dataAppello == null) {
 			renderPageError(request, response,
 					"Corso o data appello non validi.");
+			return;
 		}
 		
 		try {
