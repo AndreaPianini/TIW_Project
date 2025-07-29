@@ -1,4 +1,5 @@
 package Controllers;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
@@ -10,25 +11,28 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import BEANS.Utente;
-import DAO.UtenteDAO;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
+import BEANS.Docente;
+import DAO.DocenteDAO;
 
-@WebServlet("/CheckLogin")
-public class CheckLogin extends HttpServlet {
+
+@WebServlet("/Pubblica")
+public class Pubblica extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-
+    
+	
 	public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
@@ -63,51 +67,35 @@ public class CheckLogin extends HttpServlet {
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		Integer ID = null;
+		HttpSession session = request.getSession();
+		Docente docente = (Docente) session.getAttribute("user");
+		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+		
+		Integer corsoID = null;
+		Date dataAppello = null;
 		try {
-			ID = Integer.parseInt(request.getParameter("id"));
+			corsoID = Integer.parseInt(request.getParameter("corsoID"));
+			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
+		} 
+		catch (Exception e) {
+			corsoID = null;
+			dataAppello = null;
 		}
-		catch(NumberFormatException e) {
-			ID = null;
-		}
-        String password = request.getParameter("password");
-        
-        if ( ID == null || ID < 0 || ID > 99999999 || password == null || password.isEmpty() ) {
-        	renderPageError(request, response, "ID o Password non validi. Riprovare");
+		if( corsoID == null || dataAppello == null || corsoID < 0 || corsoID > 9999) {
+			renderPageError(request, response, "Corso o data dell'appello non validi. Riprovare.");
 			return;
 		}
-        
-        UtenteDAO dao = new UtenteDAO(this.connection);
-        Utente user = null;
-        try {
-        	user = dao.checkCredenziali(ID, password);
-        }
-        catch (SQLException e) {
-        	System.out.println("Failure in database credential checking");
-        	renderPageError(request, response, "Si è verificato un errore, riprovare");
+		
+		try {
+			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
+		} 
+		catch (SQLException e) {
+			renderPageError(request, response, "Errore durante la pubblicazione dell'appello. Riprovare.");
 			return;
 		}
-
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("utente", user);
-            String path = getServletContext().getContextPath() + "/login.html";
-
-            if (user.getRole().equals("Studente")) {
-                response.sendRedirect(path + "/VaiHomeStudente");
-            } 
-            else if (user.getRole().equals("Docente")) {
-                response.sendRedirect(path + "/VaiHomeDocente");
-            } 
-            else {
-                renderPageError(request, response, "Utente senza ruolo definito");
-                return;
-            }
-        } 
-        else {
-        	renderPageError(request, response, "ID o Password errati. Riprovare");
-        }
-        
+		String path = request.getContextPath();
+		response.sendRedirect(path + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello);
+		
 	}
 	
 	
@@ -116,7 +104,7 @@ public class CheckLogin extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/login.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/Iscritti.html", ctx, response.getWriter());
 	}
 	
 	
