@@ -9,10 +9,10 @@
     <div class="login-container">
         <h2>Accedi al sistema</h2>
 
-        <form th:action="@{/CheckLogin}" method="post">
+        <form action="CheckLogin" method="POST">
             <div class="form-group">
                 <label for="id">ID</label>
-                <input type="id" id="id" name="id" required>
+                <input type="text" id="id" name="id" required>
             </div>
 
             <div class="form-group">

@@ -90,8 +90,8 @@ public class CheckLogin extends HttpServlet {
 
         if (user != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("utente", user);
-            String path = getServletContext().getContextPath() + "/login.html";
+            session.setAttribute("user", user);
+            String path = getServletContext().getContextPath();
 
             if (user.getRole().equals("Studente")) {
                 response.sendRedirect(path + "/VaiHomeStudente");
@@ -116,7 +116,7 @@ public class CheckLogin extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/login.html", ctx, response.getWriter());
+		templateEngine.process("login.html", ctx, response.getWriter());
 	}
 	
 	

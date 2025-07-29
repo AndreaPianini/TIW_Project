@@ -42,12 +42,12 @@ public class DocenteChecker implements Filter {
 		System.out.print("Docente filter executing ..\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String loginpath = req.getServletContext().getContextPath() + "/index.html";
+		String loginpath = req.getServletContext().getContextPath() + "/login.html";
 		// check if the client is an admin
 		HttpSession s = req.getSession();
 		Utente u = null;
 		u = (Utente) s.getAttribute("user");
-		if (!u.getRole().equals("docente")) {
+		if (!u.getRole().equals("Docente")) {
 			res.sendRedirect(loginpath);
 			return;
 		}

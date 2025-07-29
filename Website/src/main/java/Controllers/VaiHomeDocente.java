@@ -66,8 +66,8 @@ public class VaiHomeDocente extends HttpServlet {
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		ArrayList<Corso> corsi = null;
-		ArrayList<ArrayList<Appello>> appelli = null;
+		ArrayList<Corso> corsi = new ArrayList();
+		ArrayList<ArrayList<Appello>> appelli = new ArrayList();
 		try {
 			docenteDAO.getCorsiAndAppelliByDocente(corsi, appelli);
 			if (corsi == null || corsi.isEmpty() ) {
@@ -80,7 +80,7 @@ public class VaiHomeDocente extends HttpServlet {
 			return;
 		}
 		@SuppressWarnings("unused")
-		String path = "/WEB-INF/HomeDocente.html";
+		String path = "/WEB-INF/DocenteHome.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("corsi", corsi);
