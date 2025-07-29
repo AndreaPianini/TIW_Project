@@ -68,9 +68,9 @@ public class MostraVerbaleCreato extends HttpServlet {
 		Verbale verbale = new Verbale();
 		ArrayList<Studente> studenti = new ArrayList<>();
 		ArrayList<Valutazione> valutazioni = new ArrayList<>();
-		verbale.setId(Integer.parseInt(request.getParameter("verbaleID")));
 		
 		try {
+			verbale.setId(Integer.parseInt(request.getParameter("verbaleID")));
 			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
 		} 
 		catch (SQLException | NumberFormatException e) {

@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import BEANS.Studente;
 import BEANS.Valutazione;
@@ -20,32 +19,25 @@ public class VerbaleDAO {
 		this.con=connection;
 	}
 	
-	public List<Verbale> getVerbaliByDocente(int docID) throws SQLException {
-		List<Verbale> verbali = new ArrayList<>();
-		String query = "SELECT DISTINCT verbale, data_ora_creazione FROM Docente AS D, Iscrizioni AS I, Verbali AS V "
-				+ "WHERE I.docente=D.id AND V.id=I.verbale AND I.docente=?";
-		ResultSet result = null;
-		PreparedStatement pstatement = null;
+	//Da controllare la query
+	public ArrayList<Verbale> getVerbaliByDocente(int docID) throws SQLException {
 		
-		pstatement = con.prepareStatement(query);
+		String query = "SELECT DISTINCT verbale, data_ora_creazione "
+					 + "FROM Docente AS D, Iscrizioni AS I, Verbali AS V "
+					 + "WHERE I.docente=D.id AND V.id=I.verbale AND I.docente=?";
+		PreparedStatement pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, docID);
-		result = pstatement.executeQuery();
+		ResultSet result = pstatement.executeQuery();
+		
+		ArrayList<Verbale> verbali = new ArrayList<>();
 		while (result.next()) {
 			Verbale v = new Verbale();
 			v.setId(result.getInt("verbale"));
 			v.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
 			verbali.add(v);
 		}
-		
-		if (result != null) {
-			result.close();
-		}
-			
-		if (pstatement != null) {
-			pstatement.close();
-		}
-			
-	
+		result.close();
+		pstatement.close();
 		return verbali;
 		
 	}
