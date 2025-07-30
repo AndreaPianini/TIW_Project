@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import BEANS.Studente;
 import BEANS.Valutazione;
@@ -20,8 +19,8 @@ public class VerbaleDAO {
 		this.con=connection;
 	}
 	
-	public List<Verbale> GetVerbaliByDocente(int docID) throws SQLException {
-		List<Verbale> verbali = new ArrayList<>();
+	public void getVerbaliByDocente(int docID, ArrayList<Verbale> verbali) throws SQLException {
+		
 		String query = "SELECT DISTINCT I.verbale, V.data_ora_creaz AS data_ora_creazione"
 				+ "FROM Iscrizioni I JOIN Corsi C ON I.corso = C.id JOIN Docenti D ON C.docente = D.id JOIN Verbali V ON I.verbale = V.id"
 				+ "WHERE D.id = ?";
@@ -38,8 +37,6 @@ public class VerbaleDAO {
 		}
 		result.close();
 		pstatement.close();
-		
-		return verbali;
 		
 	}
 	
