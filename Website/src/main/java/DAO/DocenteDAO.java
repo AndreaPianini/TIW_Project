@@ -42,8 +42,8 @@ public class DocenteDAO {
 		Appello a = null;
 		ArrayList<Appello> newAppelli = null;
 		
-		corsi = new ArrayList<>();
-		appelli = new ArrayList<>();
+		corsi.clear();
+		appelli.clear();
 		if (!result.next()) {
 			result.close();
 			pstatement.close();

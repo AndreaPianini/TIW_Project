@@ -68,67 +68,54 @@ public class ModificaVoto extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session = request.getSession();
-		Docente docente = (Docente) session.getAttribute("user");
-		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		Integer studID = null;
-		Integer corsoID = null;
-		Date dataAppello = null;
-		Valutazione valutazione = new Valutazione();
-		
-		try {
-			studID = Integer.parseInt(request.getParameter("studenteID"));
-		}
-		catch(NumberFormatException e) {
-			studID = null;
-		}
-		try {
-			corsoID = Integer.parseInt(request.getParameter("corsoID"));
-		}
-		catch(NumberFormatException e) {
-			corsoID = null;
-		}
-		try {
-			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-		}
-		catch(Exception e) {
-			dataAppello = null;
-		}
-		try {
-			valutazione.setVoto(request.getParameter("voto"));
-		}
-		catch(IllegalArgumentException e) {
-			valutazione = null;
-		}
-		
-		if(studID == null || corsoID == null || dataAppello == null || valutazione == null) {
-			renderPageError(request, response, "Parametri inseriti errati. Riprovare.");
-			return;
-		}
-		
-		StudenteDAO studenteDao = new StudenteDAO(connection, studID);
-		try {
-			if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
-				renderPageError(request, response, "Studente non iscritto all'appello.");
-				return;
-			}	
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore. Riprovare.");
-			return;
-		}
-		try {
-			docenteDAO.modificaVoto(valutazione, corsoID, dataAppello, studID);
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore durante la modifica del voto.");
-			return;
-		}
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/VediIscritti?corsoAppello=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
-		response.sendRedirect(path);
-		
+
+	    HttpSession session = request.getSession();
+	    Docente docente = (Docente) session.getAttribute("user");
+	    DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+
+	    Integer studID = null;
+	    Integer corsoID = null;
+	    Date dataAppello = null;
+	    Valutazione valutazione = new Valutazione();
+
+	    try {
+	        studID = Integer.parseInt(request.getParameter("studenteID"));
+	        corsoID = Integer.parseInt(request.getParameter("corsoID"));
+	        dataAppello = Date.valueOf(request.getParameter("dataAppello"));
+	    } catch (Exception e) {
+	        renderPageError(request, response, "Parametri numerici o data errati.");
+	        return;
+	    }
+
+	    try {
+	        String votoParam = request.getParameter("voto");
+	        valutazione.setVoto(votoParam);
+	    } catch (IllegalArgumentException e) {
+	        renderPageError(request, response, "Voto non valido.");
+	        return;
+	    }
+
+	    StudenteDAO studenteDao = new StudenteDAO(connection, studID);
+	    try {
+	        if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
+	            renderPageError(request, response, "Studente non iscritto all'appello.");
+	            return;
+	        }
+	    } catch (SQLException e) {
+	        renderPageError(request, response, "Errore durante il controllo dell'iscrizione.");
+	        return;
+	    }
+
+	    try {
+	        docenteDAO.modificaVoto(valutazione, corsoID, dataAppello, studID);
+	    } catch (SQLException e) {
+	        renderPageError(request, response, "Errore durante la modifica del voto.");
+	        return;
+	    }
+
+	    String ctxpath = getServletContext().getContextPath();
+	    String path = ctxpath + "/VediIscritti?corsoAppello=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
+	    response.sendRedirect(path);
 	}
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
