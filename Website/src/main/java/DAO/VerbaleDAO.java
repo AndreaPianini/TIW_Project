@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import BEANS.Studente;
 import BEANS.Valutazione;
@@ -91,8 +90,8 @@ public class VerbaleDAO {
 		pstatement.setInt(1, verbale.getId());
 		ResultSet result = pstatement.executeQuery();
 		
-		studenti.clear();
-		valutazioni.clear();
+		studenti = new ArrayList<>();
+		valutazioni = new ArrayList<>();
 		if (result.next()) {
 			verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
 		}
