@@ -1,3 +1,17 @@
+--Elimina dati precedenti
+SET FOREIGN_KEY_CHECKS=0;
+
+TRUNCATE TABLE Iscrizioni;
+TRUNCATE TABLE Appelli;
+TRUNCATE TABLE Verbali;
+TRUNCATE TABLE StudSegueCorso;
+TRUNCATE TABLE Studenti;
+TRUNCATE TABLE Docenti;
+TRUNCATE TABLE Corsi;
+TRUNCATE TABLE Utenti;
+
+SET FOREIGN_KEY_CHECKS=1;
+
 USE db_esami;
 
 -- Popola Utenti (5 docenti + 5 studenti)
@@ -18,7 +32,7 @@ INSERT INTO Docenti (id) VALUES
 (10000001), (10000002), (10000003), (10000004), (10000005);
 
 -- Popola Studenti (id = 20000001–20000005)
-INSERT INTO Studenti (id, matricola, corso_laurea) VALUES
+INSERT INTO Studente (id, matricola, corso_laurea) VALUES
 (20000001, 'S1001', 'Informatica'),
 (20000002, 'S1002', 'Fisica'),
 (20000003, 'S1003', 'Matematica'),
@@ -63,3 +77,29 @@ INSERT INTO Verbali (id, data_ora_creaz) VALUES
 (10, '2025-06-22 16:00:00'),
 (11, '2025-07-01 10:00:00'),
 (12, '2025-07-05 11:00:00');
+
+-- Popola StudSegueCorso (ogni studente segue 3 corsi, distribuiti)
+INSERT INTO StudSegueCorso (Studente, Corso) VALUES
+(20000001, 101), (20000001, 102), (20000001, 103),
+(20000002, 104), (20000002, 105), (20000002, 106),
+(20000003, 107), (20000003, 101), (20000003, 102),
+(20000004, 103), (20000004, 104), (20000004, 105),
+(20000005, 106), (20000005, 107), (20000005, 101);
+
+-- Popola Iscrizioni (ogni studente iscritto ad almeno un appello; alcuni verbalizzati, altri pubblicati o rifiutati)
+INSERT INTO Iscrizioni (studente, corso, data, voto, stato_valutazione, verbale) VALUES
+(20000001, 101, '2025-06-01', '28', 'VERBALIZZATO', 1),
+(20000001, 102, '2025-06-03', '30L', 'PUBBLICATO', NULL),
+(20000001, 103, '2025-06-05', NULL, 'NON INSERITO', NULL),
+(20000002, 104, '2025-06-10', '24', 'VERBALIZZATO', 4),
+(20000002, 105, '2025-06-12', '18', 'RIFIUTATO', NULL),
+(20000002, 106, '2025-06-14', '25', 'VERBALIZZATO', 6),
+(20000003, 107, '2025-06-16', NULL, 'NON INSERITO', NULL),
+(20000003, 101, '2025-07-15', '22', 'PUBBLICATO', NULL),
+(20000003, 102, '2025-07-20', '27', 'VERBALIZZATO', 2),
+(20000004, 103, '2025-07-22', '21', 'RIFIUTATO', NULL),
+(20000004, 104, '2025-07-25', NULL, 'NON INSERITO', NULL),
+(20000004, 105, '2025-07-27', '30', 'VERBALIZZATO', 5),
+(20000005, 106, '2025-07-29', NULL, 'NON INSERITO', NULL),
+(20000005, 107, '2025-07-31', '29', 'VERBALIZZATO', 12),
+(20000005, 101, '2025-06-01', '19', 'PUBBLICATO', NULL);

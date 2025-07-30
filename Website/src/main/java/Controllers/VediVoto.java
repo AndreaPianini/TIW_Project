@@ -21,14 +21,10 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-
-import BEANS.Appello;
 import BEANS.Corso;
-import BEANS.Docente;
 import BEANS.Studente;
 import BEANS.Valutazione;
 import DAO.CorsoDAO;
-import DAO.DocenteDAO;
 import DAO.StudenteDAO;
 
 
