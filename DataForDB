@@ -1,5 +1,5 @@
 
---Elimina dati precedenti
+-- Elimina dati precedenti
 SET FOREIGN_KEY_CHECKS=0;
 
 TRUNCATE TABLE Iscrizioni;
@@ -14,7 +14,7 @@ TRUNCATE TABLE Utenti;
 SET FOREIGN_KEY_CHECKS=1;
 
 
---Popola DB
+-- Popola DB
 USE db_esami;
 
 -- Cancella in ordine inverso rispetto alle FK
