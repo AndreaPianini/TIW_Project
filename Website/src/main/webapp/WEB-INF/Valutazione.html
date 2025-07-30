@@ -14,6 +14,11 @@
     <div class="alert alert-info" role="alert">
         Voto non ancora definito
     </div>
+    
+    <!-- Bottone Torna alla Home -->
+    <form th:action="@{/VaiHomeStudente}" method="get" style="margin-top: 20px;">
+        <button type="submit" class="btn-secondary">Torna alla Home</button>
+    </form>
 </div>
 
 <!-- Dati presenti quando il voto è stato pubblicato o rifiutato -->
@@ -56,6 +61,11 @@
             <button type="submit" class="btn btn-warning">Rifiuta</button>
         </form>
     </div>
+    
+    <!-- Bottone Torna alla Home -->
+    <form th:action="@{/VaiHomeStudente}" method="get" style="margin-top: 20px;">
+        <button type="submit" class="btn-secondary">Torna alla Home</button>
+    </form>
 </div>
 
 </body>
