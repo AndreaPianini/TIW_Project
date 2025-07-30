@@ -23,8 +23,9 @@ public class VerbaleDAO {
 	
 	public List<Verbale> GetVerbaliByDocente(int docID) throws SQLException {
 		List<Verbale> verbali = new ArrayList<>();
-		String query = "SELECT DISTINCT verbale, data_ora_creazione FROM Docenti AS D, Iscrizioni AS I, Verbali AS V "
-				+ "WHERE I.docente=D.id AND V.id=I.verbale AND I.docente=?";
+		String query = "SELECT DISTINCT I.verbale, V.data_ora_creaz AS data_ora_creazione"
+				+ "FROM Iscrizioni I JOIN Corsi C ON I.corso = C.id JOIN Docenti D ON C.docente = D.id JOIN Verbali V ON I.verbale = V.id"
+				+ "WHERE D.id = ?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
 		
@@ -64,7 +65,7 @@ public class VerbaleDAO {
 		if (!result.next())// non ci sono verbali
 			return null;
 			
-		verbale.setId(result.getInt("codice"));
+		verbale.setId(result.getInt("id"));
 		verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
 		
 			
@@ -84,8 +85,11 @@ public class VerbaleDAO {
 		Map<Studente,String> datiVerbale = new HashMap<>();
 		Studente studente;
 		String voto;
-		String query = "SELECT id, matricola, nome, cognome, voto FROM Iscrizioni, Studenti "
-				+ "WHERE verbale = ? AND studente=id";
+		String query = "SELECT S.id, S.matricola, U.nome, U.cognome, I.voto " +
+                "FROM Iscrizioni I " +
+                "JOIN Studenti S ON I.studente = S.id " +
+                "JOIN Utenti U ON S.id = U.id " +
+                "WHERE I.verbale = ?";
 		PreparedStatement pstatement = null;
 		ResultSet result = null;
 		
