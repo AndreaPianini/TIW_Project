@@ -110,6 +110,8 @@ public class VediIscritti extends HttpServlet {
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("iscritti", iscritti);
         ctx.setVariable("voti", voti);
+        ctx.setVariable("corsoID", corsoID);
+        ctx.setVariable("dataAppello", dataAppello);
 		templateEngine.process(path, ctx, response.getWriter());
 		
 	}

@@ -28,8 +28,8 @@ import DAO.DocenteDAO;
 import DAO.StudenteDAO;
 
 
-@WebServlet("/VaiModifica")
-public class VaiModifica extends HttpServlet {
+@WebServlet("/Modifica")
+public class Modifica extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
