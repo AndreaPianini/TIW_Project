@@ -24,11 +24,7 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import BEANS.Appello;
 import BEANS.Corso;
-import BEANS.Docente;
 import BEANS.Studente;
-import DAO.AppelloDAO;
-import DAO.CorsoDAO;
-import DAO.DocenteDAO;
 import DAO.StudenteDAO;
 
 @WebServlet("/VaiHomeStudente")
