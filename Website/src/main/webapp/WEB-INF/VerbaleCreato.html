@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Dettaglio Verbale</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+    <h2>Verbale n. <span th:text="${verbale.id}"></span></h2>
+
+    <!-- ===== Informazioni Verbale & Appello ===== -->
+    <table class="table w-auto mb-4">
+        <tr>
+            <th>Data creazione verbale</th>
+            <td th:text="${#temporals.format(verbale.data_Ora, 'dd/MM/yyyy HH:mm')}"></td>
+        </tr>
+        <tr>
+            <th>Corso</th>
+            <td th:text="${corsoInfo.nome}"></td>
+        </tr>
+        <tr>
+            <th>Data Appello</th>
+            <td th:text="${#dates.format(appello.data, 'dd/MM/yyyy')}"></td>
+        </tr>
+    </table>
+
+    <!-- ===== Studenti e Valutazioni ===== -->
+    <h3>Dettaglio Studenti</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Matricola</th>
+                <th>Cognome</th>
+                <th>Nome</th>
+                <th>Voto</th>
+                <th>Stato</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="stud, iterStat : ${studenti}">
+                <td th:text="${stud.matricola}"></td>
+                <td th:text="${stud.cognome}"></td>
+                <td th:text="${stud.nome}"></td>
+                <td th:text="${valutazioni[iterStat.index].voto.toString()}"></td>
+                <td th:text="${valutazioni[iterStat.index].statoValutazione.toString()}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbali</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+    <h2>Verbali creati</h2>
+
+    <!-- Messaggio se non ci sono verbali -->
+    <div th:if="${#lists.isEmpty(verbali)}">
+        <p>Nessun verbale disponibile.</p>
+    </div>
+
+    <!-- Tabella verbali -->
+    <div th:if="${!#lists.isEmpty(verbali)}">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Corso</th>
+                    <th>Data Appello</th>
+                    <th>ID Verbale</th>
+                    <th>Data Creazione</th>
+                    <th>Azione</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="row : ${verbali}">
+                    <td th:text="${row.nomeCorso}"></td>
+                    <td th:text="${#temporals.format(row.dataAppello, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${row.id}"></td>
+                    <td th:text="${#temporals.format(row.dataOra, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <form th:action="@{/MostraVerbaleCreato}" method="get" style="display:inline;">
+                            <input type="hidden" name="verbaleID" th:value="${row.id}" />
+                            <button type="submit" class="btn btn-primary">Seleziona</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

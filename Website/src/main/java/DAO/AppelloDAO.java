@@ -18,15 +18,18 @@ public class AppelloDAO {
 	public Appello getAppelloByVerbale(int verID) throws SQLException {
 		
 		String query = "SELECT DISTINCT corso, data FROM Iscrizioni WHERE verbale = ?";
-		Appello appello = new Appello();
+		Appello appello = null;
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
 		
 		pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, verID);
 		result = pstatement.executeQuery();
-		appello.setCorso(result.getInt("corso"));
-		appello.setData(result.getDate("data"));			
+		if (result.next()) {         
+            appello = new Appello();
+            appello.setCorso(result.getInt("corso"));
+            appello.setData(result.getDate("data"));
+        }			
 		
 			if (result != null) {
 				result.close();

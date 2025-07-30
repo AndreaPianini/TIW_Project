@@ -21,9 +21,13 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
+import BEANS.Appello;
+import BEANS.Corso;
 import BEANS.Studente;
 import BEANS.Valutazione;
 import BEANS.Verbale;
+import DAO.AppelloDAO;
+import DAO.CorsoDAO;
 import DAO.VerbaleDAO;
 
 
@@ -66,27 +70,49 @@ public class MostraVerbaleCreato extends HttpServlet {
 		
 		VerbaleDAO verbaleDAO = new VerbaleDAO(connection);
 		Verbale verbale = new Verbale();
+		AppelloDAO appelloDAO = new AppelloDAO(connection);
+		Appello appello = null;
 		ArrayList<Studente> studenti = new ArrayList<>();
 		ArrayList<Valutazione> valutazioni = new ArrayList<>();
-		
+		verbale.setId(Integer.parseInt(request.getParameter("verbaleID")));
 		try {
-			verbale.setId(Integer.parseInt(request.getParameter("verbaleID")));
 			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
 		} 
 		catch (SQLException | NumberFormatException e) {
-			renderPageError(request, response, "Si è verificato un errore durante il recupero dei corsi ed appelli.");
+			renderPageError(request, response, "Si è verificato un errore durante il recupero delle informazioni del verbale.");
 			return;
 		}
 		if (studenti.isEmpty() || valutazioni.isEmpty()) {
 			renderPageError(request, response, "Nessun studente trovato per il verbale selezionato.");
 			return;
 		}
+		
+		try {
+			appello = appelloDAO.getAppelloByVerbale(verbale.getId());
+		} 
+		catch (SQLException | NumberFormatException e) {
+			renderPageError(request, response, "Si è verificato un errore durante il recupero dell'appello.");
+			return;
+		}
+		if (appello == null) {
+			renderPageError(request, response, "Nessun appello trovato per il verbale selezionato.");
+			return;
+		}
+		Corso corso;
+		try {
+			corso = new CorsoDAO(connection).getCorsoById(appello.getCorso());
+		} catch (SQLException e) {
+			renderPageError(request, response, "Si è verificato un errore durante il recupero del corso.");
+			return;
+		}
 		String path = "/WEB-INF/VerbaleCreato.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        ctx.setVariable("corsoInfo", corso);
         ctx.setVariable("verbale", verbale);
         ctx.setVariable("studenti", studenti);
         ctx.setVariable("valutazioni", valutazioni);
+        ctx.setVariable("appello", appello);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 	

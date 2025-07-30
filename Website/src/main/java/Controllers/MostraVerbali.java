@@ -23,6 +23,7 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import BEANS.Docente;
 import BEANS.Verbale;
+import BEANS.VerbaleRiga;
 import DAO.VerbaleDAO;
 
 
@@ -68,10 +69,10 @@ public class MostraVerbali extends HttpServlet {
 		HttpSession session = request.getSession();
 		VerbaleDAO verbaleDao = new VerbaleDAO(connection);
 		Docente docente = (Docente) session.getAttribute("user");
-		ArrayList<Verbale> verbali = new ArrayList<>();
+		ArrayList<VerbaleRiga> verbali = null;
 		
 		try {
-			verbaleDao.getVerbaliByDocente(docente.getID(), verbali);
+			verbali = verbaleDao.getVerbaliByDocente(docente.getID());
 		} 
 		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero dei verbali.");

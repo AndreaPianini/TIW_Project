@@ -2,15 +2,18 @@ package DAO;
 
 import java.sql.Connection;
 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import BEANS.Studente;
 import BEANS.Valutazione;
 import BEANS.Verbale;
+import BEANS.VerbaleRiga;
 
 public class VerbaleDAO {
 	private Connection con;
@@ -19,24 +22,35 @@ public class VerbaleDAO {
 		this.con=connection;
 	}
 	
-	public void getVerbaliByDocente(int docID, ArrayList<Verbale> verbali) throws SQLException {
+	public ArrayList<VerbaleRiga> getVerbaliByDocente(int docID) throws SQLException {
 		
-		String query = "SELECT DISTINCT I.verbale, V.data_ora_creaz AS data_ora_creazione"
-				+ "FROM Iscrizioni I JOIN Corsi C ON I.corso = C.id JOIN Docenti D ON C.docente = D.id JOIN Verbali V ON I.verbale = V.id"
-				+ "WHERE D.id = ?";
+		String query = "SELECT DISTINCT V.id AS verbale_id, V.data_ora_creaz AS data_ora, " +
+		        "       C.id AS corso_id, C.nome AS nome_corso, I.data AS data_appello " +
+		        "FROM   Corsi C " +
+		        "JOIN   Iscrizioni I ON I.corso = C.id " +
+		        "JOIN   Verbali   V ON V.id    = I.verbale " +
+		        "WHERE  C.docente = ? " +
+		        "ORDER  BY C.nome ASC, I.data ASC, V.id ASC";
 		PreparedStatement pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, docID);
 		ResultSet result = pstatement.executeQuery();
 		
-		verbali = new ArrayList<>();
+		ArrayList<VerbaleRiga> righe = new ArrayList<>();
+		
 		while (result.next()) {
-			Verbale v = new Verbale();
-			v.setId(result.getInt("verbale"));
-			v.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
-			verbali.add(v);
+			VerbaleRiga r = new VerbaleRiga();
+			r.setId(result.getInt("verbale_id"));
+            r.setDataOra(
+            		result.getObject("data_ora", LocalDateTime.class));
+            r.setNomeCorso(result.getString("nome_corso"));
+            r.setDataAppello(
+            		result.getDate("data_appello").toLocalDate());
+            righe.add(r);
 		}
 		result.close();
 		pstatement.close();
+		
+		return righe;
 		
 	}
 	
@@ -65,16 +79,20 @@ public class VerbaleDAO {
 	public void getStudentiAndInfoByVerbale(Verbale verbale, 
 			ArrayList<Studente> studenti, ArrayList<Valutazione> valutazioni) throws SQLException{
 		
-		String query = "SELECT id, matricola, nome, cognome, voto , stato_valutazione, data_ora_creaz "
-				 	 + "FROM Iscrizioni, Studenti, Verbali "
-				 	 + "WHERE verbale = ? AND Iscrizioni.studente = Studenti.id AND Iscrizioni.verbale = Verbali.id";
+		String query = "SELECT s.id AS stud_id, s.matricola, u.nome, u.cognome, "
+				+ "       i.voto, i.stato_valutazione, v.data_ora_creaz "
+				+ "FROM Iscrizioni i "
+				+ "JOIN Studenti s ON i.studente = s.id "
+				+ "JOIN Utenti u ON s.id = u.id "
+				+ "JOIN Verbali v ON i.verbale = v.id "
+				+ "WHERE i.verbale = ?";
 		
 		PreparedStatement pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, verbale.getId());
 		ResultSet result = pstatement.executeQuery();
 		
-		studenti = new ArrayList<>();
-		valutazioni = new ArrayList<>();
+		studenti.clear();
+		valutazioni.clear();
 		if (result.next()) {
 			verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
 		}
@@ -87,7 +105,7 @@ public class VerbaleDAO {
 			
 		do {
 			Studente studente = new Studente();
-			studente.setID(result.getInt("id"));
+			studente.setID(result.getInt("stud_id"));
 			studente.setMatricola(result.getString("matricola"));
 			studente.setNome(result.getString("nome"));
 			studente.setCognome(result.getString("cognome"));
