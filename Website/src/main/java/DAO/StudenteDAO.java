@@ -55,6 +55,7 @@ public class StudenteDAO {
 		String query =" SELECT voto,stato_valutazione FROM Iscrizioni WHERE studente = ? AND corso = ? AND data = ?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
+		boolean flag = false;
 		pstatement = connection.prepareStatement(query);
 		pstatement.setInt(1, this.studenteID);
 		pstatement.setInt(2, corsoID);
@@ -62,7 +63,7 @@ public class StudenteDAO {
 		result = pstatement.executeQuery();
 		
 		if(result.next()) {
-			return true;
+			flag = true;
 		}
 		
 		if (result != null) {
@@ -73,7 +74,7 @@ public class StudenteDAO {
 			pstatement.close();
 		}
 			
-		return false;
+		return flag;
 		
 	}
 	
@@ -90,12 +91,16 @@ public class StudenteDAO {
 			pstatement.setDate(3, data);
 			pstatement.executeUpdate();
 			connection.commit();
+			connection.setAutoCommit(true);
 		} catch(SQLException e) {
 			connection.rollback();
+			connection.setAutoCommit(true);
 			throw new SQLException("Error rejecting the vote: " + e.getMessage());
 		} finally {
-			connection.setAutoCommit(true);
-			pstatement.close();	
+			
+			if (pstatement != null) {
+		        pstatement.close();
+		    }
 		}
 		
 			
@@ -123,6 +128,7 @@ public class StudenteDAO {
 			}
 			valutazione.setStatoValutazione(result.getString("stato_valutazione"));
 		}
+		result.close();
 		pstatement.close();
 		return valutazione;
 		
@@ -197,8 +203,8 @@ public class StudenteDAO {
 			}
 		}
 		else {
-			corsi = null;
-			appelli = null;
+			corsi.clear();
+			appelli.clear();
 		}
 		
 		result.close();

@@ -66,7 +66,7 @@ public class VerbaleDAO {
 			
 		verbale.setId(result.getInt("id"));
 
-		verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creazione"));
+		verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
 		result.close();
 		pstatement.close();	
 		return verbale;

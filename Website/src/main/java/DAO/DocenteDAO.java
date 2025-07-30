@@ -147,13 +147,14 @@ public class DocenteDAO {
 			pstatement.setInt(4, studID);
 			pstatement.executeUpdate();
 			connection.commit();
+			connection.setAutoCommit(true);
 		}
 		catch(SQLException e) {
 			connection.rollback();
+			connection.setAutoCommit(true);
 			throw new SQLException("Error updating the vote: " + e.getMessage());
 		}
 		finally {
-			connection.setAutoCommit(true);
 			pstatement.close();
 		}
 		
@@ -163,7 +164,7 @@ public class DocenteDAO {
 	public void pubblicaValutazioni(int corso, Date data) throws SQLException{
 		
 		String query = "UPDATE Iscrizioni SET stato_valutazione = 'PUBBLICATO' "
-				+ "WHERE stato_valutazione = 'INSERITO' AND corso = ' AND data = ?";
+				+ "WHERE stato_valutazione = 'INSERITO' AND corso = ? AND data = ?";
 		
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
@@ -173,13 +174,15 @@ public class DocenteDAO {
 			pstatement.setDate(2, data);
 			pstatement.executeUpdate();
 			connection.commit();
+			connection.setAutoCommit(true);
 		}
 		catch(SQLException e) {
 			connection.rollback();
+			connection.setAutoCommit(true);
 			throw new SQLException("Error updating the vote: " + e.getMessage());
 		}
 		finally {
-			connection.setAutoCommit(true);
+			
 			pstatement.close();	
 		}
 		
