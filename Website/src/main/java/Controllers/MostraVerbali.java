@@ -22,7 +22,6 @@ import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import BEANS.Docente;
-import BEANS.Verbale;
 import BEANS.VerbaleRiga;
 import DAO.VerbaleDAO;
 
