@@ -120,6 +120,8 @@ public class Modifica extends HttpServlet {
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("studente", studente);
         ctx.setVariable("valutazione", valutazione);
+        ctx.setVariable("corsoID", corsoID);
+        ctx.setVariable("dataAppello", dataAppello);
 		templateEngine.process(path, ctx, response.getWriter());
     	
 	}

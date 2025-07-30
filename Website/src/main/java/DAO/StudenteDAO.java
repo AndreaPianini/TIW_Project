@@ -118,9 +118,8 @@ public class StudenteDAO {
 		if (result.next()) {
 			valutazione = new Valutazione();
 			String votoStr = result.getString("voto");
-			if (votoStr != null) {
-				valutazione.setVoto(votoStr);
-			}
+			// Check if the votoStr is null
+			valutazione.setVoto(votoStr);
 			valutazione.setStatoValutazione(result.getString("stato_valutazione"));
 		}
 		pstatement.close();
