@@ -138,4 +138,14 @@ public class VaiModifica extends HttpServlet {
 		ctx.setVariable("error", errorMessage);
 		templateEngine.process("/WEB-INF/Iscritti.html", ctx, response.getWriter());
 	}
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} 
+		catch (SQLException sqle) {
+		}
+	}
 }

@@ -21,12 +21,12 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import BEANS.Docente;
-import DAO.DocenteDAO;
+import BEANS.Studente;
+import DAO.StudenteDAO;
 
 
-@WebServlet("/Pubblica")
-public class Pubblica extends HttpServlet {
+@WebServlet("/RifiutaVoto")
+public class RifiutaVoto extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -58,7 +58,7 @@ public class Pubblica extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-
+	
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.getWriter().append("Served at: ").append(request.getContextPath());
@@ -68,7 +68,7 @@ public class Pubblica extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
-		Docente docente = (Docente) session.getAttribute("user");
+		Studente studente = (Studente) session.getAttribute("user");
 		
 		Integer corsoID = null;
 		Date dataAppello = null;
@@ -80,31 +80,32 @@ public class Pubblica extends HttpServlet {
 			corsoID = null;
 			dataAppello = null;
 		}
+		
 		if( corsoID == null || dataAppello == null || corsoID < 0 || corsoID > 9999) {
 			renderPageError(request, response, "Corso o data dell'appello non validi. Riprovare.");
 			return;
 		}
 		
-		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
 		try {
-			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
+			studenteDAO.rifiutaVoto(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {
-			renderPageError(request, response, "Errore durante la pubblicazione dell'appello. Riprovare.");
+			System.out.println("Errore durante il rifiuto del voto");
+			renderPageError(request, response, "Errore durante il rifiuto del voto. Riprovare.");
 			return;
 		}
 		String path = request.getContextPath();
-		response.sendRedirect(path + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello);
+		response.sendRedirect(path + "/VediVoto?corsoID=" + corsoID + "&dataAppello=" + dataAppello);
 		
 	}
-	
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
 			String errorMessage) throws IOException {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/DocenteHome.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/Valutazione.html", ctx, response.getWriter());
 	}
 	
 	
