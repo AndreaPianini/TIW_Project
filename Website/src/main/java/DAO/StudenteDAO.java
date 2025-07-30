@@ -115,7 +115,10 @@ public class StudenteDAO {
 		Valutazione valutazione = null;
 		if (result.next()) {
 			valutazione = new Valutazione();
-			valutazione.setVoto(result.getString("voto"));
+			String votoStr = result.getString("voto");
+			if (votoStr != null) {
+				valutazione.setVoto(votoStr);
+			}
 			valutazione.setStatoValutazione(result.getString("stato_valutazione"));
 		}
 		pstatement.close();
@@ -126,8 +129,8 @@ public class StudenteDAO {
 	public void getCorsiAndAppelliByStudente( ArrayList<Corso> corsi, ArrayList<ArrayList<Appello>> appelli) 
 			throws SQLException {
 	
-		String query = "SELECT c.id   AS id_corso, c.nome AS nome_corso, c.cfu  AS cfu, i.data AS data_appello"
-			+ "FROM Iscrizioni AS i JOIN Corsi AS c ON c.id = i.corso WHERE i.studente = ? ORDER BY c.nome ASC, i.data ASC";
+		String query = "SELECT c.id   AS id_corso, c.nome AS nome_corso, c.cfu  AS cfu, i.data AS data_appello "
+			+ "FROM Iscrizioni AS i LEFT JOIN Corsi AS c ON c.id = i.corso WHERE i.studente = ? ORDER BY c.nome, i.data DESC";
 		PreparedStatement pstatement = connection.prepareStatement(query);
 		pstatement.setInt(1, this.id);
 		ResultSet result = pstatement.executeQuery();
@@ -138,11 +141,11 @@ public class StudenteDAO {
 		Appello a = null;
 		ArrayList<Appello> newAppelli = null;
 		if(result.next()){
-			currCorso = result.getInt("corso_id");
+			currCorso = result.getInt("id_corso");
 			c = new Corso();
 			c.setID(currCorso);
 			c.setNome(result.getString("nome_corso"));
-			c.setCfu(result.getInt("cfu_corso"));
+			c.setCfu(result.getInt("cfu"));
 			corsi.add(c);
 			//Check if the first course has an appello
 			if (result.getDate("data_appello") != null) {
@@ -158,7 +161,7 @@ public class StudenteDAO {
 				appelli.add(newAppelli);
 			}
 			while (result.next()) {
-				newCorso = result.getInt("corso_id");
+				newCorso = result.getInt("id_corso");
 				if (newCorso == currCorso) {
 					if(result.getDate("data_appello") != null) {
 						a = new Appello();
@@ -172,7 +175,7 @@ public class StudenteDAO {
 					c = new Corso();
 					c.setID(currCorso);
 					c.setNome(result.getString("nome_corso"));
-					c.setCfu(result.getInt("cfu_corso"));
+					c.setCfu(result.getInt("cfu"));
 					corsi.add(c);
 					//Check if the curr course has an appello
 					if (result.getDate("data_appello") != null) {

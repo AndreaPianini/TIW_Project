@@ -43,5 +43,31 @@ public class CorsoDAO {
 		
 		return corsi;
 	}
+	
+	public Corso getCorsoById(int corsoID) throws SQLException {
+		Corso corso = new Corso();
+		String query= "SELECT * FROM Corsi WHERE id=?";
+		ResultSet result = null;
+		PreparedStatement pstatement = null;
+		pstatement = con.prepareStatement(query);
+		pstatement.setInt(1, corsoID);
+		result = pstatement.executeQuery();
+		if (result.next()) {
+			corso.setID(corsoID);
+			corso.setCfu(result.getInt("cfu"));
+			corso.setNome(result.getString("nome"));
+			corso.setDocenteID(result.getInt("docente"));
+		}
+		if (result != null) {
+			result.close();
+			}
+			
+		if (pstatement != null) {
+			pstatement.close();
+		}
+			
+		
+		return corso;
+	}
 
 }

@@ -20,8 +20,8 @@ public class VerbaleDAO {
 		this.con=connection;
 	}
 	
-	public List<Verbale> GetVerbaliByDocente(int docID) throws SQLException {
-		List<Verbale> verbali = new ArrayList<>();
+	public ArrayList<Verbale> getVerbaliByDocente(int docID) throws SQLException {
+		ArrayList<Verbale> verbali = new ArrayList<>();
 		String query = "SELECT DISTINCT I.verbale, V.data_ora_creaz AS data_ora_creazione"
 				+ "FROM Iscrizioni I JOIN Corsi C ON I.corso = C.id JOIN Docenti D ON C.docente = D.id JOIN Verbali V ON I.verbale = V.id"
 				+ "WHERE D.id = ?";

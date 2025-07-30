@@ -71,7 +71,7 @@ public class MostraVerbali extends HttpServlet {
 		ArrayList<Verbale> verbali = new ArrayList<>();
 		
 		try {
-			verbaleDao.getVerbaliByDocente(docente.getID(), verbali);
+			verbali = verbaleDao.getVerbaliByDocente(docente.getID());
 		} 
 		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero dei verbali.");

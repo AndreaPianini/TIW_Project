@@ -26,7 +26,8 @@ public class TestDB extends HttpServlet {
             out.println("✅ Connessione riuscita!");
 
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Docenti");
+            ResultSet rs = stmt.executeQuery("SELECT c.id   AS id_corso, c.nome AS nome_corso, c.cfu  AS cfu, i.data AS data_appello\"\r\n"
+            		+ "			+ \"FROM Iscrizioni AS i LEFT JOIN Corsi AS c ON c.id = i.corso WHERE i.studente = '6' ORDER BY c.nome, i.data DESC");
             if (rs.next()) {
                 out.println("Numero righe in 'docenti': " + rs.getInt(1));
             }
