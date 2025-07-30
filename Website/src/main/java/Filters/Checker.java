@@ -12,35 +12,20 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * Servlet Filter implementation class checker
- */
 
 public class Checker implements Filter {
 
-	/**
-	 * Default constructor.
-	 */
-	public Checker() {
-		// TODO Auto-generated constructor stub
+	
+	public void init(FilterConfig fConfig) throws ServletException {
 	}
-
-	/**
-	 * @see Filter#destroy()
-	 */
 	public void destroy() {
-		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-	 */
+	
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-		System.out.print("Login checker filter executing ...\n");
-
-		// java.lang.String loginpath = "/index.html";
+		//System.out.print("Login checker filter executing ...\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
 		String loginpath = req.getServletContext().getContextPath() + "/login.html";
@@ -54,11 +39,5 @@ public class Checker implements Filter {
 		chain.doFilter(request, response);
 	}
 
-	/**
-	 * @see Filter#init(FilterConfig)
-	 */
-	public void init(FilterConfig fConfig) throws ServletException {
-		// TODO Auto-generated method stub
-	}
-
+	
 }
