@@ -122,6 +122,7 @@ public class Modifica extends HttpServlet {
         ctx.setVariable("valutazione", valutazione);
         ctx.setVariable("corsoID", corsoID);
         ctx.setVariable("dataAppello", dataAppello);
+        ctx.setVariable("votiPossibili", BEANS.Valutazione.Voto.values());
 		templateEngine.process(path, ctx, response.getWriter());
     	
 	}

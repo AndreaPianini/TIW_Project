@@ -36,14 +36,18 @@
 	        <div class="form-group">
 	            <label for="voto">Nuovo Voto:</label>
 	            <select name="voto" id="voto" class="form-control">
-	                <option value="">Seleziona voto</option>
-	                <option th:each="v : ${T(BEANS.Valutazione$Voto).values()}" th:value="${v.name()}" th:text="${v.toString()}" th:selected="${valutazione.voto.name() == v.name()}"></option>
+	                <option value="" th:selected="${valutazione.voto == null}">Seleziona voto</option>
+	                <option th:each="v : ${votiPossibili}"
+        					th:value="${v.toString()}"
+        					th:text="${v.toString()}"
+        					th:selected="${valutazione.voto != null and valutazione.voto.toString().equals(v.toString())}">
+        			</option>
 	            </select>
 	        </div>
 	        <button type="submit" class="btn-primary" style="margin-top: 15px;">Salva</button>
 	    </form>
 	
-	    <a th:href="@{/Iscritti(corsoID=${corsoID},dataAppello=${dataAppello})}" class="btn-secondary" style="margin-top: 20px;">Annulla</a>
+	    <a th:href="@{/VediIscritti(corsoID=${corsoID},dataAppello=${dataAppello})}" class="btn-secondary" style="margin-top: 20px;">Annulla</a>
 	</div>
 </body>
 </html>
