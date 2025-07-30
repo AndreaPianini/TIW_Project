@@ -225,5 +225,9 @@ public class DocenteDAO {
 		
 	}
 	
+	//Da fare - Controllo che il docente sia abilitato a modificare lo studente
+	public boolean isAutorizzato(int studenteID, int corsoID) throws SQLException {
+		return true;
+	}
 	
 }

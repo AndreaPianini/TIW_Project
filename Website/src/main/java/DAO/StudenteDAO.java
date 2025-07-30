@@ -14,11 +14,11 @@ import BEANS.Valutazione;
 
 public class StudenteDAO {
 	private Connection connection;
-	private int id;
+	private int studenteID;
 	
 	public StudenteDAO(Connection connection, int id) {
 		this.connection = connection;
-		this.id = id;
+		this.studenteID = id;
 	}
 	
 	public Studente getStudenteInfo() throws SQLException{
@@ -27,7 +27,7 @@ public class StudenteDAO {
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
 		pstatement = connection.prepareStatement(query);
-		pstatement.setInt(1, this.id);
+		pstatement.setInt(1, this.studenteID);
 		result = pstatement.executeQuery();
 		if (result.next()) {
 			studInfo.setMatricola(result.getString("matricola"));
@@ -50,12 +50,13 @@ public class StudenteDAO {
 		
 	}
 	
+	
 	public boolean checkRegistrazione(int corsoID, Date data) throws SQLException {
 		String query =" SELECT voto,stato_valutazione FROM Iscrizioni WHERE studente = ? AND corso = ? AND data = ?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
 		pstatement = connection.prepareStatement(query);
-		pstatement.setInt(1, this.id);
+		pstatement.setInt(1, this.studenteID);
 		pstatement.setInt(2, corsoID);
 		pstatement.setDate(3, data);
 		result = pstatement.executeQuery();
@@ -76,6 +77,7 @@ public class StudenteDAO {
 		
 	}
 	
+	
 	public void rifiutaVoto(int corso, Date data) throws SQLException{
 		String query = "UPDATE Iscrizioni SET stato_valutazione = 'RIFIUTATO' "
 					 + "WHERE statovalutazione = 'PUBBLICATO' AND studente = ? AND corso = ? AND data = ?";
@@ -83,7 +85,7 @@ public class StudenteDAO {
 		PreparedStatement pstatement = null;
 		try {
 			pstatement = connection.prepareStatement(query);
-			pstatement.setInt(1, this.id);
+			pstatement.setInt(1, this.studenteID);
 			pstatement.setInt(2, corso);
 			pstatement.setDate(3, data);
 			pstatement.executeUpdate();
@@ -107,7 +109,7 @@ public class StudenteDAO {
 					 + "FROM iscrizioni "
 					 + "WHERE studente = ? AND corso = ? AND data = ?";
 		PreparedStatement pstatement = connection.prepareStatement(query);
-		pstatement.setInt(1, this.id);
+		pstatement.setInt(1, this.studenteID);
 		pstatement.setInt(2, corso);
 		pstatement.setDate(3, data);
 		ResultSet result = pstatement.executeQuery();
@@ -126,13 +128,14 @@ public class StudenteDAO {
 		
 	}
 	
+	
 	public void getCorsiAndAppelliByStudente( ArrayList<Corso> corsi, ArrayList<ArrayList<Appello>> appelli) 
 			throws SQLException {
 	
 		String query = "SELECT c.id   AS id_corso, c.nome AS nome_corso, c.cfu  AS cfu, i.data AS data_appello "
 			+ "FROM Iscrizioni AS i LEFT JOIN Corsi AS c ON c.id = i.corso WHERE i.studente = ? ORDER BY c.nome, i.data DESC";
 		PreparedStatement pstatement = connection.prepareStatement(query);
-		pstatement.setInt(1, this.id);
+		pstatement.setInt(1, this.studenteID);
 		ResultSet result = pstatement.executeQuery();
 		
 		int currCorso = -1;

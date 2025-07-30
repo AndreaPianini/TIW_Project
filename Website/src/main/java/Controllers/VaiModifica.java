@@ -22,18 +22,21 @@ import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import BEANS.Docente;
+import BEANS.Studente;
+import BEANS.Valutazione;
 import DAO.DocenteDAO;
+import DAO.StudenteDAO;
 
 
-@WebServlet("/Pubblica")
-public class Pubblica extends HttpServlet {
+@WebServlet("/VaiModifica")
+public class VaiModifica extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
+       
     
-	
-	public void init() throws ServletException {
+    public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
 			String driver = context.getInitParameter("dbDriver");
@@ -59,54 +62,82 @@ public class Pubblica extends HttpServlet {
 		}
 	}
 
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+    
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+    	HttpSession session = request.getSession();
+    	Docente docente = (Docente) session.getAttribute("user");
+    	Integer studenteID = null, corsoID = null;
+    	Date dataAppello = null;
+    	
+    	try {
+			studenteID = Integer.parseInt(request.getParameter("studenteID"));
+		}
+		catch(NumberFormatException e) {
+			studenteID = null;
+		}
+		try {
+			corsoID = Integer.parseInt(request.getParameter("corsoID"));
+		}
+		catch(Exception e) {
+			corsoID = null;
+		}
+		try {
+			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
+		}
+		catch(Exception e) {
+			dataAppello = null;
+		}
+		
+		if (studenteID == null || corsoID == null || dataAppello == null) {
+			renderPageError(request, response, "Parametri non validi.");
+			return;
+		}
+		
+		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+	   	StudenteDAO studenteDAO = new StudenteDAO(connection, studenteID);
+	   	Studente studente = null;
+	   	Valutazione valutazione = null;
+		try {
+			// !!!Da fare - Controllo che il docente sia abilitato a modificare lo studente
+			if (!docenteDAO.isAutorizzato((int)studenteID, (int)corsoID)) {
+				renderPageError(request, response, "Non sei abilitato a modificare questo studente.");
+				return;
+			}
+			studente = studenteDAO.getStudenteInfo();
+			valutazione = studenteDAO.getVotoByAppello(corsoID, dataAppello);
+		} 
+		catch (SQLException e) {
+			renderPageError(request, response, "Si è verificato un errore. Riprovare");
+			return;
+		}
+		if (studente == null || valutazione == null) {
+			renderPageError(request, response, "Si è verificato un errore. Riprovare");
+			return;
+		}
+		String path = "/WEB-INF/ModificaVoto.html";
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        ctx.setVariable("studente", studente);
+        ctx.setVariable("valutazione", valutazione);
+		templateEngine.process(path, ctx, response.getWriter());
+    	
 	}
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		HttpSession session = request.getSession();
-		Docente docente = (Docente) session.getAttribute("user");
-		
-		Integer corsoID = null;
-		Date dataAppello = null;
-		try {
-			corsoID = Integer.parseInt(request.getParameter("corsoID"));
-			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-		} 
-		catch (Exception e) {
-			corsoID = null;
-			dataAppello = null;
-		}
-		if( corsoID == null || dataAppello == null || corsoID < 0 || corsoID > 9999) {
-			renderPageError(request, response, "Corso o data dell'appello non validi. Riprovare.");
-			return;
-		}
-		
-		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		try {
-			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Errore durante la pubblicazione dell'appello. Riprovare.");
-			return;
-		}
-		String path = request.getContextPath();
-		response.sendRedirect(path + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello);
-		
+		doGet(request, response);
 	}
-	
+
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
 			String errorMessage) throws IOException {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/DocenteHome.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/Iscritti.html", ctx, response.getWriter());
 	}
-	
 	
 	public void destroy() {
 		try {
@@ -117,5 +148,4 @@ public class Pubblica extends HttpServlet {
 		catch (SQLException sqle) {
 		}
 	}
-
 }
