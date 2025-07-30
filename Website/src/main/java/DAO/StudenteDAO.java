@@ -80,7 +80,7 @@ public class StudenteDAO {
 	
 	public void rifiutaVoto(int corso, Date data) throws SQLException{
 		String query = "UPDATE Iscrizioni SET stato_valutazione = 'RIFIUTATO' "
-					 + "WHERE statovalutazione = 'PUBBLICATO' AND studente = ? AND corso = ? AND data = ?";
+					 + "WHERE stato_valutazione = 'PUBBLICATO' AND studente = ? AND corso = ? AND data = ?";
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
 		try {

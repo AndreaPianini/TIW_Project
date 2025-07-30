@@ -21,8 +21,14 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
+
+import BEANS.Appello;
+import BEANS.Corso;
+import BEANS.Docente;
 import BEANS.Studente;
 import BEANS.Valutazione;
+import DAO.CorsoDAO;
+import DAO.DocenteDAO;
 import DAO.StudenteDAO;
 
 
@@ -66,65 +72,78 @@ public class VediVoto extends HttpServlet {
 		HttpSession session = request.getSession();
 		Studente studente = (Studente) session.getAttribute("user");
 		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
+		CorsoDAO corsoDAO = new CorsoDAO(connection);
 		Integer corsoID = null;
 		Date dataAppello = null;
 		Valutazione voto = null;
 		Studente studInfo = null;
+		Corso corso = null;
 		try {
-			corsoID = Integer.parseInt(request.getParameter("id"));
+			corsoID = Integer.parseInt(request.getParameter("corsoID"));
 		}
 		catch(NumberFormatException e) {
 			corsoID = null;
 		}
 		try {
-			dataAppello = Date.valueOf(request.getParameter("data"));
+			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
 		}
 		catch(IllegalArgumentException e) {
 			dataAppello = null;
 		}
 		
-		if (corsoID == null || dataAppello == null) {
+		if (corsoID != null && dataAppello != null) {
+			try {
+				if (!studenteDAO.checkRegistrazione(corsoID, dataAppello)) {
+					renderPageError(request, response, "Lo studente non è iscritto all'appello.");
+					return;
+				}
+			} catch (SQLException e) {
+				renderPageError(request, response,
+						"Si è verificato un errore nel controllare l'iscrizione dello studente all'appello.");
+				return;
+			}
+			
+			try {
+				voto = studenteDAO.getVotoByAppello(corsoID, dataAppello);
+				
+				if(voto == null) {
+					renderPageError(request, response, "Nessuna valutazione trovata per questo appello.");
+					return;
+				}
+				
+				studInfo = studenteDAO.getStudenteInfo();
+				
+				if(studInfo == null) {
+					renderPageError(request, response, "Nessuna informazione trovata per lo studente.");
+					return;
+				}
+				
+			} catch (SQLException e) {
+				renderPageError(request, response,
+						"Si è verificato un errore nel trovare le informazioni relative alla valutazione.");
+				return;
+			} 
+			
+			try {
+				corso = corsoDAO.getCorsoById(corsoID);
+			} catch (SQLException e){
+				renderPageError(request, response,
+						"Si è verificato un errore nel trovare le informazioni relative al corso.");
+				return;
+			}
+		} else {
 			renderPageError(request, response,
 					"Corso o data appello non validi.");
 			return;
 		}
-		
-		try {
-			if (!studenteDAO.checkRegistrazione(corsoID, dataAppello)) {
-				renderPageError(request, response, "Lo studente non è iscritto all'appello.");
-				return;
-			}
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response,
-					"Si è verificato un errore nel controllare l'iscrizione dello studente all'appello.");
-			return;
-		}
-		
-		try {
-			voto = studenteDAO.getVotoByAppello(corsoID, dataAppello);
-			if(voto == null) {
-				renderPageError(request, response, "Nessuna valutazione trovata per questo appello.");
-				return;
-			}
-			
-			studInfo = studenteDAO.getStudenteInfo();
-			if(studInfo == null) {
-				renderPageError(request, response, "Nessuna informazione trovata per lo studente.");
-				return;
-			}
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response,
-					"Si è verificato un errore nel trovare le informazioni relative alla valutazione.");
-			return;
-		} 
-		
+
 		String path = "/WEB-INF/Valutazione.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("voto", voto);
         ctx.setVariable("studInfo", studInfo);
+        ctx.setVariable("appelloData", dataAppello);
+        ctx.setVariable("corsoInfo", corso);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
