@@ -27,9 +27,7 @@ import BEANS.Studente;
 import BEANS.Valutazione;
 import DAO.DocenteDAO;
 
-/**
- * Servlet implementation class VediIscritti
- */
+
 @WebServlet("/VediIscritti")
 public class VediIscritti extends HttpServlet {
 	
@@ -70,8 +68,7 @@ public class VediIscritti extends HttpServlet {
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		ArrayList<Studente> iscritti = null;
-		ArrayList<Valutazione> voti = null;
+		
 		Integer corsoID = null;
 		Date dataAppello = null;
 		
@@ -94,26 +91,34 @@ public class VediIscritti extends HttpServlet {
 			return;
 		}
 		
+		ArrayList<Studente> iscritti = new ArrayList<>();
+		ArrayList<Valutazione> voti = new ArrayList<>();
 		try {
 			docenteDAO.getIscrittiByAppello(corsoID, dataAppello, iscritti, voti);
-			if (iscritti == null || iscritti.isEmpty() ) {
-				renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
-				return;
-			}
 			//controllo per i voti??
 		} 
 		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
 			return;
 		}
-		@SuppressWarnings("unused")
+		if (iscritti.isEmpty() || voti.isEmpty()) {
+			renderPageError(request, response, "Nessun iscritto trovato per l'appello.");
+			return;
+		}
 		String path = "/WEB-INF/Iscritti.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("iscritti", iscritti);
         ctx.setVariable("voti", voti);
 		templateEngine.process(path, ctx, response.getWriter());
+		
 	}
+
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+	
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
 			String errorMessage) throws IOException {
@@ -121,14 +126,6 @@ public class VediIscritti extends HttpServlet {
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
 		templateEngine.process("/WEB-INF/Iscritti.html", ctx, response.getWriter());
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
 	}
 	
 	public void destroy() {
