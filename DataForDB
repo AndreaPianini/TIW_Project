@@ -1,6 +1,22 @@
 USE db_esami;
 
--- Popola Utenti (5 docenti + 5 studenti)
+-- Cancella in ordine inverso rispetto alle FK
+SET SQL_SAFE_UPDATES = 0;   -- ⇦ disattiva il blocco
+SET FOREIGN_KEY_CHECKS = 0;
+
+DELETE FROM Iscrizioni;
+DELETE FROM StudSegueCorso;
+DELETE FROM Appelli;
+DELETE FROM Corsi;
+DELETE FROM Verbali;
+DELETE FROM Docenti;
+DELETE FROM Studenti;
+DELETE FROM Utenti;
+
+SET FOREIGN_KEY_CHECKS = 1; -- riattiva i vincoli
+SET SQL_SAFE_UPDATES = 1;
+
+-- UTENTI
 INSERT INTO Utenti (id, password, nome, cognome, email) VALUES
 (1, 'pwd1', 'Mario', 'Rossi', 'mario.rossi@uni.it'),
 (2, 'pwd2', 'Luca', 'Verdi', 'luca.verdi@uni.it'),
@@ -13,10 +29,10 @@ INSERT INTO Utenti (id, password, nome, cognome, email) VALUES
 (9, 'pwd9', 'Elena', 'Marrone', 'elena.marrone@uni.it'),
 (10, 'pwd10', 'Francesca', 'Grigi', 'francesca.grigi@uni.it');
 
--- Popola Docenti (id = 1–5)
+-- DOCENTI
 INSERT INTO Docenti (id) VALUES (1), (2), (3), (4), (5);
 
--- Popola Studenti (id = 6–10)
+-- STUDENTI
 INSERT INTO Studenti (id, matricola, corso_laurea) VALUES
 (6, 'S1001', 'Informatica'),
 (7, 'S1002', 'Fisica'),
@@ -24,7 +40,7 @@ INSERT INTO Studenti (id, matricola, corso_laurea) VALUES
 (9, 'S1004', 'Ingegneria'),
 (10, 'S1005', 'Biologia');
 
--- Popola Corsi (10 corsi, docenti da 1 a 5)
+-- CORSI
 INSERT INTO Corsi (id, nome, cfu, docente) VALUES
 (101, 'Algoritmi', 9, 1),
 (102, 'Analisi 1', 12, 2),
@@ -37,13 +53,45 @@ INSERT INTO Corsi (id, nome, cfu, docente) VALUES
 (109, 'Programmazione', 12, 4),
 (110, 'Matematica Discreta', 6, 5);
 
--- Popola Appelli (2 per ciascun corso)
+-- APPELLI (2 per corso)
 INSERT INTO Appelli (corso, data) VALUES
 (101, '2025-06-01'), (101, '2025-07-15'),
 (102, '2025-06-03'), (102, '2025-07-20'),
 (103, '2025-06-05'), (103, '2025-07-22'),
 (104, '2025-06-10'), (104, '2025-07-25'),
-(105, '2025-06-12'), (105, '2025-07-27');
+(105, '2025-06-12'), (105, '2025-07-27'),
+(106, '2025-06-14'), (106, '2025-07-29'),
+(107, '2025-06-16'), (107, '2025-07-30'),
+(108, '2025-06-18'), (108, '2025-07-31'),
+(109, '2025-06-20'), (109, '2025-08-01'),
+(110, '2025-06-22'), (110, '2025-08-02');
 
--- Popola Verbali (10 verbali)
-INSERT INTO Verbali (id, data_ora_creaz
+-- VERBALI
+INSERT INTO Verbali (id, data_ora_creaz) VALUES
+(1, '2025-06-30 10:00:00'), (2, '2025-07-01 11:00:00'),
+(3, '2025-07-02 12:00:00'), (4, '2025-07-03 13:00:00'),
+(5, '2025-07-04 14:00:00'), (6, '2025-07-05 15:00:00'),
+(7, '2025-07-06 16:00:00'), (8, '2025-07-07 17:00:00'),
+(9, '2025-07-08 18:00:00'), (10, '2025-07-09 19:00:00');
+
+-- STUDENTE SEGUE CORSO
+INSERT INTO StudSegueCorso (Studente, Corso) VALUES
+(6, 101), (6, 102), (7, 103), (7, 104),
+(8, 105), (8, 106), (9, 107), (9, 108),
+(10, 109), (10, 110);
+SHOW WARNINGS;
+
+-- ISCRIZIONI (studente, corso, data, voto, stato_valutazione, verbale)
+INSERT INTO Iscrizioni (studente, corso, data, voto, stato_valutazione, verbale) VALUES
+(6, 101, '2025-06-01', '28', 'PUBBLICATO', 1),
+(6, 102, '2025-06-03', '30', 'INSERITO', 1),
+(7, 103, '2025-06-05', '25', 'VERBALIZZATO', 2),
+(7, 104, '2025-06-10', '26', 'PUBBLICATO', 2),
+(8, 105, '2025-06-12', '30L', 'VERBALIZZATO', 3),
+(8, 106, '2025-06-14', '24', 'INSERITO', 4),
+(9, 107, '2025-06-16', '27', 'VERBALIZZATO', 5),
+(9, 108, '2025-06-18', '29', 'INSERITO', 5),
+(10, 109, '2025-06-20', '19', 'PUBBLICATO', 6),
+(10, 110, '2025-06-22', '22', 'VERBALIZZATO', 6);
+SHOW WARNINGS;
+
