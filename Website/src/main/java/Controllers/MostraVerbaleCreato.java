@@ -7,13 +7,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -21,21 +21,20 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import BEANS.Docente;
+import BEANS.Studente;
 import BEANS.Valutazione;
-import DAO.DocenteDAO;
-import DAO.StudenteDAO;
+import BEANS.Verbale;
+import DAO.VerbaleDAO;
 
 
-@WebServlet("/ModificaVoto")
-public class ModificaVoto extends HttpServlet {
+@WebServlet("/MostraVerbaleCreato")
+public class MostraVerbaleCreato extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-       
-    
-    public void init() throws ServletException {
+
+	public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
 			String driver = context.getInitParameter("dbDriver");
@@ -62,81 +61,48 @@ public class ModificaVoto extends HttpServlet {
 	}
 
 	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		VerbaleDAO verbaleDAO = new VerbaleDAO(connection);
+		Verbale verbale = new Verbale();
+		ArrayList<Studente> studenti = new ArrayList<>();
+		ArrayList<Valutazione> valutazioni = new ArrayList<>();
+		
+		try {
+			verbale.setId(Integer.parseInt(request.getParameter("verbaleID")));
+			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
+		} 
+		catch (SQLException | NumberFormatException e) {
+			renderPageError(request, response, "Si è verificato un errore durante il recupero dei corsi ed appelli.");
+			return;
+		}
+		if (studenti.isEmpty() || valutazioni.isEmpty()) {
+			renderPageError(request, response, "Nessun studente trovato per il verbale selezionato.");
+			return;
+		}
+		String path = "/WEB-INF/VerbaleCreato.html";
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        ctx.setVariable("verbale", verbale);
+        ctx.setVariable("studenti", studenti);
+        ctx.setVariable("valutazioni", valutazioni);
+		templateEngine.process(path, ctx, response.getWriter());
 	}
-
 	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session = request.getSession();
-		Docente docente = (Docente) session.getAttribute("user");
-		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		Integer studID = null;
-		Integer corsoID = null;
-		Date dataAppello = null;
-		Valutazione valutazione = new Valutazione();
-		
-		try {
-			studID = Integer.parseInt(request.getParameter("studenteID"));
-		}
-		catch(NumberFormatException e) {
-			studID = null;
-		}
-		try {
-			corsoID = Integer.parseInt(request.getParameter("corsoID"));
-		}
-		catch(NumberFormatException e) {
-			corsoID = null;
-		}
-		try {
-			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-		}
-		catch(Exception e) {
-			dataAppello = null;
-		}
-		try {
-			valutazione.setVoto(request.getParameter("voto"));
-		}
-		catch(IllegalArgumentException e) {
-			valutazione = null;
-		}
-		
-		if(studID == null || corsoID == null || dataAppello == null || valutazione == null) {
-			renderPageError(request, response, "Parametri inseriti errati. Riprovare.");
-			return;
-		}
-		
-		StudenteDAO studenteDao = new StudenteDAO(connection, studID);
-		try {
-			if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
-				renderPageError(request, response, "Studente non iscritto all'appello.");
-				return;
-			}	
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore. Riprovare.");
-			return;
-		}
-		try {
-			docenteDAO.modificaVoto(valutazione, corsoID, dataAppello, studID);
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore durante la modifica del voto.");
-			return;
-		}
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/VediIscritti?corsoAppello=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
-		response.sendRedirect(path);
-		
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
 	}
+	
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
 			String errorMessage) throws IOException {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/Modifica.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/DocenteHome.html", ctx, response.getWriter());
 	}
 
 	

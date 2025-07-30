@@ -25,7 +25,14 @@
                     <td th:text="${corso.nome}"></td>
                     <td>
                         <ul>
-                            <li th:each="appello : ${appelli[iterStat.index]}" th:text="${#dates.format(appello.data, 'dd/MM/yyyy')}"></li>
+                            <li th:each="appello : ${appelli[iterStat.index]}">
+                                <span th:text="${#dates.format(appello.data, 'dd/MM/yyyy')}"></span>
+                                <form th:action="@{/Iscritti}" method="get" style="display:inline;">
+                                    <input type="hidden" name="corsoID" th:value="${appello.corso}" />
+                                    <input type="hidden" name="dataAppello" th:value="${#dates.format(appello.data, 'yyyy-MM-dd')}" />
+                                    <button type="submit">Seleziona</button>
+                                </form>
+                            </li>
                             <li th:if="${appelli[iterStat.index].isEmpty()}" style="color:gray;">Nessun appello disponibile</li>
                         </ul>
                     </td>

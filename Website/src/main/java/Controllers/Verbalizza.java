@@ -22,20 +22,18 @@ import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import BEANS.Docente;
-import BEANS.Valutazione;
 import DAO.DocenteDAO;
-import DAO.StudenteDAO;
 
 
-@WebServlet("/ModificaVoto")
-public class ModificaVoto extends HttpServlet {
+@WebServlet("/Verbalizza")
+public class Verbalizza extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-       
     
-    public void init() throws ServletException {
+	
+	public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
 			String driver = context.getInitParameter("dbDriver");
@@ -72,81 +70,56 @@ public class ModificaVoto extends HttpServlet {
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-		Integer studID = null;
+		
 		Integer corsoID = null;
 		Date dataAppello = null;
-		Valutazione valutazione = new Valutazione();
-		
-		try {
-			studID = Integer.parseInt(request.getParameter("studenteID"));
-		}
-		catch(NumberFormatException e) {
-			studID = null;
-		}
 		try {
 			corsoID = Integer.parseInt(request.getParameter("corsoID"));
-		}
-		catch(NumberFormatException e) {
-			corsoID = null;
-		}
-		try {
 			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-		}
-		catch(Exception e) {
+		} 
+		catch (Exception e) {
+			corsoID = null;
 			dataAppello = null;
 		}
-		try {
-			valutazione.setVoto(request.getParameter("voto"));
-		}
-		catch(IllegalArgumentException e) {
-			valutazione = null;
-		}
-		
-		if(studID == null || corsoID == null || dataAppello == null || valutazione == null) {
-			renderPageError(request, response, "Parametri inseriti errati. Riprovare.");
+		if( corsoID == null || dataAppello == null || corsoID < 0 || corsoID > 9999) {
+			renderPageError(request, response, "Corso o data dell'appello non validi. Riprovare.");
 			return;
 		}
 		
-		StudenteDAO studenteDao = new StudenteDAO(connection, studID);
+		int verbaleID = -1;
 		try {
-			if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
-				renderPageError(request, response, "Studente non iscritto all'appello.");
-				return;
-			}	
+			verbaleID = docenteDAO.verbalizzaValutazioni(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore. Riprovare.");
+			renderPageError(request, response, "Errore durante la verbalizzazione dell'appello. Riprovare.");
 			return;
 		}
-		try {
-			docenteDAO.modificaVoto(valutazione, corsoID, dataAppello, studID);
-		} 
-		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore durante la modifica del voto.");
+		if (verbaleID < 0) {
+			renderPageError(request, response, "Errore durante la verbalizzazione dell'appello. Riprovare.");
 			return;
 		}
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/VediIscritti?corsoAppello=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
-		response.sendRedirect(path);
+		String path = request.getContextPath();
+		response.sendRedirect(path + "/MostraVerbaleCreato?verbaleID=" + verbaleID);
 		
 	}
+	
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
 			String errorMessage) throws IOException {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/Modifica.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/DocenteHome.html", ctx, response.getWriter());
 	}
-
+	
 	
 	public void destroy() {
 		try {
 			if (connection != null) {
 				connection.close();
 			}
-		} catch (SQLException sqle) {
+		} 
+		catch (SQLException sqle) {
 		}
 	}
-
 }

@@ -104,7 +104,7 @@ public class Pubblica extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/Iscritti.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/DocenteHome.html", ctx, response.getWriter());
 	}
 	
 	

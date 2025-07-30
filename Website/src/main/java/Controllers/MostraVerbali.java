@@ -25,23 +25,15 @@ import BEANS.Docente;
 import BEANS.Verbale;
 import DAO.VerbaleDAO;
 
-/**
- * Servlet implementation class MostraVerbali
- */
+
 @WebServlet("/MostraVerbali")
 public class MostraVerbali extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public MostraVerbali() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-    
+   
     public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
@@ -70,44 +62,38 @@ public class MostraVerbali extends HttpServlet {
 		
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		HttpSession session = request.getSession();
 		VerbaleDAO verbaleDao = new VerbaleDAO(connection);
 		Docente docente = (Docente) session.getAttribute("user");
-		ArrayList<Verbale> verbali = null;
+		ArrayList<Verbale> verbali = new ArrayList<>();
 		
 		try {
-			verbaleDao.GetVerbaliByDocente(docente.getID());
-			if (verbali == null || verbali.isEmpty() ) {
-				renderPageError(request, response, "Nessun verbale trovato per l'appello.");
-				return;
-			}
+			verbaleDao.getVerbaliByDocente(docente.getID(), verbali);
 		} 
 		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero dei verbali.");
 			return;
 		}
-		
-		@SuppressWarnings("unused")
+		if (verbali.isEmpty()) {
+			renderPageError(request, response, "Nessun verbale trovato per l'appello.");
+			return;
+		}
 		String path = "/WEB-INF/Verbali.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("verbali", verbali);
 		templateEngine.process(path, ctx, response.getWriter());
 		
-		
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
+	
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
 			String errorMessage) throws IOException {

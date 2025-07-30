@@ -31,73 +31,58 @@ public class DocenteDAO {
 		String query = "SELECT c.id AS corso_id, c.nome AS nome_corso, c.cfu AS cfu_corso, a.data AS data_appello "
 					 + "FROM Corsi c LEFT JOIN Appelli a ON c.id = a.corso "
 				     + "WHERE c.docente = ? "
-				     + "ORDER BY c.nome, a.data;";
+				     + "ORDER BY c.nome, a.data DESC;";
 		PreparedStatement pstatement = connection.prepareStatement(query);
 		pstatement.setInt(1, docenteID);
 		ResultSet result = pstatement.executeQuery();
 		
-		int currCorso = -1;
+		int currCorso = -2;
 		int newCorso = -1;
 		Corso c = null;
 		Appello a = null;
 		ArrayList<Appello> newAppelli = null;
-		if(result.next()){
-			currCorso = result.getInt("corso_id");
-			c = new Corso();
-			c.setID(currCorso);
-			c.setNome(result.getString("nome_corso"));
-			c.setCfu(result.getInt("cfu_corso"));
-			corsi.add(c);
-			//Check if the first course has an appello
-			if (result.getDate("data_appello") != null) {
-				a = new Appello();
-				a.setCorso(currCorso);
-				a.setData(result.getDate("data_appello"));
-				newAppelli = new ArrayList<>();
-				newAppelli.add(a);
-				appelli.add(newAppelli);
-			}
-			else {
-				newAppelli = new ArrayList<>();
-				appelli.add(newAppelli);
-			}
-			while (result.next()) {
-				newCorso = result.getInt("corso_id");
-				if (newCorso == currCorso) {
-					if(result.getDate("data_appello") != null) {
-						a = new Appello();
-						a.setCorso(currCorso);
-						a.setData(result.getDate("data_appello"));
-						newAppelli.add(a);
-					}
-				} 
+		
+		corsi = new ArrayList<>();
+		appelli = new ArrayList<>();
+		if (!result.next()) {
+			result.close();
+			pstatement.close();
+			return;
+		}
+		do{
+			newCorso = result.getInt("corso_id");
+			//If the course is the first one or it's different from the previous one
+			if (newCorso != currCorso) {
+				currCorso = newCorso;
+				c = new Corso();
+				c.setID(currCorso);
+				c.setNome(result.getString("nome_corso"));
+				c.setCfu(result.getInt("cfu_corso"));
+				corsi.add(c);
+				//Check if the curr course has an appello
+				if (result.getDate("data_appello") != null) {
+					newAppelli = new ArrayList<>();
+					appelli.add(newAppelli);
+					a = new Appello();
+					a.setCorso(currCorso);
+					a.setData(result.getDate("data_appello"));
+					newAppelli.add(a);
+				}
 				else {
-					currCorso = newCorso;
-					c = new Corso();
-					c.setID(currCorso);
-					c.setNome(result.getString("nome_corso"));
-					c.setCfu(result.getInt("cfu_corso"));
-					corsi.add(c);
-					//Check if the curr course has an appello
-					if (result.getDate("data_appello") != null) {
-						newAppelli = new ArrayList<>();
-						appelli.add(newAppelli);
-						a = new Appello();
-						a.setCorso(currCorso);
-						a.setData(result.getDate("data_appello"));
-						newAppelli.add(a);
-					}
-					else {
-						newAppelli = new ArrayList<>();
-						appelli.add(newAppelli);
-					}
+					newAppelli = new ArrayList<>();
+					appelli.add(newAppelli);
 				}
 			}
-		}
-		else {
-			corsi = null;
-			appelli = null;
-		}
+			//If the course is the same as the previous one
+			else {
+				if(result.getDate("data_appello") != null) {
+					a = new Appello();
+					a.setCorso(currCorso);
+					a.setData(result.getDate("data_appello"));
+					newAppelli.add(a);
+				}
+			} 
+		}while (result.next());
 		
 		result.close();
 		pstatement.close();
@@ -109,12 +94,12 @@ public class DocenteDAO {
 			ArrayList<Valutazione> voti) throws SQLException {
 		
 		String query = "SELECT s.matricola AS stud_matricola, u.nome AS stud_nome, u.cognome AS stud_cognome, "
-				+ "u.email AS stud_email, s.corso_laurea AS stud_corso_laurea, i.id AS stud_id, "
-				+ "i.voto AS voto, i.stato_valutazione AS stato_valutazione "
-				+ "FROM Iscrizioni i, Studenti s, Utenti u "
-				+ "WHERE u.id = s.id AND i.studente = u.id AND "
-				+ "i.corso = ? AND i.data = ? "
-				+ "ORDER BY s.cognome, s.nome;";
+					 + "u.email AS stud_email, s.corso_laurea AS stud_corso_laurea, i.id AS stud_id, "
+					 + "i.voto AS voto, i.stato_valutazione AS stato_valutazione "
+					 + "FROM Iscrizioni i, Studenti s, Utenti u "
+					 + "WHERE u.id = s.id AND i.studente = u.id AND "
+					 + "i.corso = ? AND i.data = ? "
+					 + "ORDER BY s.cognome, s.nome;";
 		
 		PreparedStatement pstatement = connection.prepareStatement(query);
 		pstatement.setInt(1, corsoID);
@@ -123,7 +108,6 @@ public class DocenteDAO {
 		
 		iscritti = new ArrayList<>();
 		voti = new ArrayList<>();
-		
 		while (result.next()) {
 			Studente studente = new Studente();
 			studente.setID(result.getInt("stud_id"));
@@ -150,8 +134,8 @@ public class DocenteDAO {
  	public void modificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
  		
 		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
-				+ "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') AND "
-				+ "corso = ? AND data = ? AND studente = ?";
+					 + "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') AND "
+					 + "corso = ? AND data = ? AND studente = ?";
 		
 		connection.setAutoCommit(false);
 		PreparedStatement pstatement = null;
@@ -202,15 +186,15 @@ public class DocenteDAO {
 	}
 	
 	
-	public void verbalizzaValutazioni(int corso, Date data) throws SQLException{
+	public int verbalizzaValutazioni(int corso, Date data) throws SQLException{
 		
-		connection.setAutoCommit(false);
+		int idVerbale = -1;
 		try {
+			connection.setAutoCommit(false);
 		    String insertVerbale = "INSERT INTO Verbali (data_ora_creaz) VALUES (NOW())";
 		    PreparedStatement psVerbale = connection.prepareStatement(insertVerbale, Statement.RETURN_GENERATED_KEYS);
 		    psVerbale.executeUpdate();
 		    ResultSet rs = psVerbale.getGeneratedKeys();
-		    int idVerbale = -1;
 		    if (rs.next()) {
 		        idVerbale = rs.getInt(1);
 		    } 
@@ -230,13 +214,13 @@ public class DocenteDAO {
 		    connection.commit();
 		    psVerbale.close();
 		    psUpdate.close();
+		    connection.setAutoCommit(true);
+		    return idVerbale;
 		} 
 		catch (SQLException e) {
 		    connection.rollback();
-		    throw e; 
-		} 
-		finally {
 		    connection.setAutoCommit(true);
+		    throw e; 
 		}
 		
 	}
