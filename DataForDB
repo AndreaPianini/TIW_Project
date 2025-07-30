@@ -1,3 +1,20 @@
+
+--Elimina dati precedenti
+SET FOREIGN_KEY_CHECKS=0;
+
+TRUNCATE TABLE Iscrizioni;
+TRUNCATE TABLE Appelli;
+TRUNCATE TABLE Verbali;
+TRUNCATE TABLE StudSegueCorso;
+TRUNCATE TABLE Studenti;
+TRUNCATE TABLE Docenti;
+TRUNCATE TABLE Corsi;
+TRUNCATE TABLE Utenti;
+
+SET FOREIGN_KEY_CHECKS=1;
+
+
+--Popola DB
 USE db_esami;
 
 -- Cancella in ordine inverso rispetto alle FK
