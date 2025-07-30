@@ -98,6 +98,7 @@ public class VediIscritti extends HttpServlet {
 			//controllo per i voti??
 		} 
 		catch (SQLException e) {
+			e.printStackTrace();
 			renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
 			return;
 		}

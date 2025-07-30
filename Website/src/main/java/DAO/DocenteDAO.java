@@ -94,20 +94,21 @@ public class DocenteDAO {
 			ArrayList<Valutazione> voti) throws SQLException {
 		
 		String query = "SELECT s.matricola AS stud_matricola, u.nome AS stud_nome, u.cognome AS stud_cognome, "
-					 + "u.email AS stud_email, s.corso_laurea AS stud_corso_laurea, i.id AS stud_id, "
+					 + "u.email AS stud_email, s.corso_laurea AS stud_corso_laurea, i.studente AS stud_id, "
 					 + "i.voto AS voto, i.stato_valutazione AS stato_valutazione "
-					 + "FROM Iscrizioni i, Studenti s, Utenti u "
-					 + "WHERE u.id = s.id AND i.studente = u.id AND "
-					 + "i.corso = ? AND i.data = ? "
-					 + "ORDER BY s.cognome, s.nome;";
+					 + "FROM Iscrizioni i "
+					 + "JOIN Studenti s ON i.studente = s.id "
+					 + "JOIN Utenti u ON s.id = u.id "
+					 + "WHERE i.corso = ? AND i.data = ? "
+					 + "ORDER BY u.cognome, u.nome;";
 		
 		PreparedStatement pstatement = connection.prepareStatement(query);
 		pstatement.setInt(1, corsoID);
 		pstatement.setDate(2, dataAppello);
 		ResultSet result = pstatement.executeQuery();
 		
-		iscritti = new ArrayList<>();
-		voti = new ArrayList<>();
+		iscritti.clear();
+		voti.clear();
 		while (result.next()) {
 			Studente studente = new Studente();
 			studente.setID(result.getInt("stud_id"));
@@ -124,7 +125,6 @@ public class DocenteDAO {
 			iscritti.add(studente);
 			voti.add(voto);
 		}
-		
 		result.close();
 		pstatement.close();
 		

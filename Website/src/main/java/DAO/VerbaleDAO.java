@@ -90,8 +90,8 @@ public class VerbaleDAO {
 		pstatement.setInt(1, verbale.getId());
 		ResultSet result = pstatement.executeQuery();
 		
-		studenti = new ArrayList<>();
-		valutazioni = new ArrayList<>();
+		studenti.clear();
+		valutazioni.clear();
 		if (result.next()) {
 			verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
 		}
