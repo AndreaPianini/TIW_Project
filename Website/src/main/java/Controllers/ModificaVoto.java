@@ -76,46 +76,50 @@ public class ModificaVoto extends HttpServlet {
 	    Integer studID = null;
 	    Integer corsoID = null;
 	    Date dataAppello = null;
-	    Valutazione valutazione = new Valutazione();
-
 	    try {
 	        studID = Integer.parseInt(request.getParameter("studenteID"));
 	        corsoID = Integer.parseInt(request.getParameter("corsoID"));
 	        dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-	    } catch (Exception e) {
-	        renderPageError(request, response, "Parametri numerici o data errati.");
+	    } 
+	    catch (Exception e) {
+	        renderPageError(request, response, "Parametri non validi.");
 	        return;
 	    }
-
+	    
+	    Valutazione valutazione = new Valutazione();
 	    try {
 	        String votoParam = request.getParameter("voto");
 	        valutazione.setVoto(votoParam);
-	    } catch (IllegalArgumentException e) {
+	    } 
+	    catch (IllegalArgumentException e) {
 	        renderPageError(request, response, "Voto non valido.");
 	        return;
 	    }
 
 	    StudenteDAO studenteDao = new StudenteDAO(connection, studID);
 	    try {
+	    	//DA CONTROLLARE
 	        if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
 	            renderPageError(request, response, "Studente non iscritto all'appello.");
 	            return;
 	        }
-	    } catch (SQLException e) {
+	    } 
+	    catch (SQLException e) {
 	        renderPageError(request, response, "Errore durante il controllo dell'iscrizione.");
 	        return;
 	    }
 
 	    try {
 	        docenteDAO.modificaVoto(valutazione, corsoID, dataAppello, studID);
-	    } catch (SQLException e) {
+	    } 
+	    catch (SQLException e) {
 	        renderPageError(request, response, "Errore durante la modifica del voto.");
 	        return;
 	    }
-
 	    String ctxpath = getServletContext().getContextPath();
-	    String path = ctxpath + "/VediIscritti?corsoAppello=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
+	    String path = ctxpath + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
 	    response.sendRedirect(path);
+	    
 	}
 	
 	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
@@ -123,7 +127,7 @@ public class ModificaVoto extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/Modifica.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/ModificaVoto.html", ctx, response.getWriter());
 	}
 
 	

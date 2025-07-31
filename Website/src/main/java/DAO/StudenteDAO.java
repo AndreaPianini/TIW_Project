@@ -22,7 +22,7 @@ public class StudenteDAO {
 	}
 	
 	public Studente getStudenteInfo() throws SQLException{
-		Studente studInfo = new Studente();
+		Studente studente = new Studente();
 		String query = "SELECT * FROM Studenti NATURAL JOIN Utenti WHERE id = ?";
 		ResultSet result = null;
 		PreparedStatement pstatement = null;
@@ -30,11 +30,12 @@ public class StudenteDAO {
 		pstatement.setInt(1, this.studenteID);
 		result = pstatement.executeQuery();
 		if (result.next()) {
-			studInfo.setMatricola(result.getString("matricola"));
-			studInfo.setNome(result.getString("nome"));
-			studInfo.setCognome(result.getString("cognome"));
-			studInfo.setEmail(result.getString("email"));
-			studInfo.setCorsoLaurea(result.getString("corso_laurea"));
+			studente.setID(studenteID);
+			studente.setMatricola(result.getString("matricola"));
+			studente.setNome(result.getString("nome"));
+			studente.setCognome(result.getString("cognome"));
+			studente.setEmail(result.getString("email"));
+			studente.setCorsoLaurea(result.getString("corso_laurea"));
 			}
 		
 
@@ -46,7 +47,7 @@ public class StudenteDAO {
 			pstatement.close();
 		}
 			
-		return studInfo;
+		return studente;
 		
 	}
 	
@@ -123,9 +124,8 @@ public class StudenteDAO {
 		if (result.next()) {
 			valutazione = new Valutazione();
 			String votoStr = result.getString("voto");
-			if (votoStr != null) {
-				valutazione.setVoto(votoStr);
-			}
+			// Check if the votoStr is null
+			valutazione.setVoto(votoStr);
 			valutazione.setStatoValutazione(result.getString("stato_valutazione"));
 		}
 		result.close();

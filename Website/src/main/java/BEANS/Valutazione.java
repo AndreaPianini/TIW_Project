@@ -55,6 +55,7 @@ public class Valutazione {
 	}
 	public void setVoto(String voto) throws IllegalArgumentException {
 		switch (voto) {
+			case null: this.voto = null; break;
 			case "18": this.voto = Voto._18; break;
 			case "19": this.voto = Voto._19; break;
 			case "20": this.voto = Voto._20; break;

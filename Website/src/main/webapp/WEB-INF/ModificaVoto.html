@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifica Voto Studente</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+	<div class="container">
+	    <h2>Modifica Voto Studente</h2>
+	
+	    <div th:if="${error}" class="error-message">
+	        <p th:text="${error}"></p>
+	    </div>
+	
+	    <h3>Dati Studente</h3>
+	    <table class="table">
+	        <tr><th>Matricola</th><td th:text="${studente.matricola}"></td></tr>
+	        <tr><th>Cognome</th><td th:text="${studente.cognome}"></td></tr>
+	        <tr><th>Nome</th><td th:text="${studente.nome}"></td></tr>
+	        <tr><th>Email</th><td th:text="${studente.email}"></td></tr>
+	        <tr><th>Corso di Laurea</th><td th:text="${studente.corsoLaurea}"></td></tr>
+	    </table>
+	
+	    <h3>Valutazione Attuale</h3>
+	    <table class="table">
+	        <tr><th>Voto</th>
+	            <td th:text="${valutazione.voto != null ? valutazione.voto.toString() : ''}"></td></tr>
+	        <tr><th>Stato</th><td th:text="${valutazione.statoValutazione.toString()}"></td></tr>
+	    </table>
+	
+	    <form th:action="@{/ModificaVoto}" method="post">
+	        <input type="hidden" name="studenteID" th:value="${studente.id}" />
+	        <input type="hidden" name="corsoID" th:value="${corsoID}" />
+	        <input type="hidden" name="dataAppello" th:value="${dataAppello}" />
+	        <div class="form-group">
+	            <label for="voto">Nuovo Voto:</label>
+	            <select name="voto" id="voto" class="form-control">
+	                <option value="" th:selected="${valutazione.voto == null}">Seleziona voto</option>
+	                <option th:each="v : ${votiPossibili}"
+        					th:value="${v.toString()}"
+        					th:text="${v.toString()}"
+        					th:selected="${valutazione.voto != null and valutazione.voto.toString().equals(v.toString())}">
+        			</option>
+	            </select>
+	        </div>
+	        <button type="submit" class="btn-primary" style="margin-top: 15px;">Salva</button>
+	    </form>
+	
+	    <a th:href="@{/VediIscritti(corsoID=${corsoID},dataAppello=${dataAppello})}" class="btn-secondary" style="margin-top: 20px;">Annulla</a>
+	</div>
+</body>
+</html>
