@@ -12,37 +12,40 @@
         <div th:if="${error}" class="error-message">
             <p th:text="${error}"></p>
         </div>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Corso</th>
-                    <th>Appelli con iscrizione</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="corso, iterStat : ${corsi}">
-                    <td th:text="${corso.nome}"></td>
-                    <td>
-                        <ul>
-                            <li th:each="appello : ${appelli[iterStat.index]}">
-                                <span th:text="${#dates.format(appello.data, 'dd/MM/yyyy')}"></span>
-                                <form th:action="@{/VediVoto}" method="get" style="display:inline;">
-                                    <input type="hidden" name="corsoID" th:value="${appello.corso}" />
-                                    <input type="hidden" name="dataAppello" th:value="${#dates.format(appello.data, 'yyyy-MM-dd')}" />
-                                    <button type="submit">Seleziona</button>
-                                </form>
-                            </li>
-                            <li th:if="${appelli[iterStat.index].isEmpty()}" style="color:gray;">Nessun appello a cui sei iscritto</li>
-                        </ul>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <!-- Bottone Logout -->
-        <form th:action="@{/Logout}" method="get" style="margin-top: 20px;">
-            <button type="submit" class="btn-secondary">Logout</button>
+        <div th:if="${error == null}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Corso</th>
+                        <th>Appelli con iscrizione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="corso, iterStat : ${corsi}">
+                        <td th:text="${corso.nome}"></td>
+                        <td>
+                            <ul>
+                                <li th:each="appello : ${appelli[iterStat.index]}">
+                                    <span th:text="${#dates.format(appello.data, 'dd/MM/yyyy')}"></span>
+                                    <form th:action="@{/VediVoto}" method="get" style="display:inline;">
+                                        <input type="hidden" name="corsoID" th:value="${appello.corso}" />
+                                        <input type="hidden" name="dataAppello" th:value="${#dates.format(appello.data, 'yyyy-MM-dd')}" />
+                                        <button type="submit">Seleziona</button>
+                                    </form>
+                                </li>
+                                <li th:if="${appelli[iterStat.index].isEmpty()}" style="color:gray;">Nessun appello a cui sei iscritto</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Bottone Logout -->
+            <form th:action="@{/Logout}" method="get" style="margin-top: 20px;">
+                <button type="submit" class="btn-secondary">Logout</button>
+            </form>
+        </div>
+        <form th:action="@{/VaiHomeStudente}" method="get" style="margin-top: 20px;">
+            <button type="submit" class="btn-secondary">Torna alla Home</button>
         </form>
     </div>
 </body>

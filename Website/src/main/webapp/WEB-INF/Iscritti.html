@@ -13,50 +13,59 @@
         <p th:text="${error}"></p>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Matricola</th>
-                <th>Cognome</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Corso di Laurea</th>
-                <th>Voto</th>
-                <th>Stato</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="stud, iterStat : ${iscritti}">
-                <td th:text="${stud.matricola}"></td>
-                <td th:text="${stud.cognome}"></td>
-                <td th:text="${stud.nome}"></td>
-                <td th:text="${stud.email}"></td>
-                <td th:text="${stud.corsoLaurea}"></td>
-                <td th:text="${voti[iterStat.index].voto.toString()}"></td>
-                <td th:text="${voti[iterStat.index].statoValutazione.toString()}"></td>
-                <td>
-                    <form th:action="@{/Modifica}" method="get" style="display:inline;">
-                        <input type="hidden" name="studenteID" th:value="${stud.id}" />
-                        <input type="hidden" name="corsoID" th:value="${corsoID}" />
-                        <input type="hidden" name="dataAppello" th:value="${dataAppello}" />
-                        <button type="submit" class="btn-primary">Modifica</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div th:if="${error == null}">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Matricola</th>
+                    <th>Cognome</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Corso di Laurea</th>
+                    <th>Voto</th>
+                    <th>Stato</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="stud, iterStat : ${iscritti}">
+                    <td th:text="${stud.matricola}"></td>
+                    <td th:text="${stud.cognome}"></td>
+                    <td th:text="${stud.nome}"></td>
+                    <td th:text="${stud.email}"></td>
+                    <td th:text="${stud.corsoLaurea}"></td>
+                    <td th:text="${voti[iterStat.index].voto != null ? voti[iterStat.index].voto.toString() : '-'}"></td>
+                    <td th:text="${voti[iterStat.index].statoValutazione != null ? voti[iterStat.index].statoValutazione.toString() : ''}"></td>
+                    <td>
+                        <form th:if="${voti[iterStat.index].statoValutazione != null and 
+                        			   (voti[iterStat.index].statoValutazione.name() == 'NON_INSERITO' or 
+                        			    voti[iterStat.index].statoValutazione.name() == 'INSERITO')
+                        			  }"
+                              th:action="@{/Modifica}" method="get" style="display:inline;">
+                            <input type="hidden" name="studenteID" th:value="${stud.id}" />
+                            <input type="hidden" name="corsoID" th:value="${corsoID}" />
+                            <input type="hidden" name="dataAppello" th:value="${dataAppello}" />
+                            <button type="submit" class="btn-primary">Modifica</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-    <form th:action="@{/Pubblica}" method="post" style="margin-top: 20px;">
-        <button type="submit" class="btn-warning">Pubblica</button>
-    </form>
+        <form th:action="@{/Pubblica}" method="post" style="margin-top: 20px;">
+            <input type="hidden" name="corsoID" th:value="${corsoID}" />
+            <input type="hidden" name="dataAppello" th:value="${dataAppello}" />
+            <button type="submit" class="btn-warning">Pubblica</button>
+        </form>
+        
+        <form th:action="@{/Verbalizza}" method="post" style="margin-top: 20px;">
+            <input type="hidden" name="corsoID" th:value="${corsoID}" />
+            <input type="hidden" name="dataAppello" th:value="${dataAppello}" />
+            <button type="submit" class="btn-warning">Verbalizza</button>
+        </form>
+    </div>
     
-    <form th:action="@{/Verbalizza}" method="post" style="margin-top: 20px;">
-        <button type="submit" class="btn-warning">Verbalizza</button>
-    </form>
-    
-    <!-- Bottone Torna alla Home -->
     <form th:action="@{/VaiHomeDocente}" method="get" style="margin-top: 20px;">
-        <button type="submit" class="btn-secondary">Torna alla Home</button>
+            <button type="submit" class="btn-secondary">Torna alla Home</button>
     </form>
 </div>
 </body>
