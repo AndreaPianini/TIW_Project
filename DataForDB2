@@ -1,0 +1,119 @@
+-- Elimina dati precedenti (ordine: tabelle con più dipendenze per ultime)
+SET FOREIGN_KEY_CHECKS=0;
+
+TRUNCATE TABLE Iscrizioni;
+TRUNCATE TABLE StudSegueCorso;
+TRUNCATE TABLE Appelli;
+TRUNCATE TABLE Verbali;
+TRUNCATE TABLE Corsi;
+TRUNCATE TABLE Docenti;
+TRUNCATE TABLE Studenti;
+TRUNCATE TABLE Utenti;
+
+SET FOREIGN_KEY_CHECKS=1;
+
+-- Popola DB
+USE db_esami;
+
+-- UTENTI
+INSERT INTO Utenti (id, password, nome, cognome, email) VALUES
+(1, 'pwd1', 'Mario', 'Rossi', 'mario.rossi@uni.it'),
+(2, 'pwd2', 'Luca', 'Verdi', 'luca.verdi@uni.it'),
+(3, 'pwd3', 'Anna', 'Bianchi', 'anna.bianchi@uni.it'),
+(4, 'pwd4', 'Giulia', 'Neri', 'giulia.neri@uni.it'),
+(5, 'pwd5', 'Paolo', 'Gialli', 'paolo.gialli@uni.it'),
+(6, 'pwd6', 'Marco', 'Blu', 'marco.blu@uni.it'),
+(7, 'pwd7', 'Chiara', 'Rosa', 'chiara.rosa@uni.it'),
+(8, 'pwd8', 'Stefano', 'Viola', 'stefano.viola@uni.it'),
+(9, 'pwd9', 'Elena', 'Marrone', 'elena.marrone@uni.it'),
+(10, 'pwd10', 'Francesca', 'Grigi', 'francesca.grigi@uni.it');
+
+-- DOCENTI
+INSERT INTO Docenti (id) VALUES (1), (2), (3), (4), (5);
+
+-- STUDENTI
+INSERT INTO Studenti (id, matricola, corso_laurea) VALUES
+(6, 'S1001', 'Informatica'),
+(7, 'S1002', 'Fisica'),
+(8, 'S1003', 'Matematica'),
+(9, 'S1004', 'Ingegneria'),
+(10, 'S1005', 'Biologia');
+
+-- CORSI (Corsi con 0, 1, 2, 3 appelli)
+INSERT INTO Corsi (id, nome, cfu, docente) VALUES
+(101, 'Algoritmi', 9, 1),         -- 3 appelli
+(102, 'Analisi 1', 12, 2),        -- 2 appelli
+(103, 'Fisica 1', 9, 3),          -- 1 appello
+(104, 'Statistica', 6, 4),        -- 0 appelli
+(105, 'Reti', 6, 5),              -- 3 appelli
+(106, 'Sistemi Operativi', 9, 1), -- 2 appelli
+(107, 'Database', 9, 2),          -- 1 appello
+(108, 'Chimica', 6, 3),           -- 0 appelli
+(109, 'Programmazione', 12, 4),   -- 2 appelli
+(110, 'Matematica Discreta', 6, 5); -- 1 appello
+
+-- APPELLI (diverso numero per corso: 3, 2, 1, 0)
+INSERT INTO Appelli (corso, data) VALUES
+(101, '2025-06-01'), (101, '2025-07-15'), (101, '2025-09-01'),
+(102, '2025-06-03'), (102, '2025-07-20'),
+(103, '2025-06-05'),
+-- (104, ...) Nessun appello per Statistica
+(105, '2025-06-12'), (105, '2025-07-27'), (105, '2025-09-05'),
+(106, '2025-06-14'), (106, '2025-07-29'),
+(107, '2025-06-16'),
+-- (108, ...) Nessun appello per Chimica
+(109, '2025-06-20'), (109, '2025-08-01'),
+(110, '2025-06-22');
+
+-- VERBALI (solo per appelli effettivi, esempio: 4 verbali)
+INSERT INTO Verbali (id, data_ora_creaz) VALUES
+(1, '2025-07-02 10:00:00'),
+(2, '2025-07-28 11:00:00'),
+(3, '2025-09-06 12:00:00'),
+(4, '2025-06-30 09:30:00');
+
+-- STUDENTE SEGUE CORSO (ogni studente segue almeno 2 corsi, distribuiti)
+INSERT INTO StudSegueCorso (Studente, Corso) VALUES
+(6, 101), (6, 102), (6, 105),
+(7, 103), (7, 101), (7, 106),
+(8, 105), (8, 107), (8, 109),
+(9, 101), (9, 109), (9, 110),
+(10, 105), (10, 106), (10, 110);
+
+-- ISCRIZIONI (alcuni con voto NULL e stato NON_INSERITO, alcuni VERBALIZZATI solo se associati a verbale)
+INSERT INTO Iscrizioni (studente, corso, data, voto, stato_valutazione, verbale) VALUES
+-- CORSO 101 (3 appelli, 1 verbale)
+(6, 101, '2025-06-01', NULL, 'NON_INSERITO', NULL),
+(6, 101, '2025-07-15', '28', 'VERBALIZZATO', 1),
+(7, 101, '2025-07-15', '27', 'VERBALIZZATO', 1),
+(9, 101, '2025-07-15', '30L', 'VERBALIZZATO', 1),
+(7, 101, '2025-09-01', NULL, 'NON_INSERITO', NULL),
+
+-- CORSO 102 (2 appelli, nessun verbale, un inserimento incompleto)
+(6, 102, '2025-06-03', NULL, 'NON_INSERITO', NULL),
+(6, 102, '2025-07-20', '25', 'INSERITO', NULL),
+
+-- CORSO 103 (1 appello, nessun verbale)
+(7, 103, '2025-06-05', NULL, 'NON_INSERITO', NULL),
+
+-- CORSO 105 (3 appelli, 2 con verbale, 1 senza)
+(8, 105, '2025-06-12', '29', 'VERBALIZZATO', 2),
+(10, 105, '2025-07-27', '25', 'VERBALIZZATO', 2),
+(6, 105, '2025-09-05', NULL, 'NON_INSERITO', NULL),
+
+-- CORSO 106 (2 appelli, nessun verbale)
+(7, 106, '2025-06-14', NULL, 'NON_INSERITO', NULL),
+(10, 106, '2025-07-29', '24', 'INSERITO', NULL),
+
+-- CORSO 107 (1 appello, nessun verbale)
+(8, 107, '2025-06-16', NULL, 'NON_INSERITO', NULL),
+
+-- CORSO 109 (2 appelli, 1 con verbale, 1 senza)
+(8, 109, '2025-06-20', '27', 'VERBALIZZATO', 3),
+(9, 109, '2025-06-20', '28', 'VERBALIZZATO', 3),
+(9, 109, '2025-08-01', NULL, 'NON_INSERITO', NULL),
+
+-- CORSO 110 (1 appello, nessun verbale)
+(9, 110, '2025-06-22', NULL, 'NON_INSERITO', NULL),
+(10, 110, '2025-06-22', '19', 'INSERITO', NULL);
+
