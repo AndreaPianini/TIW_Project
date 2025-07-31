@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Verbali</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 	<div class="container">
@@ -18,7 +18,6 @@
 	            <p>Nessun verbale disponibile.</p>
 	        </div>
 	
-	        <!-- Tabella verbali -->
 	        <div th:if="${!#lists.isEmpty(verbali)}">
 	            <table class="table">
 	                <thead>

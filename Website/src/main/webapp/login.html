@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-    <div class="login-container">
+    <div class="container login-container">
         <h2>Accedi al sistema</h2>
 
         <form action="CheckLogin" method="POST">
@@ -24,7 +24,7 @@
                 <p th:text="${error}"></p>
             </div>
 
-            <button type="submit">Login</button>
+            <button type="submit" class="btn-primary">Login</button>
         </form>
     </div>
 </body>

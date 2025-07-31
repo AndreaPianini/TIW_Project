@@ -30,7 +30,7 @@
                                     <form th:action="@{/VediIscritti}" method="get" style="display:inline;">
                                         <input type="hidden" name="corsoID" th:value="${appello.corso}" />
                                         <input type="hidden" name="dataAppello" th:value="${#dates.format(appello.data, 'yyyy-MM-dd')}" />
-                                        <button type="submit">Seleziona</button>
+                                        <button type="submit" class="btn-primary">Seleziona</button>
                                     </form>
                                 </li>
                                 <li th:if="${appelli[iterStat.index].isEmpty()}" style="color:gray;">Nessun appello disponibile</li>
@@ -51,7 +51,6 @@
         <form th:action="@{/VaiHomeDocente}" method="get" style="margin-top: 20px;">
             <button type="submit" class="btn-secondary">Torna alla Home</button>
         </form>
-    
     </div>
 </body>
 </html>

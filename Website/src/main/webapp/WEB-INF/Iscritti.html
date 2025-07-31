@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Iscritti all'Appello</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 <div class="container">
@@ -37,9 +37,9 @@
                     <td th:text="${voti[iterStat.index].statoValutazione != null ? voti[iterStat.index].statoValutazione.toString() : ''}"></td>
                     <td>
                         <form th:if="${voti[iterStat.index].statoValutazione != null and 
-                        			   (voti[iterStat.index].statoValutazione.name() == 'NON_INSERITO' or 
-                        			    voti[iterStat.index].statoValutazione.name() == 'INSERITO')
-                        			  }"
+                         (voti[iterStat.index].statoValutazione.name() == 'NON_INSERITO' or 
+                          voti[iterStat.index].statoValutazione.name() == 'INSERITO')
+                        }"
                               th:action="@{/Modifica}" method="get" style="display:inline;">
                             <input type="hidden" name="studenteID" th:value="${stud.id}" />
                             <input type="hidden" name="corsoID" th:value="${corsoID}" />
