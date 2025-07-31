@@ -28,7 +28,7 @@ public class StudenteChecker implements Filter {
 		//System.out.print("Studente filter executing \n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String loginpath = req.getServletContext().getContextPath() + "/login.html";
+		String loginpath = req.getServletContext().getContextPath() + "/Login";
 		HttpSession s = req.getSession();
 		Utente u = null;
         // check if the client is a worker

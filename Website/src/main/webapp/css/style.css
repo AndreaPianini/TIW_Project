@@ -141,21 +141,21 @@ button[type="submit"]:hover {
     color: #2a3a5e;
 }
 
-a.btn-secondary {
-    text-decoration: none;
-    padding: 0.6rem 1.3rem;
-    border-radius: 6px;
-    font-size: 1.05rem;
-    font-weight: 600;
-    background: #e3eafc;
-    color: #2a3a5e;
-    border: 1px solid #b6c6e6;
-    transition: background 0.2s, color 0.2s;
-}
-a.btn-secondary:hover {
-    background: #b6c6e6;
-    color: #2a3a5e;
-}
+/* a.btn-secondary { */
+/*     text-decoration: none; */
+/*     padding: 0.6rem 1.3rem; */
+/*     border-radius: 6px; */
+/*     font-size: 1.05rem; */
+/*     font-weight: 600; */
+/*     background: #e3eafc; */
+/*     color: #2a3a5e; */
+/*     border: 1px solid #b6c6e6; */
+/*     transition: background 0.2s, color 0.2s; */
+/* } */
+/* a.btn-secondary:hover { */
+/*     background: #b6c6e6; */
+/*     color: #2a3a5e; */
+/* } */
 
 /* Messaggi di errore */
 .error-message {

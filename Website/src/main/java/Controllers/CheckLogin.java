@@ -116,7 +116,7 @@ public class CheckLogin extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
 		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 		ctx.setVariable("error", errorMessage);
-		templateEngine.process("login.html", ctx, response.getWriter());
+		templateEngine.process("/WEB-INF/Login.html", ctx, response.getWriter());
 	}
 	
 	
