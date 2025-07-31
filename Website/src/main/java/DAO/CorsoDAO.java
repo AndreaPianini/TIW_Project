@@ -16,57 +16,51 @@ public class CorsoDAO {
 		this.con = connection;
 	}
 	
+	
 	public ArrayList<Corso> GetCorsiByStudente(int studID) throws SQLException {
 		ArrayList<Corso> corsi = new ArrayList<>();
 		String query = "SELECT * FROM StudSegueCorso, Corsi WHERE Corso=id AND Studente = ? ORDER BY nome DESC";
-		ResultSet result = null;
 		PreparedStatement pstatement = null;
-		
-		pstatement = con.prepareStatement(query);
-		pstatement.setInt(1, studID);
-		result = pstatement.executeQuery();
-		while (result.next()) {
-			Corso c = new Corso();
-			c.setID(result.getInt("id"));
-			c.setNome(result.getString("nome"));
-			corsi.add(c);
-		}	
-		
-		if (result != null) {
-			result.close();
+		ResultSet result = null;
+		try {
+			pstatement = con.prepareStatement(query);
+			pstatement.setInt(1, studID);
+			result = pstatement.executeQuery();
+			while (result.next()) {
+				Corso c = new Corso();
+				c.setID(result.getInt("id"));
+				c.setNome(result.getString("nome"));
+				corsi.add(c);
 			}
-			
-		if (pstatement != null) {
-			pstatement.close();
+		} 
+		finally {
+			if (result != null) try { result.close(); } catch (SQLException ignore) {}
+			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
 		}
-			
-		
 		return corsi;
 	}
+	
 	
 	public Corso getCorsoById(int corsoID) throws SQLException {
 		Corso corso = new Corso();
 		String query= "SELECT * FROM Corsi WHERE id=?";
-		ResultSet result = null;
 		PreparedStatement pstatement = null;
-		pstatement = con.prepareStatement(query);
-		pstatement.setInt(1, corsoID);
-		result = pstatement.executeQuery();
-		if (result.next()) {
-			corso.setID(corsoID);
-			corso.setCfu(result.getInt("cfu"));
-			corso.setNome(result.getString("nome"));
-			corso.setDocenteID(result.getInt("docente"));
-		}
-		if (result != null) {
-			result.close();
+		ResultSet result = null;
+		try {
+			pstatement = con.prepareStatement(query);
+			pstatement.setInt(1, corsoID);
+			result = pstatement.executeQuery();
+			if (result.next()) {
+				corso.setID(corsoID);
+				corso.setCfu(result.getInt("cfu"));
+				corso.setNome(result.getString("nome"));
+				corso.setDocenteID(result.getInt("docente"));
 			}
-			
-		if (pstatement != null) {
-			pstatement.close();
+		} 
+		finally {
+			if (result != null) try { result.close(); } catch (SQLException ignore) {}
+			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
 		}
-			
-		
 		return corso;
 	}
 

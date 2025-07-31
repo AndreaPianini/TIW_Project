@@ -21,103 +21,102 @@ public class VerbaleDAO {
 		this.con=connection;
 	}
 	
+	
 	public ArrayList<VerbaleRiga> getVerbaliByDocente(int docID) throws SQLException {
-		
+    
 		String query = "SELECT DISTINCT V.id AS verbale_id, V.data_ora_creaz AS data_ora, " +
-		        "       C.id AS corso_id, C.nome AS nome_corso, I.data AS data_appello " +
-		        "FROM   Corsi C " +
-		        "JOIN   Iscrizioni I ON I.corso = C.id " +
-		        "JOIN   Verbali   V ON V.id    = I.verbale " +
-		        "WHERE  C.docente = ? " +
-		        "ORDER  BY C.nome ASC, I.data ASC, V.id ASC";
-		PreparedStatement pstatement = con.prepareStatement(query);
-		pstatement.setInt(1, docID);
-		ResultSet result = pstatement.executeQuery();
-		
-		ArrayList<VerbaleRiga> righe = new ArrayList<>();
-		
-		while (result.next()) {
-			VerbaleRiga r = new VerbaleRiga();
-			r.setId(result.getInt("verbale_id"));
-            r.setDataOra(
-            		result.getObject("data_ora", LocalDateTime.class));
-            r.setNomeCorso(result.getString("nome_corso"));
-            r.setDataAppello(
-            		result.getDate("data_appello").toLocalDate());
-            righe.add(r);
-		}
-		result.close();
-		pstatement.close();
-		
-		return righe;
-		
+				       "C.id AS corso_id, C.nome AS nome_corso, I.data AS data_appello " +
+				       "FROM   Corsi C " +
+				       "JOIN   Iscrizioni I ON I.corso = C.id " +
+				       "JOIN   Verbali   V ON V.id    = I.verbale " +
+				       "WHERE  C.docente = ? " +
+				       "ORDER  BY C.nome ASC, I.data ASC, V.id ASC";
+	    PreparedStatement pstatement = null;
+	    ResultSet result = null;
+	    ArrayList<VerbaleRiga> righe = new ArrayList<>();
+	    try {
+	        pstatement = con.prepareStatement(query);
+	        pstatement.setInt(1, docID);
+	        result = pstatement.executeQuery();
+	        while (result.next()) {
+	            VerbaleRiga r = new VerbaleRiga();
+	            r.setId(result.getInt("verbale_id"));
+	            r.setDataOra(result.getObject("data_ora", LocalDateTime.class));
+	            r.setNomeCorso(result.getString("nome_corso"));
+	            r.setDataAppello(result.getDate("data_appello").toLocalDate());
+	            righe.add(r);
+	        }
+	    } 
+	    finally {
+	        if (result != null) try { result.close(); } catch (SQLException ignore) {}
+	        if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+	    }
+	    return righe;
 	}
+
 	
 	public Verbale getVerbaleInfo(int verID) throws SQLException {
-		
+    
 		Verbale verbale = new Verbale();
-		String query = "SELECT * FROM Verbali WHERE id = ?";
-		PreparedStatement pstatement = con.prepareStatement(query);
-		pstatement.setInt(1, verID);
-		ResultSet result = pstatement.executeQuery();
-			
-		if (!result.next())// non ci sono verbali
-			return null;
-			
-		verbale.setId(result.getInt("id"));
-
-		verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
-		result.close();
-		pstatement.close();	
-		return verbale;
-		
+	    String query = "SELECT * FROM Verbali WHERE id = ?";
+	    PreparedStatement pstatement = null;
+	    ResultSet result = null;
+	    try {
+	        pstatement = con.prepareStatement(query);
+	        pstatement.setInt(1, verID);
+	        result = pstatement.executeQuery();
+	        if (!result.next())
+	            return null;
+	        verbale.setId(result.getInt("id"));
+	        verbale.setData_Ora((java.time.LocalDateTime) result.getObject("data_ora_creaz"));
+	    } 
+	    finally {
+	        if (result != null) try { result.close(); } catch (SQLException ignore) {}
+	        if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+	    }
+	    return verbale;
 	}
-	
 
 	
 	public void getStudentiAndInfoByVerbale(Verbale verbale, 
-			ArrayList<Studente> studenti, ArrayList<Valutazione> valutazioni) throws SQLException{
+        ArrayList<Studente> studenti, ArrayList<Valutazione> valutazioni) throws SQLException{
 		
-		String query = "SELECT s.id AS stud_id, s.matricola, u.nome, u.cognome, "
-				+ "       i.voto, i.stato_valutazione, v.data_ora_creaz "
-				+ "FROM Iscrizioni i "
-				+ "JOIN Studenti s ON i.studente = s.id "
-				+ "JOIN Utenti u ON s.id = u.id "
-				+ "JOIN Verbali v ON i.verbale = v.id "
-				+ "WHERE i.verbale = ?";
-		
-		PreparedStatement pstatement = con.prepareStatement(query);
-		pstatement.setInt(1, verbale.getId());
-		ResultSet result = pstatement.executeQuery();
-		
-		studenti.clear();
-		valutazioni.clear();
-		if (result.next()) {
-			verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
-		}
-		else {
-			// Se non ci sono studenti iscritti al verbale, ritorno
-			result.close();
-			pstatement.close();
-			return;
-		}
-			
-		do {
-			Studente studente = new Studente();
-			studente.setID(result.getInt("stud_id"));
-			studente.setMatricola(result.getString("matricola"));
-			studente.setNome(result.getString("nome"));
-			studente.setCognome(result.getString("cognome"));
-			studenti.add(studente);
-			
-			Valutazione valutazione = new Valutazione();
-			valutazione.setVoto(result.getString("voto"));
-			valutazione.setStatoValutazione(result.getString("stato_valutazione"));
-			valutazioni.add(valutazione);
-		} while(result.next());
-
-		result.close();
-		pstatement.close();
+	    String query = "SELECT s.id AS stud_id, s.matricola AS matricola, u.nome AS nome, u.cognome AS cognome, "
+	    			 + "i.voto AS voto, i.stato_valutazione As stato_valutazione, v.data_ora_creaz AS data_ora_creaz "
+	    			 + "FROM Iscrizioni i "
+	    			 + "JOIN Studenti s ON i.studente = s.id "
+	    			 + "JOIN Utenti u ON s.id = u.id "
+	    			 + "JOIN Verbali v ON i.verbale = v.id "
+	    			 + "WHERE i.verbale = ?";
+	    PreparedStatement pstatement = null;
+	    ResultSet result = null;
+	    try {
+	        pstatement = con.prepareStatement(query);
+	        pstatement.setInt(1, verbale.getId());
+	        result = pstatement.executeQuery();
+	        studenti.clear();
+	        valutazioni.clear();
+	        if (result.next()) {
+	            verbale.setData_Ora((LocalDateTime) result.getObject("data_ora_creaz"));
+	            do {
+	                Studente studente = new Studente();
+	                studente.setID(result.getInt("stud_id"));
+	                studente.setMatricola(result.getString("matricola"));
+	                studente.setNome(result.getString("nome"));
+	                studente.setCognome(result.getString("cognome"));
+	                Valutazione valutazione = new Valutazione();
+	                valutazione.setVoto(result.getString("voto"));
+	                valutazione.setStatoValutazione(result.getString("stato_valutazione"));
+	                studenti.add(studente);
+	                valutazioni.add(valutazione);
+	            } while (result.next());
+	        }
+	    } 
+	    finally {
+	        if (result != null) try { result.close(); } catch (SQLException ignore) {}
+	        if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+	    }
 	}
-
+	
 }
+

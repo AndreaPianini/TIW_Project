@@ -74,23 +74,35 @@ public class MostraVerbaleCreato extends HttpServlet {
 		Appello appello = null;
 		ArrayList<Studente> studenti = new ArrayList<>();
 		ArrayList<Valutazione> valutazioni = new ArrayList<>();
-		verbale.setId(Integer.parseInt(request.getParameter("verbaleID")));
+		
+		Integer verbaleID = null;
+		try {
+			verbaleID = Integer.parseInt(request.getParameter("verbaleID"));
+		} 
+		catch (Exception e) {
+			verbaleID = null;
+		}
+		if( verbaleID == null || verbaleID < 0 ) {
+			renderPageError(request, response, "Verbale non valido. Riprovare.");
+			return;
+		}
+		verbale.setId(verbaleID);
 		try {
 			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
 		} 
-		catch (SQLException | NumberFormatException e) {
+		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero delle informazioni del verbale.");
 			return;
 		}
 		if (studenti.isEmpty() || valutazioni.isEmpty()) {
-			renderPageError(request, response, "Nessun studente trovato per il verbale selezionato.");
+			renderPageError(request, response, "Nessuno studente trovato per il verbale selezionato.");
 			return;
 		}
 		
 		try {
 			appello = appelloDAO.getAppelloByVerbale(verbale.getId());
 		} 
-		catch (SQLException | NumberFormatException e) {
+		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero dell'appello.");
 			return;
 		}
@@ -101,7 +113,8 @@ public class MostraVerbaleCreato extends HttpServlet {
 		Corso corso;
 		try {
 			corso = new CorsoDAO(connection).getCorsoById(appello.getCorso());
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero del corso.");
 			return;
 		}
