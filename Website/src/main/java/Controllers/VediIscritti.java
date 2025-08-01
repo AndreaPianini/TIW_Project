@@ -94,6 +94,10 @@ public class VediIscritti extends HttpServlet {
 		ArrayList<Studente> iscritti = new ArrayList<>();
 		ArrayList<Valutazione> voti = new ArrayList<>();
 		try {
+			if (!docenteDAO.isAutorizzato((int)corsoID)) {
+				renderPageError(request, response, "Non sei abilitato a modificare questo corso.");
+				return;
+			}
 			docenteDAO.getIscrittiByAppello(corsoID, dataAppello, iscritti, voti);
 			//controllo per i voti??
 		} 

@@ -99,9 +99,9 @@ public class Modifica extends HttpServlet {
 	   	Studente studente = null;
 	   	Valutazione valutazione = null;
 		try {
-			// !!!Da fare - Controllo che il docente sia abilitato a modificare lo studente
-			if (!docenteDAO.isAutorizzato((int)studenteID, (int)corsoID)) {
-				renderPageError(request, response, "Non sei abilitato a modificare questo studente.");
+			// !!!Da fare - Controllo che il docente sia abilitato ad accedere a questo appello
+			if (!docenteDAO.isAutorizzato((int)corsoID)) {
+				renderPageError(request, response, "Non sei abilitato a modificare questo corso.");
 				return;
 			}
 			studente = studenteDAO.getStudenteInfo();

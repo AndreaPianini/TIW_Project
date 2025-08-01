@@ -101,14 +101,17 @@ public class DocenteDAO {
 					 + "FROM Iscrizioni i "
 					 + "JOIN Studenti s ON i.studente = s.id "
 					 + "JOIN Utenti u ON s.id = u.id "
-					 + "WHERE i.corso = ? AND i.data = ? "
+					 + "JOIN Corsi c ON i.corso = c.id "
+					 + "WHERE i.corso = ? AND i.data = ? AND c.docente = ? "
 					 + "ORDER BY u.cognome, u.nome;";
+		
 		PreparedStatement pstatement = null;
 		ResultSet result = null;
 		try {
 			pstatement = connection.prepareStatement(query);
 			pstatement.setInt(1, corsoID);
 			pstatement.setDate(2, dataAppello);
+			pstatement.setInt(3, docenteID);
 			result = pstatement.executeQuery();
 			
 			iscritti.clear();
@@ -138,34 +141,32 @@ public class DocenteDAO {
 	
 	
  	public void modificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
- 		
-		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
-					 + "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') AND "
-					 + "corso = ? AND data = ? AND studente = ?";
-		
-		
-		PreparedStatement pstatement = null;
-		try {
-			connection.setAutoCommit(false);
-			pstatement = connection.prepareStatement(query);
-			pstatement.setString(1, voto.getVoto().toString());
-			pstatement.setInt(2, corso);
-			pstatement.setDate(3, data);
-			pstatement.setInt(4, studID);
-			pstatement.executeUpdate();
-			connection.commit();
-			connection.setAutoCommit(true);
-		}
-		catch(SQLException e) {
-			connection.rollback();
-			throw new SQLException("Error updating the vote: " + e.getMessage());
-		}
-		finally {
-			connection.setAutoCommit(true);
-			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
-		}
-		
-	}
+ 		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
+ 				 + "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') "
+ 				 + "AND corso = ? AND data = ? AND studente = ? "
+ 				 + "AND EXISTS (SELECT 1 FROM Corsi c WHERE c.id = Iscrizioni.corso AND c.docente = ?)";
+ 		PreparedStatement pstatement = null;
+ 		try {
+ 			connection.setAutoCommit(false);
+ 			pstatement = connection.prepareStatement(query);
+ 			pstatement.setString(1, voto.getVoto().toString());
+ 			pstatement.setInt(2, corso);
+ 			pstatement.setDate(3, data);
+ 			pstatement.setInt(4, studID);
+ 			pstatement.setInt(5, docenteID);
+ 			pstatement.executeUpdate();
+ 			connection.commit();
+ 			connection.setAutoCommit(true);
+ 		}
+ 		catch(SQLException e) {
+ 			connection.rollback();
+ 			throw new SQLException("Error updating the vote: " + e.getMessage());
+ 		}
+ 		finally {
+ 			connection.setAutoCommit(true);
+ 			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+ 		}
+ 	}
 	
  	
 	public void pubblicaValutazioni(int corso, Date data) throws SQLException{
@@ -247,9 +248,28 @@ public class DocenteDAO {
 		}
 	}
 	
-	//Da fare - Controllo che il docente sia abilitato a modificare lo studente
-	public boolean isAutorizzato(int studenteID, int corsoID) throws SQLException {
-		return true;
+	//Da fare - Controllo che il docente sia abilitato ad acccedere ad un corso
+	public boolean isAutorizzato(int corsoID) throws SQLException {
+		
+		String query = "SELECT 1 FROM Corsi WHERE id = ? AND docente = ?";
+		PreparedStatement pstatement = null;
+		ResultSet result = null;
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1, corsoID);
+			pstatement.setInt(2, docenteID);
+			result = pstatement.executeQuery();
+			if (result.next()) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		} 
+		finally {
+			if (result != null) try { result.close(); } catch (SQLException ignore) {}
+			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+		}
 	}
 	
 }

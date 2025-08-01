@@ -5,9 +5,10 @@
     <title>Esito Appello</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="container py-4">
+<body>
+<div class="container">
 
-<h1>Esito Appello</h1>
+<h2>Esito Appello</h2>
 
 <div th:if="${error}" class="error-message">
     <p th:text="${error}"></p>
@@ -17,7 +18,7 @@
 
     <!-- Voto non ancora pubblicato -->
     <div th:if="${voto.statoValutazione.name() == 'NON_INSERITO' or voto.statoValutazione.name() == 'INSERITO'}">
-        <div class="alert alert-info" role="alert">
+        <div class="error-message" style="background:#e3eafc;color:#2a3a5e;border-color:#b6c6e6;">
             Voto non ancora definito
         </div>
     </div>
@@ -26,8 +27,8 @@
     <div th:if="${voto.statoValutazione.name() == 'PUBBLICATO' or 
     			  voto.statoValutazione.name() == 'RIFIUTATO' or 
     			  voto.statoValutazione.name() == 'VERBALIZZATO'}">
-    	<h2>Dati Studente</h2>
-        <table class="table table-bordered w-auto">
+    	<h3>Dati Studente</h3>
+        <table class="table">
             <tr><th>Matricola</th><td th:text="${studInfo.matricola}"></td></tr>
             <tr><th>Cognome</th><td th:text="${studInfo.cognome}"></td></tr>
             <tr><th>Nome</th><td th:text="${studInfo.nome}"></td></tr>
@@ -35,26 +36,36 @@
             <tr><th>Corso di Laurea</th><td th:text="${studInfo.corsoLaurea}"></td></tr>
         </table>
 
-        <h2>Corso</h2>
-        <table class="table table-bordered w-auto">
+        <h3>Corso</h3>
+        <table class="table">
             <tr><th>Nome</th><td th:text="${corsoInfo.nome}"></td></tr>
             <tr><th>CFU</th><td th:text="${corsoInfo.cfu}"></td></tr>
             <tr><th>Data Appello</th><td th:text="${#dates.format(appelloData, 'dd/MM/yyyy')}"></td></tr>
         </table>
-
-        <h2 class="mt-4">Voto Assegnato</h2>
-        <p class="fs-4" th:text="${voto.voto.toString()}"></p>
-        
-        <h2 class="mt-4">Stato Valutazione</h2>
-        <p class="fs-5" th:text="${voto.statoValutazione.toString()}"></p>
+		
+		<h3>Esito</h3>
+		<table class="table">
+		<thead>
+            <tr>
+            <th>Voto Assegnato</th>
+            <th>Stato Valutazione</th>
+            </tr>
+        </thead>
+        <tbody>
+		<tr>
+            <td th:text="${voto.voto.toString()}"></td>
+            <td th:text="${voto.statoValutazione.toString()}"></td>
+        </tr>
+        </tbody>
+        </table>
 
         <div th:if="${voto.statoValutazione.name() == 'RIFIUTATO'}">
-            <p class="text-danger fw-bold">Il voto è stato rifiutato</p>
+            <p style="color:#c0392b;font-weight:600;">Il voto è stato rifiutato</p>
         </div>
 
         <div th:if="${voto.rifiutabile()}">
             <form th:action="@{'/RifiutaVoto'(corsoID=${param.corsoID}, dataAppello=${param.dataAppello})}" method="post">
-                <button type="submit" class="btn btn-warning">Rifiuta</button>
+                <button type="submit" class="btn-warning">Rifiuta</button>
             </form>
         </div>
     </div>
@@ -64,5 +75,6 @@
     <button type="submit" class="btn-secondary">Torna alla Home</button>
 </form>
 
+</div>
 </body>
 </html>
