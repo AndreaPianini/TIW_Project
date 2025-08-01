@@ -17,14 +17,64 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Matricola</th>
-                    <th>Cognome</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Corso di Laurea</th>
-                    <th>Voto</th>
-                    <th>Stato</th>
-                </tr>
+    <!-- Matricola -->
+    <th th:if="${order=='DESC'} or ${sortBy!='matricola'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='matricola',order='ASC')}">Matricola</a>
+    </th>
+    <th th:if="${order=='ASC'} and ${sortBy=='matricola'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='matricola',order='DESC')}">Matricola</a>
+    </th>
+
+    <!-- Cognome -->
+    <th th:if="${order=='DESC'} or ${sortBy!='cognome'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='cognome',order='ASC')}">Cognome</a>
+    </th>
+    <th th:if="${order=='ASC'} and ${sortBy=='cognome'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='cognome',order='DESC')}">Cognome</a>
+    </th>
+
+    <!-- Nome -->
+    <th th:if="${order=='DESC'} or ${sortBy!='nome'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='nome',order='ASC')}">Nome</a>
+    </th>
+    <th th:if="${order=='ASC'} and ${sortBy=='nome'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='nome',order='DESC')}">Nome</a>
+    </th>
+
+    <!-- Email -->
+    <th th:if="${order=='DESC'} or ${sortBy!='email'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='email',order='ASC')}">Email</a>
+    </th>
+    <th th:if="${order=='ASC'} and ${sortBy=='email'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='email',order='DESC')}">Email</a>
+    </th>
+
+    <!-- Corso di Laurea -->
+    <th th:if="${order=='DESC'} or ${sortBy!='corsoLaurea'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='corsoLaurea',order='ASC')}">Corso di Laurea</a>
+    </th>
+    <th th:if="${order=='ASC'} and ${sortBy=='corsoLaurea'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='corsoLaurea',order='DESC')}">Corso di Laurea</a>
+    </th>
+
+    <!-- Voto -->
+    <th th:if="${order=='DESC'} or ${sortBy!='voto'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='voto',order='ASC')}">Voto</a>
+    </th>
+    <th th:if="${order=='ASC'} and ${sortBy=='voto'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='voto',order='DESC')}">Voto</a>
+    </th>
+
+    <!-- Stato -->
+    <th th:if="${order=='DESC'} or ${sortBy!='stato'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='stato',order='ASC')}">Stato</a>
+    </th>
+    <th th:if="${order=='ASC'} and ${sortBy=='stato'}">
+        <a th:href="@{/VediIscritti(dataAppello=${dataAppello},corsoID=${corsoID},sortBy='stato',order='DESC')}">Stato</a>
+    </th>
+    <th></th>
+</tr>
+
             </thead>
             <tbody>
                 <tr th:each="stud, iterStat : ${iscritti}">
@@ -56,16 +106,14 @@
             <input type="hidden" name="dataAppello" th:value="${dataAppello}" />
             <button type="submit" class="btn-warning">Pubblica</button>
         </form>
-        
         <form th:action="@{/Verbalizza}" method="post" style="margin-top: 20px;">
             <input type="hidden" name="corsoID" th:value="${corsoID}" />
             <input type="hidden" name="dataAppello" th:value="${dataAppello}" />
             <button type="submit" class="btn-warning">Verbalizza</button>
         </form>
     </div>
-    
     <form th:action="@{/VaiHomeDocente}" method="get" style="margin-top: 20px;">
-            <button type="submit" class="btn-secondary">Torna alla Home</button>
+        <button type="submit" class="btn-secondary">Torna alla Home</button>
     </form>
 </div>
 </body>

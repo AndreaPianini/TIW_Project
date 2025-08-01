@@ -43,7 +43,6 @@ public class Pubblica extends HttpServlet {
 			Class.forName(driver);
 			connection = DriverManager.getConnection(url, user, password);
 
-			// Thymeleaf setup
 			JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(context);
 			WebApplicationTemplateResolver templateResolver = new WebApplicationTemplateResolver(webApplication);
 			templateResolver.setTemplateMode(TemplateMode.HTML);
@@ -94,7 +93,9 @@ public class Pubblica extends HttpServlet {
 			return;
 		}
 		String path = request.getContextPath();
-		response.sendRedirect(path + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello);
+		response.sendRedirect(path + "/VediIscritti?corsoID=" + corsoID + 
+                "&dataAppello=" + dataAppello +
+                "&sortBy=matricola&order=ASC");
 		
 	}
 	
