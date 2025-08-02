@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Set;
 
 import BEANS.Appello;
 import BEANS.Corso;
@@ -92,52 +93,69 @@ public class DocenteDAO {
 	}
 	
 	
-	public void getIscrittiByAppello(int corsoID, Date dataAppello, ArrayList<Studente> iscritti, 
-			ArrayList<Valutazione> voti) throws SQLException {
-		
-		String query = "SELECT s.matricola AS stud_matricola, u.nome AS stud_nome, u.cognome AS stud_cognome, "
-					 + "u.email AS stud_email, s.corso_laurea AS stud_corso_laurea, i.studente AS stud_id, "
-					 + "i.voto AS voto, i.stato_valutazione AS stato_valutazione "
-					 + "FROM Iscrizioni i "
-					 + "JOIN Studenti s ON i.studente = s.id "
-					 + "JOIN Utenti u ON s.id = u.id "
-					 + "JOIN Corsi c ON i.corso = c.id "
-					 + "WHERE i.corso = ? AND i.data = ? AND c.docente = ? "
-					 + "ORDER BY u.cognome, u.nome;";
-		
-		PreparedStatement pstatement = null;
-		ResultSet result = null;
-		try {
-			pstatement = connection.prepareStatement(query);
-			pstatement.setInt(1, corsoID);
-			pstatement.setDate(2, dataAppello);
-			pstatement.setInt(3, docenteID);
-			result = pstatement.executeQuery();
-			
-			iscritti.clear();
-			voti.clear();
-			while (result.next()) {
-				Studente studente = new Studente();
-				studente.setID(result.getInt("stud_id"));
-				studente.setNome(result.getString("stud_nome"));
-				studente.setCognome(result.getString("stud_cognome"));
-				studente.setMatricola(result.getString("stud_matricola"));
-				studente.setEmail(result.getString("stud_email"));
-				studente.setCorsoLaurea(result.getString("stud_corso_laurea"));
-				
-				Valutazione voto = new Valutazione();
-				voto.setVoto(result.getString("voto"));
-				voto.setStatoValutazione(result.getString("stato_valutazione"));
-				
-				iscritti.add(studente);
-				voti.add(voto);
-			}
-		} 
-		finally {
-			if (result != null) try { result.close(); } catch (SQLException ignore) {}
-			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
-		}
-	}
+    
+    public void getIscrittiByAppello(int corsoID, Date dataAppello,
+                                     String sortBy, String order,
+                                     ArrayList<Studente> iscritti,
+                                     ArrayList<Valutazione> voti) throws SQLException {
+
+        // Whitelist per prevenire SQL‑injection
+        Set<String> allowedSort = Set.of("matricola", "cognome", "nome", "email", "corsoLaurea", "voto", "stato");
+        if (!allowedSort.contains(sortBy)) {
+            sortBy = "matricola";
+        }
+        String direction = "DESC".equalsIgnoreCase(order) ? "DESC" : "ASC";
+
+        String query = "SELECT "
+                     + "s.matricola         AS matricola, "
+                     + "u.cognome           AS cognome, "
+                     + "u.nome              AS nome, "
+                     + "u.email             AS email, "
+                     + "s.corso_laurea      AS corsoLaurea, "
+                     + "i.studente          AS stud_id, "
+                     + "i.voto              AS voto, "
+                     + "i.stato_valutazione AS stato "
+                     + "FROM   Iscrizioni i "
+                     + "JOIN   Studenti  s ON i.studente = s.id "
+                     + "JOIN   Utenti    u ON s.id       = u.id "
+                     + "JOIN   Corsi     c ON i.corso    = c.id "
+                     + "WHERE  i.corso = ? AND i.data = ? AND c.docente = ? "
+                     + "ORDER  BY " + sortBy + " " + direction + ";";
+
+        PreparedStatement pstatement = null;
+        ResultSet result = null;
+        try {
+            pstatement = connection.prepareStatement(query);
+            pstatement.setInt(1, corsoID);
+            pstatement.setDate(2, dataAppello);
+            pstatement.setInt(3, docenteID);
+
+            result = pstatement.executeQuery();
+
+            iscritti.clear();
+            voti.clear();
+            while (result.next()) {
+                Studente stud = new Studente();
+                stud.setID(result.getInt("stud_id"));
+                stud.setNome(result.getString("nome"));
+                stud.setCognome(result.getString("cognome"));
+                stud.setMatricola(result.getString("matricola"));
+                stud.setEmail(result.getString("email"));
+                stud.setCorsoLaurea(result.getString("corsoLaurea"));
+
+                Valutazione val = new Valutazione();
+                val.setVoto(result.getString("voto"));
+                val.setStatoValutazione(result.getString("stato"));
+
+                iscritti.add(stud);
+                voti.add(val);
+            }
+        } finally {
+            if (result != null) try { result.close(); } catch (SQLException ignore) {}
+            if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+        }
+    }
+
 	
 	
  	public void modificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
