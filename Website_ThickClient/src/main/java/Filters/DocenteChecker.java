@@ -34,7 +34,9 @@ public class DocenteChecker implements Filter {
 		Utente u = null;
 		u = (Utente) s.getAttribute("user");
 		if (!u.getRole().equals("Docente")) {
-			res.sendRedirect(loginpath);
+			res.setStatus(403);
+			res.setHeader("Location", loginpath);
+			System.out.print("Docente checker FAILED...\n");
 			return;
 		}
 		// pass the request along the filter chain

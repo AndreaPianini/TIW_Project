@@ -31,10 +31,12 @@ public class StudenteChecker implements Filter {
 		String loginpath = req.getServletContext().getContextPath() + "/Login";
 		HttpSession s = req.getSession();
 		Utente u = null;
-        // check if the client is a worker
+		// check if the user is a student
 		u = (Utente) s.getAttribute("user");
 		if (!u.getRole().equals("Studente")) {
-			res.sendRedirect(loginpath);
+			res.setStatus(403);
+			res.setHeader("Location", loginpath);
+			System.out.print("Studente checker FAILED...\n");
 			return;
 		}
 		// pass the request along the filter chain
