@@ -10,11 +10,15 @@ import java.util.ArrayList;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import BEANS.Appello;
 import BEANS.Corso;
@@ -22,6 +26,7 @@ import BEANS.Studente;
 import DAO.StudenteDAO;
 
 @WebServlet("/VaiHomeStudente")
+@MultipartConfig
 public class VaiHomeStudente extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -58,19 +63,26 @@ public class VaiHomeStudente extends HttpServlet {
 			studenteDAO.getCorsiAndAppelliByStudente(corsi, appelli);
 		} 
 		catch (SQLException e) {
-			renderPageError(request, response, "Si è verificato un errore durante il recupero dei corsi ed appelli.");
-			return;
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	        response.getWriter().println("Si è verificato un errore durante il recupero dei corsi ed appelli.");
+	        return;
+			
 		}
 		if (corsi.isEmpty() ) {
-			renderPageError(request, response, "Nessun corso trovato per lo studente.");
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	        response.getWriter().println("Nessun corso trovato per lo studente.");
 			return;
 		}
-		String path = "/WEB-INF/StudenteHome.html";
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("corsi", corsi);
-        ctx.setVariable("appelli", appelli);
-		templateEngine.process(path, ctx, response.getWriter());
+		
+		JsonObject jsonResponse = new JsonObject();
+		jsonResponse.add("corsi", new Gson().toJsonTree(corsi));
+		jsonResponse.add("appelli", new Gson().toJsonTree(appelli));
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(jsonResponse.toString());
+		
 	}
 	
 	
@@ -78,23 +90,13 @@ public class VaiHomeStudente extends HttpServlet {
 			throws ServletException, IOException {
 		doGet(request, response);
 	}
-	
-	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
-			String errorMessage) throws IOException {
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/StudenteHome.html", ctx, response.getWriter());
-	}
 
 	
 	public void destroy() {
 		try {
-			if (connection != null) {
-				connection.close();
-			}
-		} catch (SQLException sqle) {
-		}
+			if (connection != null) connection.close();
+		} 
+		catch (SQLException sqle) {}
 	}
 	
 }
