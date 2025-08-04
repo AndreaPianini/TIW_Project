@@ -3,6 +3,7 @@ package Controllers;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,12 +16,6 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
-import org.thymeleaf.web.servlet.JakartaServletWebApplication;
-
 import BEANS.Docente;
 import BEANS.Valutazione;
 import DAO.DocenteDAO;
@@ -28,6 +23,7 @@ import DAO.StudenteDAO;
 
 
 @WebServlet("/ModificaVoto")
+@MultipartConfig
 public class ModificaVoto extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;

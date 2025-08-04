@@ -3,6 +3,7 @@ package Controllers;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,17 +16,12 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
-import org.thymeleaf.web.servlet.JakartaServletWebApplication;
-
 import BEANS.Docente;
 import DAO.DocenteDAO;
 
 
 @WebServlet("/Pubblica")
+@MultipartConfig
 public class Pubblica extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
