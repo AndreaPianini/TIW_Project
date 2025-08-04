@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Gestione Esami</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="js/LoginController.js"></script>
 </head>
 <body>
-    <div class="container login-container">
+    <div class="container">
         <h2>Accedi al sistema</h2>
 
         <form action="CheckLogin" method="POST">
@@ -20,9 +21,9 @@
                 <input type="password" id="password" name="password" required>
             </div>
 
-            <div th:if="${error}" class="error-message">
-                <p th:text="${error}"></p>
-            </div>
+            <div id="error-message" class="error-message" style="display:none;">
+            	<p id="error-text"></p>
+        	</div>
 
             <button type="submit" class="btn-primary">Login</button>
         </form>
