@@ -1,0 +1,103 @@
+VERBALIZZAZIONE 
+      @startuml
+    actor Docente
+    participant "RegisteredStudentsDetails (JS)" as JS_View
+    participant "createReport() helper" as JS_Helper
+    participant "Servlet: Verbalizza" as Verbalizza
+    participant "DocenteDAO" as DAO
+    participant "Servlet: MostraVerbaleCreato" as MostraVerbale
+    participant "VerbaleDAO" as VerbaleDAO
+    participant "AppelloDAO" as AppelloDAO
+    participant "CorsoDAO" as CorsoDAO
+    participant "reportDetails.update()" as UI_Report
+    
+    Docente -> JS_View : click Verbalizza
+    JS_View -> JS_Helper : createReport(courseId, appealDate)
+    
+    JS_Helper -> Verbalizza : POST /Verbalizza\n(corsoID, dataAppello)
+    Verbalizza -> DAO : VerbalizzaValutazioni(corsoID, dataAppello)
+    DAO --> Verbalizza : return verbaleID
+    Verbalizza --> JS_Helper : JSON { verbaleID }
+    
+    JS_Helper -> MostraVerbale : GET /MostraVerbaleCreato?verbaleID
+    MostraVerbale -> VerbaleDAO : getVerbaleInfo(verbaleID)
+    MostraVerbale -> AppelloDAO : getAppelloByVerbale(verbaleID)
+    MostraVerbale -> CorsoDAO : getCorsoById(courseId)
+    VerbaleDAO --> MostraVerbale : info
+    AppelloDAO --> MostraVerbale : appello
+    CorsoDAO --> MostraVerbale : corso
+    MostraVerbale --> JS_Helper : JSON { verbale, corso, appello, studenti }
+    
+    JS_Helper -> UI_Report : reportDetails.update(json)
+    JS_Helper -> JS_View : update( )
+    
+    @enduml
+
+
+VEDI ISCRITTI
+
+    @startuml
+    actor Docente
+    participant "CourseAppeals (JS)" as JS_Appelli
+    participant "RegisteredStudentsDetails (JS)" as JS_Iscritti
+    participant "Servlet: VediIscritti" as VediIscritti
+    participant "DocenteDAO" as DAO
+    participant "Lista Iscritti" as UI_Table
+    
+    Docente -> JS_Appelli : click Appello
+    JS_Appelli -> JS_Iscritti : show(courseId, appealDate)
+    
+    JS_Iscritti -> VediIscritti : GET /VediIscritti?corsoID=…&dataAppello=…
+    VediIscritti -> DAO : getIscrittiByAppello(corsoID, dataAppello)
+    DAO --> VediIscritti : lista iscritti + voti
+    VediIscritti --> JS_Iscritti : JSON { studenti, voti }
+    
+    JS_Iscritti -> UI_Table : update(json)
+    @enduml
+
+PUBBLICAZIONE
+    @startuml
+    actor Docente
+    participant "RegisteredStudentsDetails (JS)" as JS_Iscritti
+    participant "Servlet: Pubblica" as Pubblica
+    participant "DocenteDAO" as DAO
+    participant "JS: tabella iscritti" as UI_Table
+    
+    Docente -> JS_Iscritti : click Pubblica
+    JS_Iscritti -> Pubblica : POST /Pubblica?corsoID=…&dataAppello=…
+    Pubblica -> DAO : pubblicaValutazioni(corsoID, dataAppello)
+    DAO --> Pubblica : conferma pubblicazione
+    Pubblica --> JS_Iscritti : HTTP 200 OK
+    
+    JS_Iscritti -> UI_Table : show(courseId, appealDate)
+    @enduml
+
+MODIFICA VOTO
+    @startuml
+    actor Docente
+    participant "RegisteredStudentsDetails (JS)" as JS_Iscritti
+    participant "Servlet: Modifica" as ModificaServlet
+    participant "StudenteDAO" as StudenteDAO
+    participant "SingleStudentDetails (JS)" as JS_Pannello
+    participant "Servlet: ModificaVoto" as ModificaVotoServlet
+    participant "DocenteDAO" as DocenteDAO
+    participant "JS: tabella iscritti" as UI_Table
+    
+    Docente -> JS_Iscritti : click Modifica (studente)
+    JS_Iscritti -> ModificaServlet : GET /Modifica?studenteID=…&corsoID=…&dataAppello=…
+    ModificaServlet -> StudenteDAO : getStudenteInfo()\ngetVotoByAppello()
+    StudenteDAO --> ModificaServlet : studente + voto attuale
+    ModificaServlet --> JS_Iscritti : JSON { studente, voto, votiPossibili }
+    
+    JS_Iscritti -> JS_Pannello : update(json)
+    
+    Docente -> JS_Pannello : click “Salva” nuovo voto
+    JS_Pannello -> ModificaVotoServlet : POST /ModificaVoto\nstudenteID, corsoID, dataAppello, voto
+    ModificaVotoServlet -> StudenteDAO : checkRegistrazione(studenteID, appello)
+    ModificaVotoServlet -> DocenteDAO : modificaVoto(voto, corsoID, dataAppello, studenteID)
+    DocenteDAO --> ModificaVotoServlet : conferma
+    ModificaVotoServlet --> JS_Pannello : HTTP 200 OK
+    
+    JS_Pannello -> UI_Table : refresh iscritti → show(courseId, appealDate)
+    @enduml
+
