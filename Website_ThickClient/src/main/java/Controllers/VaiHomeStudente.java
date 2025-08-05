@@ -22,16 +22,16 @@ import com.google.gson.JsonObject;
 
 import BEANS.Appello;
 import BEANS.Corso;
-import BEANS.Docente;
-import DAO.DocenteDAO;
+import BEANS.Studente;
+import DAO.StudenteDAO;
 
-@WebServlet("/VaiHomeDocente")
+@WebServlet("/VaiHomeStudente")
 @MultipartConfig
-public class VaiHomeDocente extends HttpServlet {
+public class VaiHomeStudente extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-
+	
 	public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
@@ -42,61 +42,61 @@ public class VaiHomeDocente extends HttpServlet {
 			Class.forName(driver);
 			connection = DriverManager.getConnection(url, user, password);
 		} 
-		catch (ClassNotFoundException | SQLException e) {
-			throw new UnavailableException("Database connection failed");
+		catch (ClassNotFoundException e) {
+			throw new UnavailableException("Can't load database driver");
+		} 
+		catch (SQLException e) {
+			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-
+	
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-	        throws ServletException, IOException {
-
-	    HttpSession session = request.getSession();
-	    Docente docente = (Docente) session.getAttribute("user");
-	    if (docente == null) {
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			throws ServletException, IOException {
+		
+		HttpSession session = request.getSession();
+		Studente studente = (Studente) session.getAttribute("user");
+		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
+		ArrayList<Corso> corsi = new ArrayList<>();
+		ArrayList<ArrayList<Appello>> appelli = new ArrayList<>();
+		try {
+			studenteDAO.getCorsiAndAppelliByStudente(corsi, appelli);
+		} 
+		catch (SQLException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	        response.getWriter().println("Si è verificato un errore durante il recupero dei corsi ed appelli.");
 	        return;
-	    }
-
-	    DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
-	    ArrayList<Corso> corsi = new ArrayList<>();
-	    ArrayList<ArrayList<Appello>> appelli = new ArrayList<>();
-
-	    try {
-	        docenteDAO.getCorsiAndAppelliByDocente(corsi, appelli);
-	    } 
-	    catch (SQLException e) {
-	        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	        response.getWriter().println("Database access failed");
-	        return;
-	    }
-	    if (corsi.isEmpty()) {
-	        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-	        response.getWriter().println("Nessun corso trovato per il docente.");
-	        return;
-	    }
-	    
-	    JsonObject json = new JsonObject();
-	    json.add("corsi",   new Gson().toJsonTree(corsi));
-	    json.add("appelli", new Gson().toJsonTree(appelli));
-
-	    response.setStatus(HttpServletResponse.SC_OK);
-	    response.setContentType("application/json");
-	    response.setCharacterEncoding("UTF-8");
-	    response.getWriter().write(json.toString());
+			
+		}
+		if (corsi.isEmpty() ) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	        response.getWriter().println("Nessun corso trovato per lo studente.");
+			return;
+		}
+		
+		JsonObject jsonResponse = new JsonObject();
+		jsonResponse.add("corsi", new Gson().toJsonTree(corsi));
+		jsonResponse.add("appelli", new Gson().toJsonTree(appelli));
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(jsonResponse.toString());
+		
 	}
-
-
+	
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
 	}
 
+	
 	public void destroy() {
 		try {
 			if (connection != null) connection.close();
 		} 
-		catch (SQLException e) {}
+		catch (SQLException sqle) {}
 	}
+	
 }
-

@@ -1,0 +1,187 @@
+VERBALIZZAZIONE 
+      @startuml
+    actor Docente
+    participant "Lista studenti" as JS_View
+    participant "creaVerbale() helper" as JS_Helper
+    participant "Servlet: Verbalizza" as Verbalizza #Lightblue
+    participant "DocenteDAO" as DAO #Lightblue
+    participant "Servlet: MostraVerbaleCreato" as MostraVerbale #Lightblue
+    participant "VerbaleDAO" as VerbaleDAO #Lightblue
+    participant "AppelloDAO" as AppelloDAO #Lightblue
+    participant "CorsoDAO" as CorsoDAO #Lightblue
+    participant "Verbale dettagliato" as UI_Report
+    
+    Docente -> JS_View : click Verbalizza
+    JS_View -> JS_Helper : createReport(courseId, appealDate)
+    
+    JS_Helper -> Verbalizza : POST /Verbalizza\n(corsoID, dataAppello)
+    Verbalizza -> DAO : VerbalizzaValutazioni(corsoID, dataAppello)
+    DAO --> Verbalizza : return verbaleID
+    Verbalizza --> JS_Helper : JSON { verbaleID }
+    
+    JS_Helper -> MostraVerbale : GET /MostraVerbaleCreato?verbaleID
+    MostraVerbale -> VerbaleDAO : getVerbaleInfo(verbaleID)
+    MostraVerbale -> AppelloDAO : getAppelloByVerbale(verbaleID)
+    MostraVerbale -> CorsoDAO : getCorsoById(courseId)
+    VerbaleDAO --> MostraVerbale : info
+    AppelloDAO --> MostraVerbale : appello
+    CorsoDAO --> MostraVerbale : corso
+    MostraVerbale --> JS_Helper : JSON { verbale, corso, appello, studenti }
+    
+    JS_Helper -> UI_Report : verbale.show(json)
+    JS_Helper -> JS_View : update( )
+    
+    @enduml
+
+
+VEDI ISCRITTI
+
+    @startuml
+    actor Docente
+    participant "CourseAppeals (JS)" as JS_Appelli
+    participant "Servlet: VediIscritti" as VediIscritti #Lightblue
+    participant "DocenteDAO" as DAO #Lightblue
+    participant "Lista Iscritti" as UI_Table
+    
+    Docente -> JS_Appelli : click Appello
+    JS_Appelli -> UI_Table : show(courseId, appealDate)
+    
+    UI_Table -> VediIscritti : GET /VediIscritti?corsoID=…&dataAppello=…
+    VediIscritti -> DAO : getIscrittiByAppello(corsoID, dataAppello)
+    DAO --> VediIscritti : lista iscritti + voti
+    VediIscritti --> UI_Table : JSON { studenti, voti }
+    
+    UI_Table -> UI_Table : update(json)
+    @enduml
+
+PUBBLICAZIONE
+    @startuml
+    actor Docente
+    participant "RegisteredStudentsDetails (JS)" as JS_Iscritti
+    participant "Servlet: Pubblica" as Pubblica #Lightblue
+    participant "DocenteDAO" as DAO #Lightblue
+    participant "JS: tabella iscritti" as UI_Table
+    
+    Docente -> JS_Iscritti : click Pubblica
+    JS_Iscritti -> Pubblica : POST /Pubblica?corsoID=…&dataAppello=…
+    Pubblica -> DAO : pubblicaValutazioni(corsoID, dataAppello)
+    DAO --> Pubblica : conferma pubblicazione
+    Pubblica --> JS_Iscritti : HTTP 200 OK
+    
+    JS_Iscritti -> UI_Table : show(courseId, appealDate)
+    @enduml
+
+MODIFICA VOTO
+      @startuml
+      actor Docente
+      participant "RegisteredStudentsDetails (JS)" as JS_Iscritti 
+      participant "Servlet: Modifica" as ModificaServlet #Lightblue
+      participant "StudenteDAO" as StudenteDAO #Lightblue
+      participant "SingleStudentDetails (JS)" as JS_Pannello
+      participant "Servlet: ModificaVoto" as ModificaVotoServlet #Lightblue
+      participant "DocenteDAO" as DocenteDAO #Lightblue
+      participant "JS: tabella iscritti" as UI_Table
+      
+      Docente -> JS_Iscritti : click Modifica (studente)
+      JS_Iscritti -> ModificaServlet : GET /Modifica?studenteID=…&corsoID=…&dataAppello=…
+      ModificaServlet -> StudenteDAO : getStudenteInfo()\ngetVotoByAppello()
+      StudenteDAO --> ModificaServlet : studente + voto attuale
+      ModificaServlet --> JS_Iscritti : JSON { studente, voto, votiPossibili }
+      
+      JS_Iscritti -> JS_Pannello : update(json)
+      
+      Docente -> JS_Pannello : click “Salva” nuovo voto
+      JS_Pannello -> ModificaVotoServlet : POST /ModificaVoto\nstudenteID, corsoID, dataAppello, voto
+      ModificaVotoServlet -> StudenteDAO : checkRegistrazione(studenteID, appello)
+      ModificaVotoServlet -> DocenteDAO : modificaVoto(voto, corsoID, dataAppello, studenteID)
+      DocenteDAO --> ModificaVotoServlet : conferma
+      ModificaVotoServlet --> JS_Pannello : HTTP 200 OK
+      
+      JS_Pannello -> UI_Table : refresh iscritti → show(courseId, appealDate)
+      @enduml
+
+INSERIMENTO VOTI MUTLIPLI
+      @startuml
+      actor Docente
+      participant "RegisteredStudentsDetails (JS)" as JS_Iscritti
+      participant "MultipleInsertionModal (JS)" as JS_Modal
+      participant "Servlet: GetStudentiSenzaVotoByAppello" as GetSenzaVoto #Lightblue
+      participant "DocenteDAO" as DAO #Lightblue
+      participant "Servlet: ModificaVoto" as ModificaVotoServlet #Lightblue
+      participant "DocenteDAO" as DocenteDAO #Lightblue
+      participant "JS: tabella iscritti" as UI_Table
+      
+      Docente -> JS_Iscritti : click “Voti Multipli”
+      JS_Iscritti -> JS_Modal : open(courseId, appealDate)
+      JS_Modal -> GetSenzaVoto : GET /getStudentiSenzaVotoByAppello?corsoID=…&dataAppello=…
+      GetSenzaVoto -> DAO : getStudentiSenzaVoto(corsoID, dataAppello)
+      DAO --> GetSenzaVoto : studenti senza voto
+      GetSenzaVoto --> JS_Modal : JSON { studenti senza voto }
+      
+      JS_Modal -> JS_Modal : mostra modale + form multiplo
+      
+      Docente -> JS_Modal : click “Salva Voti”
+      loop per ogni voto inserito
+        JS_Modal -> ModificaVotoServlet : POST /ModificaVoto\nstudenteID, corsoID, dataAppello, voto
+        ModificaVotoServlet -> DocenteDAO : modificaVoto(...)
+        DocenteDAO --> ModificaVotoServlet : conferma
+        ModificaVotoServlet --> JS_Modal : HTTP 200 OK
+      end
+      
+      JS_Modal -> UI_Table : refresh iscritti → show(courseId, appealDate)
+      @enduml
+
+MOSTRA VERBALE
+      @startuml
+      actor Docente
+      participant "VerbaliList (JS)" as JS_Verbali
+      participant "Servlet: MostraVerbaleCreato" as MostraVerbale #Lightblue
+      participant "VerbaleDAO" as VerbaleDAO #Lightblue
+      participant "AppelloDAO" as AppelloDAO #Lightblue
+      participant "CorsoDAO" as CorsoDAO #Lightblue
+      participant "Verbale dettagliato" as UI_Report
+      
+      Docente -> JS_Verbali : click Verbale (id=…)
+      JS_Verbali -> MostraVerbale : GET /MostraVerbaleCreato?verbaleID=…
+      MostraVerbale -> VerbaleDAO : getStudentiAndInfoByVerbale(verbaleID)
+      MostraVerbale -> AppelloDAO : getAppelloByVerbale(verbaleID)
+      MostraVerbale -> CorsoDAO : getCorsoById(appello.corsoID)
+      VerbaleDAO --> MostraVerbale : verbale + studenti + voti
+      AppelloDAO --> MostraVerbale : appello
+      CorsoDAO --> MostraVerbale : corso
+      MostraVerbale --> JS_Verbali : JSON { verbale, appello, corso, studenti, voti }
+      
+      JS_Verbali -> UI_Report : show(json)
+      @enduml
+
+CARICAMENTO INIZIALE
+      @startuml
+      actor Docente
+      participant "PageOrchestrator (JS)" as JS_Orchestrator
+      participant "CoursesList (JS)" as JS_Corsi
+      participant "Servlet: VaiHomeDocente" as VaiHome #Lightblue
+      participant "DocenteDAO" as DAO #Lightblue
+      participant "VerbaliList (JS)" as JS_Verbali
+      
+      Docente -> JS_Orchestrator : carica pagina (onload)
+      JS_Orchestrator -> JS_Corsi : show()
+      
+      JS_Corsi -> VaiHome : GET /VaiHomeDocente
+      VaiHome -> DAO : getCorsiAndAppelliByDocente(docenteID)
+      DAO --> VaiHome : corsi + appelli
+      VaiHome --> JS_Corsi : JSON { corsi, appelli }
+      
+      JS_Corsi -> JS_Corsi : update(json) → mostra lista corsi + appelli
+      
+      JS_Orchestrator -> JS_Verbali : show()
+      JS_Verbali -> Servlet: MostraVerbali : GET /MostraVerbali
+      MostraVerbali -> DAO : getVerbaliByDocente(docenteID)
+      DAO --> MostraVerbali : lista verbali
+      MostraVerbali --> JS_Verbali : JSON { verbali }
+      
+      JS_Verbali -> JS_Verbali : update(json) → mostra lista verbali
+      @enduml
+
+
+
+
