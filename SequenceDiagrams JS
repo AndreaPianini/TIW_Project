@@ -1,5 +1,28 @@
+
+LOGIN
+@startuml
+    actor Utente
+    participant "Login.html +\nLoginController.js" as Login
+    participant "Servlet: CheckLogin" as CheckLogin #Lightblue
+    participant "UtenteDAO" as DAO #Lightblue
+    participant "Sessione" as Sessione #Lightblue
+    participant "Window" as Window
+    
+    Utente -> Login : click submit
+    Login -> CheckLogin : AJAX POST \nusername, password
+    CheckLogin -> DAO : checkCredenziali\nusername, password
+    DAO -> CheckLogin : user || null
+    CheckLogin --> Login : [Exception, Errori \nStatusCode 400/401/500]
+    Login <- Login : [Show error message]
+    CheckLogin -> Sessione : [no errori] setAttribute("user", user)
+    CheckLogin --> Login : utente JSON\nStatusCode 200
+    Login -> Window : utente.role == "Docente" ? \nlocation.href("DocenteHome.html")
+    Login -> Window : utente.role == "Studente" ? \nlocation.href("StudenteHome.html")
+ @enduml
+
+
 VERBALIZZAZIONE 
-      @startuml
+@startuml
     actor Docente
     participant "Lista studenti" as JS_View
     participant "creaVerbale() helper" as JS_Helper
@@ -31,7 +54,7 @@ VERBALIZZAZIONE
     JS_Helper -> UI_Report : verbale.show(json)
     JS_Helper -> JS_View : update( )
     
-    @enduml
+@enduml
 
 
 VEDI ISCRITTI
