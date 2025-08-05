@@ -28,7 +28,7 @@ public class Checker implements Filter {
 		//System.out.print("Login checker filter executing ...\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String loginpath = req.getServletContext().getContextPath() + "/Login";
+		String loginpath = req.getServletContext().getContextPath() + "/Login.html";
 
 		HttpSession s = req.getSession();
 		if (s.isNew() || s.getAttribute("user") == null) {
