@@ -1,4 +1,5 @@
 package Controllers;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
@@ -13,6 +14,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import BEANS.Utente;
 import DAO.UtenteDAO;
@@ -63,6 +67,7 @@ public class CheckLogin extends HttpServlet {
         if ( ID == null || ID < 0 || ID > 99999999 || password == null || password.isEmpty() ) {
         	response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         	response.getWriter().println("ID e Password devono essere validi e non vuoti");
+        	response.setCharacterEncoding("UTF-8");
 			return;
 		}
         
@@ -75,37 +80,43 @@ public class CheckLogin extends HttpServlet {
         	System.out.println("Failure in database credential checking");
         	response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         	response.getWriter().println("Si è verificato un errore, riprovare");
+        	response.setCharacterEncoding("UTF-8");
 			return;
 		}
 
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            String path = getServletContext().getContextPath();
+            JsonObject jsonResponse = new JsonObject();
+            jsonResponse.add("user", new Gson().toJsonTree(user));
+            // Aggiunta ruolo manualmente
+            jsonResponse.getAsJsonObject("user").addProperty("role", user.getRole());
 
             if (user.getRole().equals("Studente")) {
             	request.getSession().setAttribute("user", user);
     			response.setStatus(HttpServletResponse.SC_OK);
     			response.setContentType("application/json");
     			response.setCharacterEncoding("UTF-8");
-                response.sendRedirect(path + "/VaiHomeStudente");
+    			response.getWriter().write(jsonResponse.toString());
             } 
             else if (user.getRole().equals("Docente")) {
             	request.getSession().setAttribute("user", user);
     			response.setStatus(HttpServletResponse.SC_OK);
     			response.setContentType("application/json");
     			response.setCharacterEncoding("UTF-8");
-                response.sendRedirect(path + "/VaiHomeDocente");
+    			response.getWriter().write(jsonResponse.toString());
             } 
             else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				response.getWriter().println("Ruolo non riconosciuto. Accesso negato.");
+				response.setCharacterEncoding("UTF-8");
 				return;
             }
         } 
         else {
         	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         	response.getWriter().println("ID o Password errati. Riprovare");
+        	response.setCharacterEncoding("UTF-8");
         	return;
         }
         

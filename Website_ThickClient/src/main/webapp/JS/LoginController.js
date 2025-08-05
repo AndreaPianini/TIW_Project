@@ -2,55 +2,74 @@
  * Login Controller
  */
 
-	function makeCall( method, url, formElement, cback, reset = true ) {
-	    var req = new XMLHttpRequest(); // visible by closure
-	    req.onreadystatechange = function() {
-	      cback(req)
+	function makeAJAXCall( method, url, formElement, callBack ) {
+	    var request = new XMLHttpRequest(); // visible by closure
+	    request.onreadystatechange = function() {
+	      callBack(request)
 	    }; // closure
-	    req.open(method, url);
+	    request.open(method, url);
 	    if (formElement == null) {
-	      req.send();
+	      request.send();
 	    } 
 		else {
-	      req.send(new FormData(formElement));
-	    }
-	    if (formElement !== null && reset === true) {
-	      formElement.reset();
+	      request.send(new FormData(formElement));
 	    }
 	}
 	
 	
-	(function(){ // avoid variables ending up in the global scope
-
-	  document.getElementById("loginbutton").addEventListener('click', (e) => {
-	    var form = e.target.closest("form");
-	    if (form.checkValidity()) {
-	    	makeCall("POST", 'CheckLogin', e.target.closest("form"),
-	        function(x) {
-		          if (x.readyState == XMLHttpRequest.DONE) {
-		            var message = x.responseText;
-		            switch (x.status) {
-		              case 200:
-		            	sessionStorage.setItem('username', message);
-		                window.location.href = "HomeCS.html";
-		                break;
-		              case 400: // bad request
-		                document.getElementById("errormessage").textContent = message;
-		                break;
-		              case 401: // unauthorized
-		                  document.getElementById("errormessage").textContent = message;
-		                  break;
-		              case 500: // server error
-		            	document.getElementById("errormessage").textContent = message;
-		                break;
-		            }
-		          }
-		        }
-	       );
-	    } 
-		else {
-	    	 form.reportValidity();
+	// Immediately Invoked Function Expression (IIFE)
+	(function(){ 
+	  document.getElementById("login-button").addEventListener('click', 
+		(e) => {
+			e.preventDefault(); // Impedisce il submit del form e il caricamento della pagina
+		    var form = e.target.closest("form");
+		    if (form.checkValidity()) {
+		    	makeAJAXCall("POST", "CheckLogin", form, reqCallBack);
+		    } 
+			else {
+		    	 form.reportValidity();
+		    }
 	    }
-	  });
-
+	  );
 	})();
+	
+	
+	
+	function reqCallBack(x) {
+	  	if (x.readyState == XMLHttpRequest.DONE) {
+	    	var errorDiv = document.getElementById("error-message");
+	    	var errorText = document.getElementById("error-text");
+	    	switch (x.status) {
+	    		case 200: // ok
+	        		try {
+	          			var response = JSON.parse(x.responseText);
+	          			var user = response.user;
+	          			if (user.role === "Docente") {
+	            			window.location.href = "DocenteHome.html";
+	          			} 
+						else if (user.role === "Studente") {
+	            			window.location.href = "StudenteHome.html";
+	          			} 
+						else {
+	            			errorText.textContent = "Ruolo non riconosciuto.";
+	            			errorDiv.style.display = "block";
+	            			return;
+	          		    }
+	          			form.reset();
+	          			errorDiv.style.display = "none";
+	        		} 
+					catch (err) {
+	          			errorText.textContent = "Risposta non valida dal server.";
+	          			errorDiv.style.display = "block";
+	        		}
+	        		break;
+	      		case 400:
+	      		case 401:
+	      		case 500:
+	        		// Mostra il messaggio di errore restituito dal backend
+	        		errorText.textContent = x.responseText;
+	        		errorDiv.style.display = "block";
+	        		break;
+	    	}
+	  	}
+	}
