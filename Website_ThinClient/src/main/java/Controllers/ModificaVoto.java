@@ -98,7 +98,6 @@ public class ModificaVoto extends HttpServlet {
 
 	    StudenteDAO studenteDao = new StudenteDAO(connection, studID);
 	    try {
-	    	//DA CONTROLLARE
 	        if (!studenteDao.checkRegistrazione(corsoID, dataAppello)) {
 	            renderPageError(request, response, "Studente non iscritto all'appello.");
 	            return;
@@ -117,7 +116,8 @@ public class ModificaVoto extends HttpServlet {
 	        return;
 	    }
 	    String ctxpath = getServletContext().getContextPath();
-	    String path = ctxpath + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello + "&sortBy=id&order=ASC";
+	    String path = ctxpath + "/VediIscritti?corsoID=" + corsoID + "&dataAppello=" + dataAppello + 
+	    						"&sortBy=matricola&order=ASC";
 	    response.sendRedirect(path);
 	    
 	}

@@ -114,7 +114,8 @@ public class VediVoto extends HttpServlet {
 					return;
 				}
 				
-			} catch (SQLException e) {
+			} 
+			catch (SQLException e) {
 				renderPageError(request, response,
 						"Si è verificato un errore nel trovare le informazioni relative alla valutazione.");
 				return;
@@ -122,12 +123,14 @@ public class VediVoto extends HttpServlet {
 			
 			try {
 				corso = corsoDAO.getCorsoById(corsoID);
-			} catch (SQLException e){
+			} 
+			catch (SQLException e){
 				renderPageError(request, response,
 						"Si è verificato un errore nel trovare le informazioni relative al corso.");
 				return;
 			}
-		} else {
+		} 
+		else {
 			renderPageError(request, response,
 					"Corso o data appello non validi.");
 			return;

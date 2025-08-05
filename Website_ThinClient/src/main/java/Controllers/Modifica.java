@@ -99,7 +99,6 @@ public class Modifica extends HttpServlet {
 	   	Studente studente = null;
 	   	Valutazione valutazione = null;
 		try {
-			// !!!Da fare - Controllo che il docente sia abilitato ad accedere a questo appello
 			if (!docenteDAO.isAutorizzato((int)corsoID)) {
 				renderPageError(request, response, "Non sei abilitato a modificare questo corso.");
 				return;
@@ -111,10 +110,12 @@ public class Modifica extends HttpServlet {
 			renderPageError(request, response, "Si è verificato un errore. Riprovare");
 			return;
 		}
+		
 		if (studente == null || valutazione == null) {
 			renderPageError(request, response, "Si è verificato un errore. Riprovare");
 			return;
 		}
+		
 		String path = "/WEB-INF/ModificaVoto.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());

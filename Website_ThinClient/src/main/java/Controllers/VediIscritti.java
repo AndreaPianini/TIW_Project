@@ -78,7 +78,7 @@ public class VediIscritti extends HttpServlet {
             dataAppello = Date.valueOf(request.getParameter("dataAppello"));
         } catch (Exception ignored) {}
 
-        // ----------------- nuova funzionalità: ordinamento -----------------
+        // ----------------- Ordinamento -----------------
         String sortBy = request.getParameter("sortBy");
         String order  = request.getParameter("order");
 
@@ -112,12 +112,13 @@ public class VediIscritti extends HttpServlet {
         ArrayList<Valutazione> voti   = new ArrayList<>();
         try {
             if (!docenteDAO.isAutorizzato(corsoID)) {
-                renderPageError(request, response, "Non sei abilitato a modificare questo corso.");
+                renderPageError(request, response, "Non sei autorizzato a modificare questo corso.");
                 return;
             }
 
             docenteDAO.getIscrittiByAppello(corsoID, dataAppello, sortBy, order, iscritti, voti);
-        } catch (SQLException e) {
+        } 
+        catch (SQLException e) {
             e.printStackTrace();
             renderPageError(request, response, "Si è verificato un errore durante il recupero degli iscritti.");
             return;
@@ -144,7 +145,7 @@ public class VediIscritti extends HttpServlet {
         doGet(request, response);
     }
 
-    /* ----------------------- utils ----------------------- */
+
     private void renderPageError(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws IOException {
         JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
