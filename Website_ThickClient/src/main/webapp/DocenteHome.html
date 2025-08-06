@@ -1,153 +1,170 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
-<html lang="it">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Area Docente</title>
-  <link rel="stylesheet" href="style.css" />
+	<meta charset="UTF-8">
+	<title>Home Docente</title>
+	<link rel="stylesheet" href="css/docenteStyle.css" />
+	<script src="JS/DocenteController.js"></script>
 </head>
 <body>
 
-  <header id="header">
-    <h1>Area Docente</h1>
-    <div id="userbox">
-      <span id="id_username"></span>
-      <a href="Logout" id="logoutlink">Logout</a>
+	<div class="header-bar">
+		<h2>Benvenuto nella Home Docente</h2>
+		<form id="logout-form">
+			<button type="button" class="btn-secondary" id="logout-btn">Logout</button>
+		</form>
+	</div>
+	
+	<div id="error-message" class="error-message" style="display:none;">
+		<p id="error-text"></p>
+	</div>
+	
+	<div class="container">
+		<div class="col-sx">
+			<table id="corsi_appelli-table" class="table" style="display:none;">
+				<thead>
+					<tr>
+						<th>Corso</th>
+						<th>Appelli</th>
+						<th>Azioni</th>
+					</tr>
+				</thead>
+				<tbody id="corsi_appelli-table-body">
+					</tbody>
+			</table>
+			<h3 id="appelli-titolo" style="display:none;">Appelli per il corso: <span id="nome-corso-selezionato"></span></h3>
+			<table id="appelli-table" class="table" style="display:none;">
+				<thead>
+					<tr>
+						<th>Data Appello</th>
+						<th>Stato</th>
+						<th>Azioni</th>
+					</tr>
+				</thead>
+				<tbody id="appelli-table-body">
+					</tbody>
+			</table>
+			<button type="button" id="back-to-corsi-btn" class="btn-secondary" style="display:none;">Torna ai Corsi</button>
+		</div>
+	</div>
+	
+	<div id="studenti-iscritti-container" class="container" style="display:none;">
+    <div class="header-container">
+        <h3 id="titolo-elenco-studenti">Elenco Studenti Iscritti</h3>
+        <button type="button" id="pubblica-voti-btn" class="btn-primary" style="display:none;">Pubblica</button>
+        <button type="button" id="verbalizza-btn" class="btn-primary" style="display:none;">Verbalizza</button>
+        <button type="button" id="apri-inserimento-multiplo-btn" class="btn-primary" style="display:none;">Inserisci Voti Multipli</button>
     </div>
-  </header>
-
-  <div id="id_alert"></div>
-
-  <main id="page-container">
-
-    <section id="courses_section">
-      <h2>Corsi</h2>
-      <ul id="id_courses"></ul>
-
-      <h3>Appelli</h3>
-      <ul id="id_appeals"></ul>
-    </section>
-
-    <section id="registered_section">
-      <h2>Iscritti</h2>
-
-      <p id="id_registeredstudentsstring"></p>
-
-      <div id="id_registeredstudentscontainer" style="visibility:hidden">
-        <table>
-          <thead>
-            <tr>
-              <th class="column-label"><a href="#" data-column="matricola">Matricola</a></th>
-              <th class="column-label"><a href="#" data-column="cognome">Cognome</a></th>
-              <th class="column-label"><a href="#" data-column="nome">Nome</a></th>
-              <th class="column-label"><a href="#" data-column="email">Email</a></th>
-              <th class="column-label"><a href="#" data-column="corsoLaurea">Corso Laurea</a></th>
-              <th class="column-label"><a href="#" data-column="mark">Voto</a></th>
-              <th class="column-label"><a href="#" data-column="stato">Stato</a></th>
-              <th>Azioni</th>
-            </tr>
-          </thead>
-          <tbody id="id_registeredstudentscontainerbody"></tbody>
-        </table>
-      </div>
-
-      <div id="appeal_actions">
-        <form id="id_publishbutton">
-          <input type="hidden" name="appealDate" />
-          <input type="hidden" name="courseId" />
-          <button type="button">Pubblica</button>
-        </form>
-
-        <form id="id_createreportbutton">
-          <input type="hidden" name="dataAppello" />
-          <input type="hidden" name="idCorso" />
-          <button type="button">Verbalizza</button>
-        </form>
-
-        <form id="id_multipleinsertionbutton">
-          <input type="hidden" name="dataAppello" />
-          <input type="hidden" name="idCorso" />
-          <button type="button">Voti Multipli</button>
-        </form>
-      </div>
-    </section>
-
-    <section id="id_studentdetailscontainer" hidden>
-      <h2>Modifica Voto</h2>
-      <p>Matricola: <span id="id_studentid"></span></p>
-      <p>Nome: <span id="id_studentname"></span></p>
-      <p>Cognome: <span id="id_studentsurname"></span></p>
-
-      <form id="id_modifyevaluationform">
-        <select name="evaluation" id="id_evalselect">
-          <option value=""></option>
-          <option>ASSENTE</option><option>RIMANDATO</option><option>RIPROVATO</option>
-          <script>
-            document.currentScript.insertAdjacentHTML(
-              "beforebegin",
-              [...Array(13)].map((_,i)=>`<option>${18+i}</option>`).join("") + "<option>30L</option>"
-            );
-          </script>
-        </select>
-        <button type="button" id="id_modifyevaluationbutton">Salva</button>
-      </form>
-    </section>
-
-    <section id="reports_section">
-      <h2>Verbali</h2>
-      <ul id="id_verbali"></ul>
-    </section>
-
-    <section id="id_reportdetailscontainer" hidden>
-      <h2>Dettaglio Verbale</h2>
-      <div id="report_info">
-        <div>N° Verbale: <span id="id_reportnumber"></span></div>
-        <div>Data: <span id="id_reportdate"></span></div>
-        <div>Ora: <span id="id_reporttime"></span></div>
-        <div>Corso (ID): <span id="id_reportcourseid"></span></div>
-        <div>Data Appello: <span id="id_reportappealdate"></span></div>
-      </div>
-      <table>
+    <table id="studenti-iscritti-table" class="table">
         <thead>
-          <tr>
-            <th>Matricola</th><th>Nome</th><th>Cognome</th><th>Voto</th>
-          </tr>
-        </thead>
-        <tbody id="id_reportstudentdetailscontainerbody"></tbody>
-      </table>
-    </section>
-
-  </main>
-
-  <div id="id_multipleinsertionmodal" class="modal" style="display:none;">
-    <div id="modal_content" class="modal-content">
-      <div id="modal_header">
-        <h3>Inserisci voti multipli</h3>
-        <span class="close">×</span>
-      </div>
-
-      <div id="modal_body">
-        <table>
-          <thead>
             <tr>
-              <th>Matricola</th><th>Nome</th><th>Cognome</th>
-              <th>Email</th><th>Corso L.</th><th>Voto</th><th>Stato</th>
+                <th>Matricola</th>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Voto</th>
+                <th>Stato</th>
+                <th>Azioni</th>
             </tr>
-          </thead>
-          <tbody id="id_multipleinsertioncontainerbody"></tbody>
-        </table>
-      </div>
+        </thead>
+        <tbody id="studenti-iscritti-body">
+            </tbody>
+    </table>
+    <button type="button" id="nascondi-elenco-btn" class="btn-secondary">Chiudi Elenco</button>
+</div>
 
-      <form id="id_multipleinsertionsubmitbutton">
-        <input type="hidden" name="appealDate" />
-        <input type="hidden" name="courseId" />
-        <button type="button">Salva Voti</button>
-      </form>
+<div id="modifica-voto-modale" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Modifica Voto per <span id="studente-info-modale"></span></h3>
+            <span class="close" id="close-modifica-voto-btn">×</span>
+        </div>
+        <div class="modal-body">
+            <form id="modifica-voto-form">
+                <input type="hidden" name="studenteID" id="studenteID-input" />
+                <input type="hidden" name="corsoID" id="corsoID-input" />
+                <input type="hidden" name="dataAppello" id="dataAppello-input" />
+                
+                <div class="form-group">
+                    <label for="voto-modifica">Nuovo Voto:</label>
+                    <select name="voto" id="voto-modifica" class="form-control">
+                        </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Salva</button>
+                    <button type="button" class="btn-secondary" id="annulla-modifica-btn">Annulla</button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
+</div>
 
-  <script src="docenteHome.js"></script>
+<div id="inserimento_multiplo_modale" class="modal" style="display:none;">
+    <div id="modal_content" class="modal-content">
+        <div id="modal_header">
+            <h3>Inserisci voti multipli</h3>
+            <span class="close" id="close-multiplo-btn">×</span>
+        </div>
+        <div id="modal_body">
+            <form id="inserimento-multiplo-form">
+                <input type="hidden" name="corsoID" id="corsoID-multiplo-input" />
+                <input type="hidden" name="dataAppello" id="dataAppello-multiplo-input" />
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Matricola</th>
+                            <th>Nome</th>
+                            <th>Cognome</th>
+                            <th>Voto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inserimento_multiplo_corpo">
+                        </tbody>
+                </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn-primary" id="salva-multiplo-btn">Salva Voti</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <div id="verbali-visualizzazione-container" class="container" style="margin-top: 20px; display: none;">
+        <div class="col-sx" id="verbali-lista">
+            <h3>Verbali di Appello</h3>
+            <table class="table" id="verbali-table">
+                <thead>
+                    <tr>
+                        <th>Appello</th>
+                        <th>Data</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="verbali-table-body">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="col-dx" id="verbali-dettagli" style="display: none;">
+            <h3>Dettagli Verbale: <span id="verbale-info"></span></h3>
+            <p><strong>Corso:</strong> <span id="verbale-corso"></span></p>
+            <p><strong>Data Appello:</strong> <span id="verbale-data"></span></p>
+            <h4>Voti degli Studenti:</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Matricola</th>
+                        <th>Nome</th>
+                        <th>Cognome</th>
+                        <th>Voto</th>
+                        <th>Stato</th>
+                    </tr>
+                </thead>
+                <tbody id="verbale-voti-body">
+                    </tbody>
+            </table>
+            <button type="button" class="btn-secondary" id="nascondi-dettagli-btn">Chiudi Dettagli</button>
+        </div>
+    </div>
+	
 </body>
 </html>
