@@ -22,7 +22,7 @@ body {
 	border-radius: 16px;
 	box-shadow: 0 8px 32px rgba(60, 80, 180, 0.10), 0 1.5px 4px rgba(0, 0, 0, 0.04);
 	width: 100%;
-	max-width: 1300px; /* aumentata larghezza massima */
+	max-width: 1300px; 
 	margin: 0 auto 40px auto;
 	display: flex;
 	flex-direction: row;
