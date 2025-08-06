@@ -15,11 +15,8 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
-import org.thymeleaf.web.servlet.JakartaServletWebApplication;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import BEANS.Corso;
 import BEANS.Studente;
@@ -33,7 +30,6 @@ public class VediVoto extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	private TemplateEngine templateEngine;
        
     
     public void init() throws ServletException {
@@ -45,14 +41,6 @@ public class VediVoto extends HttpServlet {
 			String password = context.getInitParameter("dbPassword");
 			Class.forName(driver);
 			connection = DriverManager.getConnection(url, user, password);
-
-			// Thymeleaf setup
-			JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(context);
-			WebApplicationTemplateResolver templateResolver = new WebApplicationTemplateResolver(webApplication);
-			templateResolver.setTemplateMode(TemplateMode.HTML);
-			templateResolver.setSuffix(".html");
-			this.templateEngine = new TemplateEngine();
-			this.templateEngine.setTemplateResolver(templateResolver);
 		} 
 		catch (ClassNotFoundException e) {
 			throw new UnavailableException("Can't load database driver");
@@ -71,7 +59,7 @@ public class VediVoto extends HttpServlet {
 		CorsoDAO corsoDAO = new CorsoDAO(connection);
 		Integer corsoID = null;
 		Date dataAppello = null;
-		Valutazione voto = null;
+		Valutazione valutazione = null;
 		Studente studInfo = null;
 		Corso corso = null;
 		
@@ -89,41 +77,45 @@ public class VediVoto extends HttpServlet {
 		}
 		
 		if (corsoID == null || dataAppello == null) {
-			renderPageError(request, response,
-					"Corso o data appello non validi.");
-			return;
-		}
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	        response.getWriter().println("Corso o data appello non validi.");
+	        return;
+	    }
 		
 		try {
 			if (!studenteDAO.checkRegistrazione(corsoID, dataAppello)) {
-				renderPageError(request, response, "Lo studente non è iscritto all'appello.");
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		        response.getWriter().println("Lo studente non è iscritto all'appello indicato.");
 				return;
 			}
-		} catch (SQLException e) {
-			renderPageError(request, response,
-					"Si è verificato un errore nel controllare l'iscrizione dello studente all'appello.");
+		} 
+		catch (SQLException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	        response.getWriter().println("Si è verificato un errore nel controllare l'iscrizione dello studente all'appello.");
 			return;
 		}
 		
 		try {
-			voto = studenteDAO.getVotoByAppello(corsoID, dataAppello);
+			valutazione = studenteDAO.getVotoByAppello(corsoID, dataAppello);
 			
-			if(voto == null) {
-				renderPageError(request, response, "Nessuna valutazione trovata per questo appello.");
+			if(valutazione == null) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		        response.getWriter().println("Nessuna valutazione trovata per questo appello.");
 				return;
 			}
 			
 			studInfo = studenteDAO.getStudenteInfo();
 			
 			if(studInfo == null) {
-				renderPageError(request, response, "Nessuna informazione trovata per lo studente.");
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		        response.getWriter().println("Nessuna informazione trovata per lo studente.");
 				return;
 			}
 			
 		} 
 		catch (SQLException e) {
-			renderPageError(request, response,
-					"Si è verificato un errore nel trovare le informazioni relative alla valutazione.");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	        response.getWriter().println("Si è verificato un errore nel trovare le informazioni relative alla valutazione.");
 			return;
 		} 
 		
@@ -131,34 +123,31 @@ public class VediVoto extends HttpServlet {
 			corso = corsoDAO.getCorsoById(corsoID);
 		} 
 		catch (SQLException e){
-			renderPageError(request, response,
-					"Si è verificato un errore nel trovare le informazioni relative al corso.");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	        response.getWriter().println("Si è verificato un errore nel trovare le informazioni relative al corso.");
 			return;
 		}
-	
-		String path = "/WEB-INF/Valutazione.html";
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("voto", voto);
-        ctx.setVariable("studInfo", studInfo);
-        ctx.setVariable("appelloData", dataAppello);
-        ctx.setVariable("corsoInfo", corso);
-		templateEngine.process(path, ctx, response.getWriter());
+		
+		JsonObject jsonResponse = new JsonObject();
+		JsonObject valutazioneJson = new JsonObject();
+	    valutazioneJson.addProperty("voto", valutazione.getVoto() != null ? valutazione.getVoto().toString() : "-");
+	    valutazioneJson.addProperty("statoValutazione", valutazione.getStatoValutazione().toString());
+
+		jsonResponse.add("valutazione", valutazioneJson);
+		jsonResponse.add("studInfo", new Gson().toJsonTree(studInfo));
+		jsonResponse.add("corso", new Gson().toJsonTree(corso));
+		jsonResponse.addProperty("dataAppello", dataAppello.toString());
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(jsonResponse.toString());
 		
 	}
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}
-	
-	
-	private void renderPageError(HttpServletRequest request, HttpServletResponse response, 
-			String errorMessage) throws IOException {
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-		WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-		ctx.setVariable("error", errorMessage);
-		templateEngine.process("/WEB-INF/Valutazione.html", ctx, response.getWriter());
 	}
 	
 	public void destroy() {

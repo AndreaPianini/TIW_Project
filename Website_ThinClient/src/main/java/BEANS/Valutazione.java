@@ -8,7 +8,7 @@ public class Valutazione {
 		@Override
 		public String toString() {
 			switch (this) {
-				case NON_INSERITO: return "NON_INSERITO";
+				case NON_INSERITO: return "NON INSERITO";
 				case INSERITO: return "INSERITO";
 				case PUBBLICATO: return "PUBBLICATO";
 				case RIFIUTATO: return "RIFIUTATO";
@@ -81,8 +81,10 @@ public class Valutazione {
 		return statoValutazione;
 	}
 	public void setStatoValutazione(String statoValutazione) throws IllegalArgumentException {
+		statoValutazione = statoValutazione.toUpperCase();
 		switch (statoValutazione) {
 			case "NON_INSERITO": this.statoValutazione = StatoValutazione.NON_INSERITO; break;
+			case "NON INSERITO": this.statoValutazione = StatoValutazione.NON_INSERITO; break;
 			case "INSERITO": this.statoValutazione = StatoValutazione.INSERITO; break;
 			case "PUBBLICATO": this.statoValutazione = StatoValutazione.PUBBLICATO; break;
 			case "RIFIUTATO": this.statoValutazione = StatoValutazione.RIFIUTATO; break;

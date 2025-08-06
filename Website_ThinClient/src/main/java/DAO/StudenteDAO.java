@@ -114,6 +114,10 @@ public class StudenteDAO {
 				valutazione.setVoto(votoStr);
 				valutazione.setStatoValutazione(result.getString("stato_valutazione"));
 			}
+			if(valutazione.getStatoValutazione().toString().equals("INSERITO")) {
+				valutazione.setStatoValutazione("NON_INSERITO");
+				valutazione.setVoto(null);
+			}
 			return valutazione;
 		} 
 		finally {
@@ -123,11 +127,13 @@ public class StudenteDAO {
 	}
 	
 	
+	//Da corregere: prendere anche i corsi per cui lo studente non è iscritto a nessun appello
 	public void getCorsiAndAppelliByStudente( ArrayList<Corso> corsi, ArrayList<ArrayList<Appello>> appelli) 
 			throws SQLException {
 	
-		String query = "SELECT c.id   AS id_corso, c.nome AS nome_corso, c.cfu  AS cfu, i.data AS data_appello "
-			+ "FROM Iscrizioni AS i LEFT JOIN Corsi AS c ON c.id = i.corso WHERE i.studente = ? ORDER BY c.nome, i.data DESC";
+		String query = "SELECT c.id AS id_corso, c.nome AS nome_corso, c.cfu  AS cfu, i.data AS data_appello "
+					 + "FROM Iscrizioni AS i LEFT JOIN Corsi AS c ON c.id = i.corso "
+					 + "WHERE i.studente = ? ORDER BY c.nome, i.data DESC";
 		PreparedStatement pstatement = null;
 		ResultSet result = null;
 		try {

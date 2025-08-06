@@ -4,33 +4,38 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Home Studente</title>
-	<link rel="stylesheet" href="css/style.css" />
-	<script src="js/StudentiController.js"></script>
+	<link rel="stylesheet" href="css/studenteStyle.css" />
+	<script src="JS/StudenteController.js"></script>
 </head>
 
 <body>
-	<div class="container">
+	<div class="header-bar">
 		<h2>Benvenuto nella Home Studente</h2>
-		<div id="error-message" class="error-message" style="display:none;">
-			<p id="error-text"></p>
-		</div>
-		<table id="corsi-table" class="table" style="display:none;">
-			<thead>
-				<tr>
-					<th>Corso</th>
-					<th>Appelli</th>
-				</tr>
-			</thead>
-			<tbody id="corsi-table-body">
-				<!-- Popolato da StudentiController.js -->
-			</tbody>
-		</table>
-		<form id="logout-form" style="margin-top: 20px;">
+		<form id="logout-form">
 			<button type="button" class="btn-secondary" id="logout-btn">Logout</button>
 		</form>
-		<form id="home-form" style="margin-top: 20px;">
-			<button type="button" class="btn-secondary" id="home-btn">Torna alla Home</button>
-		</form>
+	</div>
+	<div id="error-message" class="error-message" style="display:none;">
+		<p id="error-text"></p>
+	</div>
+	<div class="container">
+		<div class="col-sx">
+			<table id="corsi_appelli-table" class="table" style="display:none;">
+				<thead>
+					<tr>
+						<th>Corso</th>
+						<th>Appelli</th>
+					</tr>
+				</thead>
+				<tbody id="corsi_appelli-table-body">
+					<!-- I dati verranno inseriti dinamicamente qui -->
+				</tbody>
+			</table>
+		</div>
+		<div class="col-dx">
+			<!-- Box valutazione, inizialmente nascosto -->
+			<div id="valutazione-box" style="display:none;"></div>
+		</div>
 	</div>
 </body>
 

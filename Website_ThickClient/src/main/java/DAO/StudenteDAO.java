@@ -114,6 +114,10 @@ public class StudenteDAO {
 				valutazione.setVoto(votoStr);
 				valutazione.setStatoValutazione(result.getString("stato_valutazione"));
 			}
+			if(valutazione.getStatoValutazione().toString().equals("INSERITO")) {
+				valutazione.setStatoValutazione("NON_INSERITO");
+				valutazione.setVoto(null);
+			}
 			return valutazione;
 		} 
 		finally {

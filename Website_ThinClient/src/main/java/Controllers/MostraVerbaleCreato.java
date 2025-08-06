@@ -86,6 +86,7 @@ public class MostraVerbaleCreato extends HttpServlet {
 			renderPageError(request, response, "Verbale non valido. Riprovare.");
 			return;
 		}
+		
 		verbale.setId(verbaleID);
 		try {
 			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
@@ -110,6 +111,7 @@ public class MostraVerbaleCreato extends HttpServlet {
 			renderPageError(request, response, "Nessun appello trovato per il verbale selezionato.");
 			return;
 		}
+		
 		Corso corso;
 		try {
 			corso = new CorsoDAO(connection).getCorsoById(appello.getCorso());
@@ -118,6 +120,7 @@ public class MostraVerbaleCreato extends HttpServlet {
 			renderPageError(request, response, "Si è verificato un errore durante il recupero del corso.");
 			return;
 		}
+		
 		String path = "/WEB-INF/VerbaleCreato.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());

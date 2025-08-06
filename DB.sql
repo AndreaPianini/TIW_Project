@@ -38,6 +38,7 @@ CREATE TABLE `Appelli` (
 
 LOCK TABLES `Appelli` WRITE;
 /*!40000 ALTER TABLE `Appelli` DISABLE KEYS */;
+INSERT INTO `Appelli` VALUES (101,'2025-06-01'),(101,'2025-07-15'),(101,'2025-09-01'),(102,'2025-06-03'),(102,'2025-07-20'),(103,'2025-06-05'),(105,'2025-06-12'),(105,'2025-07-27'),(105,'2025-09-05'),(106,'2025-06-14'),(106,'2025-07-29'),(107,'2025-06-16'),(109,'2025-06-20'),(109,'2025-08-01'),(110,'2025-06-22');
 /*!40000 ALTER TABLE `Appelli` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -65,6 +66,7 @@ CREATE TABLE `Corsi` (
 
 LOCK TABLES `Corsi` WRITE;
 /*!40000 ALTER TABLE `Corsi` DISABLE KEYS */;
+INSERT INTO `Corsi` VALUES (101,'Algoritmi',9,1),(102,'Analisi 1',12,2),(103,'Fisica 1',9,3),(104,'Statistica',6,4),(105,'Reti',6,5),(106,'Sistemi Operativi',9,1),(107,'Database',9,2),(108,'Chimica',6,3),(109,'Programmazione',12,4),(110,'Matematica Discreta',6,5);
 /*!40000 ALTER TABLE `Corsi` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,6 +90,7 @@ CREATE TABLE `Docenti` (
 
 LOCK TABLES `Docenti` WRITE;
 /*!40000 ALTER TABLE `Docenti` DISABLE KEYS */;
+INSERT INTO `Docenti` VALUES (1),(2),(3),(4),(5);
 /*!40000 ALTER TABLE `Docenti` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -120,6 +123,7 @@ CREATE TABLE `Iscrizioni` (
 
 LOCK TABLES `Iscrizioni` WRITE;
 /*!40000 ALTER TABLE `Iscrizioni` DISABLE KEYS */;
+INSERT INTO `Iscrizioni` VALUES (6,101,'2025-06-01',NULL,'NON_INSERITO',NULL),(6,101,'2025-07-15','28','VERBALIZZATO',1),(6,102,'2025-06-03',NULL,'NON_INSERITO',NULL),(6,102,'2025-07-20','25','INSERITO',NULL),(6,105,'2025-09-05',NULL,'NON_INSERITO',NULL),(7,101,'2025-07-15','27','VERBALIZZATO',1),(7,101,'2025-09-01',NULL,'NON_INSERITO',NULL),(7,103,'2025-06-05',NULL,'NON_INSERITO',NULL),(7,106,'2025-06-14',NULL,'NON_INSERITO',NULL),(8,105,'2025-06-12','29','VERBALIZZATO',2),(8,107,'2025-06-16',NULL,'NON_INSERITO',NULL),(8,109,'2025-06-20','27','VERBALIZZATO',3),(9,101,'2025-07-15','30L','VERBALIZZATO',1),(9,109,'2025-06-20','28','VERBALIZZATO',3),(9,109,'2025-08-01',NULL,'NON_INSERITO',NULL),(9,110,'2025-06-22',NULL,'NON_INSERITO',NULL),(10,105,'2025-07-27','25','VERBALIZZATO',2),(10,106,'2025-07-29','24','INSERITO',NULL),(10,110,'2025-06-22','19','INSERITO',NULL);
 /*!40000 ALTER TABLE `Iscrizioni` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -146,6 +150,7 @@ CREATE TABLE `Studenti` (
 
 LOCK TABLES `Studenti` WRITE;
 /*!40000 ALTER TABLE `Studenti` DISABLE KEYS */;
+INSERT INTO `Studenti` VALUES (6,'S1001','Informatica'),(7,'S1002','Fisica'),(8,'S1003','Matematica'),(9,'S1004','Ingegneria'),(10,'S1005','Biologia');
 /*!40000 ALTER TABLE `Studenti` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -157,12 +162,12 @@ DROP TABLE IF EXISTS `StudSegueCorso`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `StudSegueCorso` (
-  `Studente` int NOT NULL,
-  `Corso` int NOT NULL,
-  PRIMARY KEY (`Studente`,`Corso`),
-  KEY `cors_idx` (`Corso`),
-  CONSTRAINT `cors` FOREIGN KEY (`Corso`) REFERENCES `Corsi` (`id`) ON UPDATE CASCADE,
-  CONSTRAINT `stu` FOREIGN KEY (`Studente`) REFERENCES `Studenti` (`id`) ON UPDATE CASCADE
+  `studente` int NOT NULL,
+  `corso` int NOT NULL,
+  PRIMARY KEY (`studente`,`corso`),
+  KEY `cors_idx` (`corso`),
+  CONSTRAINT `cors` FOREIGN KEY (`corso`) REFERENCES `Corsi` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `stu` FOREIGN KEY (`studente`) REFERENCES `Studenti` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -172,6 +177,7 @@ CREATE TABLE `StudSegueCorso` (
 
 LOCK TABLES `StudSegueCorso` WRITE;
 /*!40000 ALTER TABLE `StudSegueCorso` DISABLE KEYS */;
+INSERT INTO `StudSegueCorso` VALUES (6,101),(7,101),(9,101),(6,102),(7,103),(6,105),(8,105),(10,105),(7,106),(10,106),(8,107),(8,109),(9,109),(9,110),(10,110);
 /*!40000 ALTER TABLE `StudSegueCorso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -199,6 +205,7 @@ CREATE TABLE `Utenti` (
 
 LOCK TABLES `Utenti` WRITE;
 /*!40000 ALTER TABLE `Utenti` DISABLE KEYS */;
+INSERT INTO `Utenti` VALUES (1,'pwd1','Mario','Rossi','mario.rossi@uni.it'),(2,'pwd2','Luca','Verdi','luca.verdi@uni.it'),(3,'pwd3','Anna','Bianchi','anna.bianchi@uni.it'),(4,'pwd4','Giulia','Neri','giulia.neri@uni.it'),(5,'pwd5','Paolo','Gialli','paolo.gialli@uni.it'),(6,'pwd6','Marco','Blu','marco.blu@uni.it'),(7,'pwd7','Chiara','Rosa','chiara.rosa@uni.it'),(8,'pwd8','Stefano','Viola','stefano.viola@uni.it'),(9,'pwd9','Elena','Marrone','elena.marrone@uni.it'),(10,'pwd10','Francesca','Grigi','francesca.grigi@uni.it');
 /*!40000 ALTER TABLE `Utenti` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -213,7 +220,7 @@ CREATE TABLE `Verbali` (
   `id` int NOT NULL AUTO_INCREMENT,
   `data_ora_creaz` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,6 +229,7 @@ CREATE TABLE `Verbali` (
 
 LOCK TABLES `Verbali` WRITE;
 /*!40000 ALTER TABLE `Verbali` DISABLE KEYS */;
+INSERT INTO `Verbali` VALUES (1,'2025-07-02 10:00:00'),(2,'2025-07-28 11:00:00'),(3,'2025-09-06 12:00:00'),(4,'2025-06-30 09:30:00');
 /*!40000 ALTER TABLE `Verbali` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -238,4 +246,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-29 15:17:57
+-- Dump completed on 2025-08-05 19:07:59
