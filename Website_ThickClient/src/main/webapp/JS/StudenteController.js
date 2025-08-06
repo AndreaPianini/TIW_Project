@@ -29,13 +29,7 @@
 
         refresh() {
 			this.error.resetError();
-			try {
-                this.corsi_appelli.show();
-            }
-			catch (e) {
-				this.error.showError(e.message);
-            }
-			
+            this.corsi_appelli.show();
         }
 	}
 	
@@ -78,11 +72,13 @@
 							self.renderData();
                         } 
                         catch (e) {
-							throw new Error("Errore nel parsing della risposta JSON.");
+							pageOrchestator.error
+							.showError("Errore nel parsing della risposta JSON.");
                         }
                     } 
                     else {
-                        throw new Error("Errore nella richiesta: " + request.status);
+						pageOrchestator.error
+						.showError("Errore nella richiesta: " + request.status);
                     }
                 }
             });
@@ -95,7 +91,8 @@
             // Mostra la tabella solo se ci sono corsi
             if (!this.corsiList || this.corsiList.length === 0) {
                 this.corsi_appelliTable.style.display = "none";
-                throw new Error("Nessun corso disponibile.");
+				pageOrchestator.error
+				.showError("Nessun corso disponibile.");
             }
             this.corsi_appelliTable.style.display = "table";
             // Per ogni corso
