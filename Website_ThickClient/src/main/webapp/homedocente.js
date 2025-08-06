@@ -1,9 +1,4 @@
-/* ---------------------------------------------------------
- *  DocenteHome.js – versione aggiornata con:
- *   • endpoint italiani (VaiHomeDocente, Modifica, …)
- *   • componente SingleStudentDetails
- *   • funzione modifyStudent() agganciata alla tabella
- * -------------------------------------------------------*/
+
 (function () {  
 
   /* ----------------- Personal message ----------------- */
@@ -402,7 +397,7 @@
     };
 
     this.createReport = (courseId, appealDate) => {
-      makeCall("POST", `Pubblica?corsoID=${courseId}&dataAppello=${appealDate}`, null, (req) => {
+      makeCall("POST", `Verbalizza?corsoID=${courseId}&dataAppello=${appealDate}`, null, (req) => {
         if (req.readyState !== 4) return;
         if (req.status === 200) {
           const vid = JSON.parse(req.responseText);

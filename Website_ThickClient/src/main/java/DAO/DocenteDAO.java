@@ -290,4 +290,33 @@ public class DocenteDAO {
 		}
 	}
 	
+	public ArrayList<Studente> getStudentiSenzaVoto (int corsoID, Date dataAppello) throws SQLException {
+		ArrayList<Studente> studenti = new ArrayList<>();
+		String query = "SELECT s.id AS id, s.matricola AS matricola, u.cognome AS cognome, u.nome AS nome "
+				+ "FROM Iscrizioni i JOIN Studenti s ON i.studente = s.id JOIN Utenti u ON s.id = u.id "
+				+ "WHERE i.corso = ? AND i.data = ? AND i.stato_valutazione = 'NON_INSERITO'";
+		
+		PreparedStatement pstatement = null;
+		ResultSet result = null;
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1, corsoID);
+			pstatement.setDate(2, dataAppello);
+			result = pstatement.executeQuery();
+			while (result.next()) {
+				Studente s = new Studente();
+				s.setID(result.getInt("id"));
+				s.setNome(result.getString("nome"));
+				s.setCognome(result.getString("cognome"));
+				s.setMatricola(result.getString("matricola"));
+				studenti.add(s);
+			}
+		} 
+		finally {
+			if (result != null) try { result.close(); } catch (SQLException ignore) {}
+			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+		}
+		return studenti;
+	}
+	
 }

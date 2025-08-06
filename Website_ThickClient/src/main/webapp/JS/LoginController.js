@@ -1,6 +1,6 @@
 /**
  * Login Controller
- */
+ 
 
 	function makeAJAXCall( method, url, formElement, callBack ) {
 	    var request = new XMLHttpRequest(); // visible by closure
@@ -15,6 +15,8 @@
 	      request.send(new FormData(formElement));
 	    }
 	}
+	
+	*/
 	
 	
 	// Immediately Invoked Function Expression (IIFE)
