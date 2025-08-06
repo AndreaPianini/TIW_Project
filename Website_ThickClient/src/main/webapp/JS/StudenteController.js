@@ -160,14 +160,15 @@
         constructor(errorHandler) {
             this.error = errorHandler;
             this.valutazioneBox = document.getElementById("valutazione-box");
-		    this.valutazione = null;
-			this.studInfo = null;
-			this.corso = null;
+            this.valutazione = null;
+            this.studInfo = null;
+            this.corso = null;
             this.dataAppello = null;
+            this.rifiutabile = false;
+            this.draggedVoto = null;
         }
 
         show(corsoID, dataAppello) {
-            // Chiamata AJAX alla servlet VediVoto
             let self = this;
             const params = new URLSearchParams({ corsoID, dataAppello });
             makeAJAXCall("GET", "VediVoto?" + params.toString(), null, (request) => {
@@ -181,6 +182,7 @@
 							self.studInfo = data.studInfo || null;
 							self.corso = data.corso || null;
 							self.dataAppello = data.dataAppello || null;
+                            self.rifiutabile = data.rifiutabile ? true : false;
                             self.renderData();
                         } 
 						catch (e) {
@@ -284,13 +286,43 @@
             esitoTable.appendChild(thead);
             const tbody = document.createElement("tbody");
             const bodyRow = document.createElement("tr");
-            const voto = this.valutazione.voto ? this.valutazione.voto : "Non disponibile";
+            // Voto cell
+            const voto = this.valutazione.voto ? this.valutazione.voto : "-";
+            const votoTd = document.createElement("td");
+            votoTd.textContent = voto;
+            // Drag & Drop solo se rifiutabile
+            if (this.rifiutabile) {
+                votoTd.setAttribute("draggable", "true");
+                votoTd.style.cursor = "grab";
+                votoTd.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("text/plain", voto);
+                    this.draggedVoto = votoTd;
+                });
+                // Trash icon
+                const trashDiv = document.createElement("div");
+                trashDiv.innerHTML = '<span style="font-size:2rem;cursor:pointer;" id="trash-icon" title="Trascina qui per rifiutare">🗑️</span>';
+                trashDiv.style.display = "inline-block";
+                trashDiv.style.marginLeft = "1rem";
+                trashDiv.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                    trashDiv.style.background = "#ffeaea";
+                });
+                trashDiv.addEventListener("dragleave", (e) => {
+                    trashDiv.style.background = "";
+                });
+                trashDiv.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    trashDiv.style.background = "";
+                    this.showRifiutaPopup();
+                });
+                votoTd.appendChild(trashDiv);
+            }
+            bodyRow.appendChild(votoTd);
+            // Stato Valutazione cell
             const stato = this.valutazione.statoValutazione ? this.valutazione.statoValutazione : "Non disponibile";
-            [voto, stato].forEach(value => {
-                const td = document.createElement("td");
-                td.textContent = value;
-                bodyRow.appendChild(td);
-            });
+            const statoTd = document.createElement("td");
+            statoTd.textContent = stato;
+            bodyRow.appendChild(statoTd);
             tbody.appendChild(bodyRow);
             esitoTable.appendChild(tbody);
             esitoSection.appendChild(esitoTable);
@@ -301,12 +333,97 @@
             this.valutazioneBox.appendChild(esitoSection);
         }
 
-        hide() {
-            this.valutazioneBox.style.display = "none";
-            this.valutazioneBox.innerHTML = "";
-        }
-		
+        showRifiutaPopup() {
+	        // Overlay
+	        const overlay = document.createElement("div");
+	        overlay.style.position = "fixed";
+	        overlay.style.top = "0";
+	        overlay.style.left = "0";
+	        overlay.style.width = "100vw";
+	        overlay.style.height = "100vh";
+	        overlay.style.background = "rgba(0,0,0,0.3)";
+	        overlay.style.zIndex = "9999";
+	        overlay.id = "rifiuta-overlay";
+	        // Popup
+	        const popup = document.createElement("div");
+	        popup.style.position = "fixed";
+	        popup.style.top = "50%";
+	        popup.style.left = "50%";
+	        popup.style.transform = "translate(-50%, -50%)";
+	        popup.style.background = "#fff";
+	        popup.style.padding = "2rem";
+	        popup.style.borderRadius = "10px";
+	        popup.style.boxShadow = "0 2px 8px rgba(192,57,43,0.15)";
+	        popup.style.textAlign = "center";
+	        popup.innerHTML = `<h3>Conferma rifiuto voto</h3><p>Sei sicuro di voler rifiutare il voto?</p>`;
+	        // Bottone Cancella
+	        const btnCancel = document.createElement("button");
+	        btnCancel.className = "btn-secondary";
+	        btnCancel.textContent = "Cancella";
+	        btnCancel.style.marginRight = "1rem";
+	        btnCancel.onclick = () => {
+	            document.body.removeChild(overlay);
+	        };
+			// Bottone Conferma
+	        const btnConfirm = document.createElement("button");
+	        btnConfirm.className = "btn-warning";
+	        btnConfirm.textContent = "Conferma";
+	        btnConfirm.onclick = () => {
+	            document.body.removeChild(overlay);
+	            this.rifiutaVoto();
+	        };
+			
+	        popup.appendChild(btnCancel);
+	        popup.appendChild(btnConfirm);
+	        overlay.appendChild(popup);
+	        document.body.appendChild(overlay);
+	    }
+
+    	rifiutaVoto() {
+			// Crea un form invisibile
+			   const form = document.createElement("form");
+			   form.style.display = "none";
+
+			   // Input hidden per corsoID
+			   const inputCorso = document.createElement("input");
+			   inputCorso.type = "hidden";
+			   inputCorso.name = "corsoID";
+			   inputCorso.value = this.corso.ID;
+			   form.appendChild(inputCorso);
+
+			   // Input hidden per dataAppello
+			   const inputData = document.createElement("input");
+			   inputData.type = "hidden";
+			   inputData.name = "dataAppello";
+			   inputData.value = this.dataAppello;
+			   form.appendChild(inputData);
+
+		   // Aggiungi il form al body
+		      document.body.appendChild(form);
+	        // Crea FormData con i parametri richiesti
+			
+	        const formData = new FormData();
+	        formData.append("corsoID", this.corso.ID);
+	        formData.append("dataAppello", this.dataAppello);
+	        makeAJAXCall("POST", "RifiutaVoto", formData, (request) => {
+	            if (request.readyState === XMLHttpRequest.DONE) {
+	                if (request.status === 200) {
+	                    this.error.showError("Voto rifiutato con successo.");
+	                    this.hide();
+	                } 
+					else {
+	                    this.error.showError(request.responseText || "Errore nel rifiuto del voto.");
+	                }
+					document.body.removeChild(form)
+	            }
+	        });
+    	}
+
+    hide() {
+        this.valutazioneBox.style.display = "none";
+        this.valutazioneBox.innerHTML = "";
     }
+}
 	
 	
 	/***** Page Controller  *****/
