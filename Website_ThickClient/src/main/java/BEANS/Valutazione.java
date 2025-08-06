@@ -94,6 +94,9 @@ public class Valutazione {
 	
 	public boolean rifiutabile() {
 		
+		if ( voto == null || statoValutazione == null ) {
+			return false;
+		}
 		if ( voto.ordinal() >= Voto._18.ordinal() && voto.ordinal() <= Voto._30L.ordinal() 
 				&& statoValutazione == StatoValutazione.PUBBLICATO ) {
 			return true;

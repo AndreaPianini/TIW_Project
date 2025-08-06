@@ -137,6 +137,7 @@ public class VediVoto extends HttpServlet {
 		jsonResponse.add("studInfo", new Gson().toJsonTree(studInfo));
 		jsonResponse.add("corso", new Gson().toJsonTree(corso));
 		jsonResponse.addProperty("dataAppello", dataAppello.toString());
+		jsonResponse.addProperty("rifiutabile", valutazione.rifiutabile());
 		
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json");
