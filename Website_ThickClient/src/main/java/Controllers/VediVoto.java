@@ -129,7 +129,11 @@ public class VediVoto extends HttpServlet {
 		}
 		
 		JsonObject jsonResponse = new JsonObject();
-		jsonResponse.add("valutazione", new Gson().toJsonTree(valutazione));
+		JsonObject valutazioneJson = new JsonObject();
+	    valutazioneJson.addProperty("voto", valutazione.getVoto() != null ? valutazione.getVoto().toString() : "-");
+	    valutazioneJson.addProperty("statoValutazione", valutazione.getStatoValutazione().toString());
+
+		jsonResponse.add("valutazione", valutazioneJson);
 		jsonResponse.add("studInfo", new Gson().toJsonTree(studInfo));
 		jsonResponse.add("corso", new Gson().toJsonTree(corso));
 		jsonResponse.addProperty("dataAppello", dataAppello.toString());
