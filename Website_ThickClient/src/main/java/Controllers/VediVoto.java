@@ -77,7 +77,7 @@ public class VediVoto extends HttpServlet {
 		}
 		
 		if (corsoID == null || dataAppello == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	        response.getWriter().println("Corso o data appello non validi.");
 	        return;
 	    }
