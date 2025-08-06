@@ -63,8 +63,9 @@
 			this.corsiList = null;
             this.appelliList = null;
         }
-
-        getData() {
+		
+		// Ottieni i dati e renderizza la tabella
+        show() {
 			let self = this;
             makeAJAXCall("GET", "VaiHomeStudente", null, (request) => {
                 if (request.readyState === XMLHttpRequest.DONE) {
@@ -74,6 +75,7 @@
                             // Parsing e salvataggio
                            	self.corsiList = Array.isArray(data.corsi) ? data.corsi : [];
                             self.appelliList = Array.isArray(data.appelli) ? data.appelli : [];
+							self.renderData();
                         } 
                         catch (e) {
 							throw new Error("Errore nel parsing della risposta JSON.");
@@ -120,8 +122,8 @@
             });
         }
 
-        show() {
-            this.renderData(this.getData());
+        update() {
+			this.getData();
         }
     }
 	
@@ -129,7 +131,7 @@
 	/***** Page Controller  *****/
 	let pageOrchestator = new PageOrchestrator();
 	
-	window.addEventListener("load",() => {pageOrchestator.refresh();},false);
+	window.addEventListener("load",() => {pageOrchestator.refresh();}, false);
 							 
 							 
 };
