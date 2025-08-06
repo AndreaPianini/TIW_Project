@@ -23,8 +23,8 @@
 
 	class PageOrchestrator {
         init() {
-            this.corsi_appelli = new Corsi_Appelli();
-			this.error = new Errore();
+            this.error = new Errore();
+            this.corsi_appelli = new Corsi_Appelli(this.error);
         }
 
         refresh() {
@@ -51,11 +51,12 @@
 	}
 
 	class Corsi_Appelli {
-		constructor() {
+		constructor(errorHandler) {
             this.corsi_appelliTable = document.getElementById("corsi_appelli-table");
             this.corsi_appelliTableBody = document.getElementById("corsi_appelli-table-body");
 			this.corsiList = null;
             this.appelliList = null;
+            this.error = errorHandler;
         }
 		
 		// Ottieni i dati e renderizza la tabella
@@ -66,33 +67,32 @@
                     if (request.status === 200) {
                         try {
                             const data = JSON.parse(request.responseText);
+							console.log("Dati ricevuti dalla servlet:", data);
                             // Parsing e salvataggio
                            	self.corsiList = Array.isArray(data.corsi) ? data.corsi : [];
                             self.appelliList = Array.isArray(data.appelli) ? data.appelli : [];
 							self.renderData();
                         } 
                         catch (e) {
-							pageOrchestator.error
-							.showError("Errore nel parsing della risposta JSON.");
+							self.error.showError("Errore nel parsing della risposta JSON.");
                         }
                     } 
                     else {
-						pageOrchestator.error
-						.showError("Errore nella richiesta: " + request.status);
+						self.error.showError("Errore nella richiesta: " + request.status);
                     }
                 }
             });
         }
-
+		
+	    // Renderizza i dati nella tabella
         renderData() {
-			console.log("Dati ricevuti dalla servlet:", data);
             // Pulisci la tabella
             this.corsi_appelliTableBody.innerHTML = "";
             // Mostra la tabella solo se ci sono corsi
             if (!this.corsiList || this.corsiList.length === 0) {
                 this.corsi_appelliTable.style.display = "none";
-				pageOrchestator.error
-				.showError("Nessun corso disponibile.");
+				this.error.showError("Nessun corso disponibile.");
+				return;
             }
             this.corsi_appelliTable.style.display = "table";
             // Per ogni corso
@@ -118,7 +118,7 @@
                 this.corsi_appelliTableBody.appendChild(row);
             });
         }
-
+		
         update() {
 			this.getData();
         }
@@ -128,7 +128,7 @@
 	/***** Page Controller  *****/
 	let pageOrchestator = new PageOrchestrator();
 	
-	window.addEventListener("load",() => {pageOrchestator.refresh();}, false);
+	window.addEventListener("load",() => {pageOrchestator.init(); pageOrchestator.refresh();}, false);
 							 
 							 
 };
