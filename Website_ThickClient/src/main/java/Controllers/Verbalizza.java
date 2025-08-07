@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import com.google.gson.Gson;
 
 import BEANS.Docente;
+import DAO.AppelloDAO;
 import DAO.DocenteDAO;
 
 
@@ -72,7 +73,13 @@ public class Verbalizza extends HttpServlet {
 		
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		int verbaleID = -1;
+		AppelloDAO appelloDAO = new AppelloDAO(connection);
 		try {
+			if (!appelloDAO.isVerbalizzabile(corsoID, dataAppello)) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("Non ci sono valutazioni pubblicate per questo appello.");
+				return;
+			}
 			if(!docenteDAO.isAutorizzato(corsoID)) {
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				response.getWriter().println("Non sei autorizzato a verbalizzare per questo corso.");

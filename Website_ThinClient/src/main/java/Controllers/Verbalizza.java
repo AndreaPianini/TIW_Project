@@ -22,6 +22,7 @@ import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import BEANS.Docente;
+import DAO.AppelloDAO;
 import DAO.DocenteDAO;
 
 
@@ -91,7 +92,12 @@ public class Verbalizza extends HttpServlet {
 		}
 		
 		int verbaleID = -1;
+		AppelloDAO appelloDAO = new AppelloDAO(connection);
 		try {
+			if (!appelloDAO.isVerbalizzabile(corsoID, dataAppello)) {
+				renderPageError(request, response, "Non sono presenti voti da verbalizzare.");
+				return;
+			}
 			verbaleID = docenteDAO.verbalizzaValutazioni(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {
