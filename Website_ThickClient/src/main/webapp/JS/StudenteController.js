@@ -310,7 +310,8 @@
             const voto = this.valutazione.voto ? this.valutazione.voto : "-";
             const votoTd = document.createElement("td");
             votoTd.textContent = voto;
-            // Drag & Drop solo se rifiutabile (solo draggable, niente cestino qui)
+            // Drag & Drop solo se rifiutabile
+			//Qui solo Voto Draggable
             if (this.rifiutabile) {
                 votoTd.setAttribute("draggable", "true");
                 votoTd.style.cursor = "grab";
@@ -335,6 +336,7 @@
             this.valutazioneBox.appendChild(esitoSection);
 
             // Cestino in fondo al box, solo se rifiutabile
+			//Qui Cestino Droppable
             if (this.rifiutabile) {
                 const trashDiv = document.createElement("div");
                 trashDiv.innerHTML = '<span style="font-size:2.5rem;cursor:pointer;" id="trash-icon" title="Trascina qui il voto per rifiutare">🗑️</span>';

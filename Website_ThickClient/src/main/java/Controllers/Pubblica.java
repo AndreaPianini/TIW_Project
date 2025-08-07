@@ -42,10 +42,12 @@ public class Pubblica extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
-		if (docente == null) {
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
 			return;
 		}
 		
@@ -69,7 +71,8 @@ public class Pubblica extends HttpServlet {
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		try {
 			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Errore durante la pubblicazione.");
 			return;

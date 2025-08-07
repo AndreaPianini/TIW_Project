@@ -48,12 +48,13 @@ public class StudentiSenzaVoto extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
-        Docente docente = (Docente) session.getAttribute("user");
-        if (docente == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+    	HttpSession session = request.getSession();
+		Docente docente = (Docente) session.getAttribute("user");
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
+			return;
+		}
 
         DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 

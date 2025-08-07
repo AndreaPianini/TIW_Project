@@ -48,8 +48,9 @@ public class ModificaVoto extends HttpServlet {
 
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
-		if (docente == null) {
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
 			return;
 		}
 
@@ -72,7 +73,8 @@ public class ModificaVoto extends HttpServlet {
 		try {
 			valutazione = new Valutazione();
 			valutazione.setVoto(votoParam);
-		} catch (IllegalArgumentException e) {
+		} 
+		catch (IllegalArgumentException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Voto non valido.");
 			return;

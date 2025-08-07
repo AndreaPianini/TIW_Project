@@ -32,7 +32,7 @@ public class DocenteChecker implements Filter {
 		HttpSession s = req.getSession();
 		Utente u = null;
 		u = (Utente) s.getAttribute("user");
-		if (!u.getRole().equals("Docente")) {
+		if (!u.getRole().equals("DOCENTE")) {
 			System.out.print("Docente checker FAILED...\n");
 			res.setStatus(403);
 			res.setHeader("Location", loginpath);

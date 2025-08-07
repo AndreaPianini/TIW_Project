@@ -55,6 +55,7 @@ public class VaiHomeStudente extends HttpServlet {
 			throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
+		
 		Studente studente = (Studente) session.getAttribute("user");
 		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
 		ArrayList<Corso> corsi = new ArrayList<>();

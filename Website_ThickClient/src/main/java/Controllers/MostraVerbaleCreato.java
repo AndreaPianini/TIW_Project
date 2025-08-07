@@ -7,7 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -21,6 +21,7 @@ import com.google.gson.JsonArray;
 
 import BEANS.Appello;
 import BEANS.Corso;
+import BEANS.Docente;
 import BEANS.Studente;
 import BEANS.Valutazione;
 import BEANS.Verbale;
@@ -51,6 +52,14 @@ public class MostraVerbaleCreato extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
+		HttpSession session = request.getSession();
+		Docente docente = (Docente) session.getAttribute("user");
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
+			return;
+		}
 
 		String idVerbaleStr = request.getParameter("verbaleID");
 		if (idVerbaleStr == null) {

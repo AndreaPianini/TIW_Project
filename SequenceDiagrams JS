@@ -21,6 +21,81 @@ LOGIN
  @enduml
 
 
+CARICAMENTO HomeStudente
+ @startuml
+    actor Studente as Stud
+    participant "StudenteHome.html" as Home
+    participant "PageOrchestrator JS" as PagOrc
+    participant "Errore JS" as Err
+    participant "Corsi_Appelli JS" as CA
+    participant "VaiHomeStudente" as HomeStud #Lightblue
+    participant "StudenteDAO" as DAO #Lightblue
+    
+    Stud -> Home : load
+    Home -> PagOrc : init(), refresh()
+    PagOrc -> CA : show()
+    CA -> HomeStud : makeAJAXCall(GET, ...)
+    HomeStud -> DAO : getCorsiAndAppelli\nByStudente()
+    DAO -> HomeStud : corsi, appelli
+    HomeStud --> CA : [status == 200] \n? corsi, appelli \n:errore
+    CA -> Err : [errore] \n? showError(msg) \n: resetError()
+    CA <- CA : renderData()
+    CA -> Home : modifica html
+ @enduml
+
+Bottone VediVoto:
+ @startuml
+    actor Studente as Stud
+    participant "StudenteHome.html" as Home
+    participant "Errore JS" as Err
+    participant "Valutazione JS" as Val
+    participant "VediVoto" as VediVoto #Lightblue
+    participant "DAO" as DAO #Lightblue
+    
+    Stud -> Home : click \nbtn Vedi Voto
+    Home -> Val : show(corsoID, dataAppello)
+    Val -> VediVoto : makeAJAXCall\n(GET, corsoID, dataAppello)
+    VediVoto -> DAO : get...
+    DAO -> VediVoto : \nstudInfo, corso, \nvalutazione
+    VediVoto --> Val : [status == 200] \n?JSON{ \nstudInfo, corso, dataAppello, \nvalutazione, rifiutabile\n} \n:errore
+    Val -> Err : [errore] \n? showError(msg) \n: resetError()
+    Val <- Val : renderData()
+    Val -> Home : modifica html 
+ @enduml
+
+Drag&Drop Voto:
+ @startuml
+    actor Studente as Stud
+    participant "StudenteHome.html" as Home
+    participant "Errore JS" as Err
+    participant "Valutazione JS" as Val
+    participant "RifiutaVoto" as Rif #Lightblue
+    participant "StudenteDAO" as DAO #Lightblue
+    
+    Stud -> Home : Drag&Drop \nVoto nel Cestino
+    Home -> Val : showRifiutaPopup()
+    Val -> Home : Overlay + Popup html
+    group Popup Cancella
+    Home <- Home : click Cancella
+    Home <- Home : remove Overlay
+    Home -> Stud 
+    end
+    group Popup Conferma
+    Home <- Home : click Conferma
+    Home <- Home : remove Overlay
+    Home -> Val : rifiutaVoto()
+    Val -> Rif : makeAJAXCall\n(POST, corsoID, dataAppello)
+    Rif -> DAO : rifiutaVoto()
+    DAO -> Rif 
+    Rif --> Val : [status == 200] \n? ok \n:errore
+    Val -> Err : [errore] \n? showError(msg) \n: resetError()
+    Val <- Val : hide()
+    Val -> Home : modifica html
+    Home -> Stud
+    end
+ @enduml
+
+
 VERBALIZZAZIONE 
 @startuml
     actor Docente

@@ -69,6 +69,10 @@ public class RifiutaVoto extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Studente studente = (Studente) session.getAttribute("user");
+		if (studente == null || !studente.getRole().equals("STUDENTE")) {
+			response.sendRedirect(request.getContextPath() + "/Login");
+			return;
+		}
 		
 		Integer corsoID = null;
 		Date dataAppello = null;

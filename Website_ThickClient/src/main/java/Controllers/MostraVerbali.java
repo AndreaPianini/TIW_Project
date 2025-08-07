@@ -50,8 +50,9 @@ public class MostraVerbali extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
-		if (docente == null) {
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
 			return;
 		}
 
