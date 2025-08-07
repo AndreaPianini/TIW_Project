@@ -69,6 +69,10 @@ public class Verbalizza extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
+			response.sendRedirect(request.getContextPath() + "/Login");
+			return;
+		}
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		
 		Integer corsoID = null;

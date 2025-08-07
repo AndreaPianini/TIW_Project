@@ -68,6 +68,10 @@ public class Pubblica extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
+			response.sendRedirect(request.getContextPath() + "/Login");
+			return;
+		}
 		
 		Integer corsoID = null;
 		Date dataAppello = null;

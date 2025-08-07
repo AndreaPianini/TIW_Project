@@ -66,8 +66,12 @@ public class MostraVerbali extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
-		VerbaleDAO verbaleDao = new VerbaleDAO(connection);
 		Docente docente = (Docente) session.getAttribute("user");
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
+			response.sendRedirect(request.getContextPath() + "/Login");
+			return;
+		}
+		VerbaleDAO verbaleDao = new VerbaleDAO(connection);
 		ArrayList<VerbaleRiga> verbali = null;
 		
 		try {
