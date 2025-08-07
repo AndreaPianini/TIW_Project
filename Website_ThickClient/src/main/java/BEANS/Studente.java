@@ -22,7 +22,7 @@ public class Studente extends Utente{
 	
 	@Override
 	public String getRole() {
-		return "Studente";
+		return "STUDENTE";
 	}
 	
 }

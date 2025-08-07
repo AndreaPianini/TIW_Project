@@ -66,6 +66,11 @@ public class VaiHomeDocente extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
+			renderPageError(request, response, "Utente non autenticato");
+			return;
+		}
+		
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		ArrayList<Corso> corsi = new ArrayList<>();
 		ArrayList<ArrayList<Appello>> appelli = new ArrayList<>();

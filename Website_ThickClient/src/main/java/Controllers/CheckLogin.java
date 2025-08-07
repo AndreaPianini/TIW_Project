@@ -92,14 +92,14 @@ public class CheckLogin extends HttpServlet {
             // Aggiunta ruolo manualmente
             jsonResponse.getAsJsonObject("user").addProperty("role", user.getRole());
 
-            if (user.getRole().equals("Studente")) {
+            if (user.getRole().equals("STUDENTE")) {
             	request.getSession().setAttribute("user", user);
     			response.setStatus(HttpServletResponse.SC_OK);
     			response.setContentType("application/json");
     			response.setCharacterEncoding("UTF-8");
     			response.getWriter().write(jsonResponse.toString());
             } 
-            else if (user.getRole().equals("Docente")) {
+            else if (user.getRole().equals("DOCENTE")) {
             	request.getSession().setAttribute("user", user);
     			response.setStatus(HttpServletResponse.SC_OK);
     			response.setContentType("application/json");

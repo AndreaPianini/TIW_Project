@@ -67,6 +67,11 @@ public class VediVoto extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Studente studente = (Studente) session.getAttribute("user");
+		if (studente == null || !studente.getRole().equals("STUDENTE")) {
+			response.sendRedirect(request.getContextPath() + "/Login");
+			return;
+		}
+		
 		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
 		CorsoDAO corsoDAO = new CorsoDAO(connection);
 		Integer corsoID = null;

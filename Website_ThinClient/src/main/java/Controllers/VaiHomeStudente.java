@@ -66,6 +66,11 @@ public class VaiHomeStudente extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Studente studente = (Studente) session.getAttribute("user");
+		if (studente == null || !studente.getRole().equals("STUDENTE")) {
+			response.sendRedirect(request.getContextPath() + "/Login");
+			return;
+		}
+		
 		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
 		ArrayList<Corso> corsi = new ArrayList<>();
 		ArrayList<ArrayList<Appello>> appelli = new ArrayList<>();
