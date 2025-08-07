@@ -110,7 +110,7 @@ public class VediIscritti extends HttpServlet {
             studJson.addProperty("cognome", s.getCognome());
             studJson.addProperty("email", s.getEmail());
             studJson.addProperty("corsoLaurea", s.getCorsoLaurea());
-            studJson.addProperty("voto", v.getVoto().toString());
+            studJson.addProperty("voto", v.getVoto() != null ? v.getVoto().toString() : null);
             studJson.addProperty("stato", v.getStatoValutazione().toString());
             iscrittiArray.add(studJson);
         }
