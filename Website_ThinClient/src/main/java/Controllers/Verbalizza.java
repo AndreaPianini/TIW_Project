@@ -98,6 +98,10 @@ public class Verbalizza extends HttpServlet {
 				renderPageError(request, response, "Non sono presenti voti da verbalizzare.");
 				return;
 			}
+			if(!docenteDAO.isAutorizzato(corsoID)) {
+				renderPageError(request, response, "Non sei abilitato a verbalizzare per questo corso.");
+				return;
+			}
 			verbaleID = docenteDAO.verbalizzaValutazioni(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {
