@@ -61,7 +61,8 @@ public class ModificaVoto extends HttpServlet {
 			studID = Integer.parseInt(request.getParameter("studenteID"));
 			corsoID = Integer.parseInt(request.getParameter("corsoID"));
 			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Parametri non validi.");
 			return;
