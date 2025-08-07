@@ -94,7 +94,7 @@ public class StudenteDAO {
 	}
 		
 	
-public Valutazione getVotoByAppello(int corso, Date data) throws SQLException {
+	public Valutazione getVotoByAppello(int corso, Date data) throws SQLException {
 		
 		String query = "SELECT voto, stato_valutazione "
 					 + "FROM iscrizioni "
@@ -131,8 +131,12 @@ public Valutazione getVotoByAppello(int corso, Date data) throws SQLException {
 	public void getCorsiAndAppelliByStudente( ArrayList<Corso> corsi, ArrayList<ArrayList<Appello>> appelli) 
 			throws SQLException {
 	
-		String query = "SELECT c.id   AS id_corso, c.nome AS nome_corso, c.cfu  AS cfu, i.data AS data_appello "
-			+ "FROM Iscrizioni AS i LEFT JOIN Corsi AS c ON c.id = i.corso WHERE i.studente = ? ORDER BY c.nome, i.data DESC";
+		String query = "SELECT c.id AS id_corso, c.nome AS nome_corso, c.cfu AS cfu, i.data AS data_appello " +
+         	   	 	   "FROM StudSegueCorso ssc " +
+         	   	 	   "JOIN Corsi c ON ssc.corso = c.id " +
+         	   	 	   "LEFT JOIN Iscrizioni i ON i.corso = c.id AND i.studente = ssc.studente " +
+         	   	 	   "WHERE ssc.studente = ? " +
+         	   	 	   "ORDER BY c.nome, i.data DESC";
 		PreparedStatement pstatement = null;
 		ResultSet result = null;
 		try {
@@ -206,6 +210,7 @@ public Valutazione getVotoByAppello(int corso, Date data) throws SQLException {
 			if (result != null) try { result.close(); } catch (SQLException ignore) {}
 			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
 		}
+		
 	}
 	
 	

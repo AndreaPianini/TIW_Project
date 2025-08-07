@@ -167,7 +167,7 @@
                     });
                 } 
 				else {
-                    appelliCell.textContent = "Nessuna iscrizione";
+                    appelliCell.textContent = "Nessun appello a cui sei iscritto";
                 }
                 row.appendChild(appelliCell);
                 this.corsi_appelliTableBody.appendChild(row);
