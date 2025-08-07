@@ -94,7 +94,7 @@ public class StudenteDAO {
 	}
 		
 	
-	public Valutazione getVotoByAppello(int corso, Date data) throws SQLException {
+public Valutazione getVotoByAppello(int corso, Date data) throws SQLException {
 		
 		String query = "SELECT voto, stato_valutazione "
 					 + "FROM iscrizioni "
@@ -118,6 +118,7 @@ public class StudenteDAO {
 				valutazione.setStatoValutazione("NON_INSERITO");
 				valutazione.setVoto(null);
 			}
+			
 			return valutazione;
 		} 
 		finally {

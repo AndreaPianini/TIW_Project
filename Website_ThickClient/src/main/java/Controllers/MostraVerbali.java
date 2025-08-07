@@ -76,7 +76,7 @@ public class MostraVerbali extends HttpServlet {
 		JsonArray verbaliArray = new JsonArray();
 		for (VerbaleRiga v : verbali) {
 			JsonObject obj = new JsonObject();
-			obj.addProperty("verbaleId", v.getId());
+			obj.addProperty("verbaleID", v.getId());
 			obj.addProperty("data_ora", v.getDataOra().toString());
 			obj.addProperty("nomeCorso", v.getNomeCorso());
 			obj.addProperty("dataAppello", v.getDataAppello().toString());

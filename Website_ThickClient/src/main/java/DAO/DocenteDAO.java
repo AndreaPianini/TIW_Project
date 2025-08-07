@@ -95,16 +95,10 @@ public class DocenteDAO {
 	
     
     public void getIscrittiByAppello(int corsoID, Date dataAppello,
-                                     String sortBy, String order,
                                      ArrayList<Studente> iscritti,
                                      ArrayList<Valutazione> voti) throws SQLException {
 
-        // Whitelist per prevenire SQL‑injection
-        Set<String> allowedSort = Set.of("matricola", "cognome", "nome", "email", "corsoLaurea", "voto", "stato");
-        if (!allowedSort.contains(sortBy)) {
-            sortBy = "matricola";
-        }
-        String direction = "DESC".equalsIgnoreCase(order) ? "DESC" : "ASC";
+        Set<String> allowedSort = Set.of("matricola", "cognome", "nome", "email", "corsoLaurea", "voto", "stato");      
 
         String query = "SELECT "
                      + "s.matricola         AS matricola, "
@@ -119,8 +113,7 @@ public class DocenteDAO {
                      + "JOIN   Studenti  s ON i.studente = s.id "
                      + "JOIN   Utenti    u ON s.id       = u.id "
                      + "JOIN   Corsi     c ON i.corso    = c.id "
-                     + "WHERE  i.corso = ? AND i.data = ? AND c.docente = ? "
-                     + "ORDER  BY " + sortBy + " " + direction + ";";
+                     + "WHERE  i.corso = ? AND i.data = ? AND c.docente = ? ";
 
         PreparedStatement pstatement = null;
         ResultSet result = null;

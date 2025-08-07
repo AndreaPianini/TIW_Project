@@ -1,3 +1,4 @@
+
 package BEANS;
 
 public class Valutazione {

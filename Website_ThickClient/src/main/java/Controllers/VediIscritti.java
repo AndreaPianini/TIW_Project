@@ -69,25 +69,6 @@ public class VediIscritti extends HttpServlet {
             return;
         }
 
-        // Ordinamento
-        String sortBy = request.getParameter("sortBy");
-        String order  = request.getParameter("order");
-
-        ArrayList<String> sortByWhitelist = new ArrayList<>();
-        sortByWhitelist.add("matricola");
-        sortByWhitelist.add("cognome");
-        sortByWhitelist.add("nome");
-        sortByWhitelist.add("email");
-        sortByWhitelist.add("corsoLaurea");
-        sortByWhitelist.add("voto");
-        sortByWhitelist.add("stato");
-
-        ArrayList<String> orderWhitelist = new ArrayList<>();
-        orderWhitelist.add("ASC");
-        orderWhitelist.add("DESC");
-
-        if (sortBy == null || !sortByWhitelist.contains(sortBy)) sortBy = "matricola";
-        if (order == null || !orderWhitelist.contains(order)) order = "ASC";
 
         ArrayList<Studente> iscritti = new ArrayList<>();
         ArrayList<Valutazione> voti = new ArrayList<>();
@@ -99,7 +80,7 @@ public class VediIscritti extends HttpServlet {
                 return;
             }
 
-            docenteDAO.getIscrittiByAppello(corsoID, dataAppello, sortBy, order, iscritti, voti);
+            docenteDAO.getIscrittiByAppello(corsoID, dataAppello, iscritti, voti);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println("Errore nel recupero degli iscritti.");
@@ -116,14 +97,13 @@ public class VediIscritti extends HttpServlet {
         JsonObject json = new JsonObject();
         json.addProperty("corsoID", corsoID);
         json.addProperty("dataAppello", dataAppello.toString());
-        json.addProperty("sortBy", sortBy);
-        json.addProperty("order", order);
 
         JsonArray iscrittiArray = new JsonArray();
         for (int i = 0; i < iscritti.size(); i++) {
             Studente s = iscritti.get(i);
             Valutazione v = voti.get(i);
             JsonObject studJson = new JsonObject();
+            studJson.addProperty("id", s.getID());
             studJson.addProperty("matricola", s.getMatricola());
             studJson.addProperty("nome", s.getNome());
             studJson.addProperty("cognome", s.getCognome());

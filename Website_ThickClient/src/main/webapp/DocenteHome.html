@@ -26,25 +26,11 @@
 					<tr>
 						<th>Corso</th>
 						<th>Appelli</th>
-						<th>Azioni</th>
 					</tr>
 				</thead>
 				<tbody id="corsi_appelli-table-body">
 					</tbody>
 			</table>
-			<h3 id="appelli-titolo" style="display:none;">Appelli per il corso: <span id="nome-corso-selezionato"></span></h3>
-			<table id="appelli-table" class="table" style="display:none;">
-				<thead>
-					<tr>
-						<th>Data Appello</th>
-						<th>Stato</th>
-						<th>Azioni</th>
-					</tr>
-				</thead>
-				<tbody id="appelli-table-body">
-					</tbody>
-			</table>
-			<button type="button" id="back-to-corsi-btn" class="btn-secondary" style="display:none;">Torna ai Corsi</button>
 		</div>
 	</div>
 	
@@ -57,15 +43,34 @@
     </div>
     <table id="studenti-iscritti-table" class="table">
         <thead>
-            <tr>
-                <th>Matricola</th>
-                <th>Nome</th>
-                <th>Cognome</th>
-                <th>Voto</th>
-                <th>Stato</th>
-                <th>Azioni</th>
-            </tr>
-        </thead>
+    <tr>
+        <th id="sort-matricola">
+            Matricola
+            <span class="normalarrow">▲</span>
+            <span class="normalarrow">▼</span>
+        </th>
+        <th id="sort-nome">
+            Nome
+            <span class="normalarrow">▲</span>
+            <span class="normalarrow">▼</span>
+        </th>
+        <th id="sort-cognome">
+            Cognome
+            <span class="normalarrow">▲</span>
+            <span class="normalarrow">▼</span>
+        </th>
+        <th id="sort-voto">
+            Voto
+            <span class="normalarrow">▲</span>
+            <span class="normalarrow">▼</span>
+        </th>
+        <th id="sort-stato">
+            Stato
+            <span class="normalarrow">▲</span>
+            <span class="normalarrow">▼</span>
+        </th>
+    </tr>
+</thead>
         <tbody id="studenti-iscritti-body">
             </tbody>
     </table>
