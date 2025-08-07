@@ -74,7 +74,7 @@ INSERT INTO Verbali (id, data_ora_creaz) VALUES
 
 -- STUDENTE SEGUE CORSO (ogni studente segue almeno 2 corsi, distribuiti)
 INSERT INTO StudSegueCorso (Studente, Corso) VALUES
-(6, 101), (6, 102), (6, 105),
+(6, 101), (6, 102), (6, 104), (6, 105),
 (7, 103), (7, 101), (7, 106),
 (8, 105), (8, 107), (8, 109),
 (9, 101), (9, 109), (9, 110),
