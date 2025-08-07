@@ -3,20 +3,24 @@
  */
 {
 	
-	function makeAJAXCall( method, url, formElement, callBack, reset = true) {
-	    var request = new XMLHttpRequest(); // visible by closure
+	function makeAJAXCall(method, url, data, callBack, reset = true) {
+	    var request = new XMLHttpRequest();
 	    request.onreadystatechange = function() {
 	      callBack(request)
-	    }; // closure
+	    };
 	    request.open(method, url);
-	    if (formElement == null) {
-	    	request.send();
+	    if (typeof data === "string") {
+	        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	        request.send(data);
+	    } 
+		else if (data == null) {
+	        request.send();
 	    } 
 		else {
-	    	request.send(new FormData(formElement));
+	        request.send(data);
 	    }
-		if (formElement !== null && reset === true) {
-			formElement.reset();
+		if (data !== null && reset === true) {
+			form.reset();
 		}
 	}
 	
@@ -36,6 +40,9 @@
 	        const anno = match[3];
 	        return `${anno}-${mese}-${giorno}`;
 	    }
+		else{
+			return dataOriginale; // Se non corrisponde al formato, restituisce la data originale
+		}
 	}
 	
 	
@@ -50,6 +57,19 @@
         refresh() {
 			this.error.resetError();
             this.corsi_appelli.show(this.valutazione);
+			document.getElementById("logout-btn")
+			.addEventListener("click", () => {
+				makeAJAXCall("GET", "Logout", null, (request) => {
+                	if (request.readyState === XMLHttpRequest.DONE) {
+                    	if (request.status === 200) {
+                            window.location.href = "Login.html"; // Reindirizza alla pagina di login
+                        } 
+						else {
+                            this.error.showError("Errore durante il logout: " + request.status);
+                        }
+                    }
+                });
+            });
         }
 	}
 	
@@ -290,7 +310,7 @@
             const voto = this.valutazione.voto ? this.valutazione.voto : "-";
             const votoTd = document.createElement("td");
             votoTd.textContent = voto;
-            // Drag & Drop solo se rifiutabile
+            // Drag & Drop solo se rifiutabile (solo draggable, niente cestino qui)
             if (this.rifiutabile) {
                 votoTd.setAttribute("draggable", "true");
                 votoTd.style.cursor = "grab";
@@ -298,24 +318,6 @@
                     e.dataTransfer.setData("text/plain", voto);
                     this.draggedVoto = votoTd;
                 });
-                // Trash icon
-                const trashDiv = document.createElement("div");
-                trashDiv.innerHTML = '<span style="font-size:2rem;cursor:pointer;" id="trash-icon" title="Trascina qui per rifiutare">🗑️</span>';
-                trashDiv.style.display = "inline-block";
-                trashDiv.style.marginLeft = "1rem";
-                trashDiv.addEventListener("dragover", (e) => {
-                    e.preventDefault();
-                    trashDiv.style.background = "#ffeaea";
-                });
-                trashDiv.addEventListener("dragleave", (e) => {
-                    trashDiv.style.background = "";
-                });
-                trashDiv.addEventListener("drop", (e) => {
-                    e.preventDefault();
-                    trashDiv.style.background = "";
-                    this.showRifiutaPopup();
-                });
-                votoTd.appendChild(trashDiv);
             }
             bodyRow.appendChild(votoTd);
             // Stato Valutazione cell
@@ -331,6 +333,33 @@
             this.valutazioneBox.appendChild(studSection);
             this.valutazioneBox.appendChild(corsoSection);
             this.valutazioneBox.appendChild(esitoSection);
+
+            // Cestino in fondo al box, solo se rifiutabile
+            if (this.rifiutabile) {
+                const trashDiv = document.createElement("div");
+                trashDiv.innerHTML = '<span style="font-size:2.5rem;cursor:pointer;" id="trash-icon" title="Trascina qui il voto per rifiutare">🗑️</span>';
+                trashDiv.style.display = "flex";
+                trashDiv.style.justifyContent = "center";
+                trashDiv.style.alignItems = "center";
+                trashDiv.style.margin = "2rem 0 0 0";
+                trashDiv.style.height = "60px";
+                trashDiv.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                    trashDiv.style.background = "#ffeaea";
+                });
+                trashDiv.addEventListener("dragleave", (e) => {
+                    trashDiv.style.background = "";
+                });
+                trashDiv.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    trashDiv.style.background = "";
+                    this.showRifiutaPopup();
+                });
+                trashDiv.addEventListener("click", () => {
+                    this.showRifiutaPopup();
+                });
+                this.valutazioneBox.appendChild(trashDiv);
+            }
         }
 
         showRifiutaPopup() {
@@ -380,44 +409,20 @@
 	    }
 
     	rifiutaVoto() {
-			// Crea un form invisibile
-			   const form = document.createElement("form");
-			   form.style.display = "none";
-
-			   // Input hidden per corsoID
-			   const inputCorso = document.createElement("input");
-			   inputCorso.type = "hidden";
-			   inputCorso.name = "corsoID";
-			   inputCorso.value = this.corso.ID;
-			   form.appendChild(inputCorso);
-
-			   // Input hidden per dataAppello
-			   const inputData = document.createElement("input");
-			   inputData.type = "hidden";
-			   inputData.name = "dataAppello";
-			   inputData.value = this.dataAppello;
-			   form.appendChild(inputData);
-
-		   // Aggiungi il form al body
-		      document.body.appendChild(form);
-	        // Crea FormData con i parametri richiesti
-			
-	        const formData = new FormData();
-	        formData.append("corsoID", this.corso.ID);
-	        formData.append("dataAppello", this.dataAppello);
-	        makeAJAXCall("POST", "RifiutaVoto", formData, (request) => {
-	            if (request.readyState === XMLHttpRequest.DONE) {
-	                if (request.status === 200) {
-	                    this.error.showError("Voto rifiutato con successo.");
-	                    this.hide();
-	                } 
-					else {
-	                    this.error.showError(request.responseText || "Errore nel rifiuto del voto.");
-	                }
-					document.body.removeChild(form)
-	            }
-	        });
-    	}
+		console.log("Rifiuto voto per il corso:", this.corso.ID, "data appello:", this.dataAppello);
+        // Serializza i dati come application/x-www-form-urlencoded
+        const params = `corsoID=${encodeURIComponent(this.corso.ID)}&dataAppello=${encodeURIComponent(dataConverter(this.dataAppello))}`;
+        makeAJAXCall("POST", "RifiutaVoto", params, (request) => {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                if (request.status === 200) {
+                    this.error.showError("Voto rifiutato con successo.");
+                    this.hide();
+                } else {
+                    this.error.showError(request.responseText || "Errore nel rifiuto del voto.");
+                }
+            }
+        }, false);
+    }
 
     hide() {
         this.valutazioneBox.style.display = "none";
