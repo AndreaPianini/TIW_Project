@@ -34,9 +34,10 @@ public class StudenteChecker implements Filter {
 		// check if the user is a student
 		u = (Utente) s.getAttribute("user");
 		if (!u.getRole().equals("Studente")) {
+			System.out.print("Studente checker FAILED...\n");
 			res.setStatus(403);
 			res.setHeader("Location", loginpath);
-			System.out.print("Studente checker FAILED...\n");
+			res.sendRedirect(loginpath);
 			return;
 		}
 		// pass the request along the filter chain

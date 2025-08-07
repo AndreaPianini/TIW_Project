@@ -34,6 +34,7 @@ public class Checker implements Filter {
 		if (s.isNew() || s.getAttribute("user") == null) {
 			res.setStatus(403);
 			res.setHeader("Location", loginpath);
+			res.sendRedirect(loginpath);
 			System.out.print("Checker FAILED...\n");
 			return;
 		}

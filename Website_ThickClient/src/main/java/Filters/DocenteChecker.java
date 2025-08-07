@@ -25,7 +25,6 @@ public class DocenteChecker implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		
-		System.out.print("Docente filter executing ..\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
 		String loginpath = req.getServletContext().getContextPath() + "/Login.html";
@@ -34,9 +33,10 @@ public class DocenteChecker implements Filter {
 		Utente u = null;
 		u = (Utente) s.getAttribute("user");
 		if (!u.getRole().equals("Docente")) {
+			System.out.print("Docente checker FAILED...\n");
 			res.setStatus(403);
 			res.setHeader("Location", loginpath);
-			System.out.print("Docente checker FAILED...\n");
+			res.sendRedirect(loginpath);
 			return;
 		}
 		// pass the request along the filter chain
