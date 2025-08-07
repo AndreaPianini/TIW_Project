@@ -19,9 +19,6 @@
 			} else if (data instanceof FormData) {
 				request.send(data);
 			// Se il parametro 'data' è un oggetto URLSearchParams, invialo con il corretto Content-Type.
-			} else if (data instanceof URLSearchParams) {
-				request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-				request.send(data.toString());
 			} else {
 				// Gestisci altri casi (come stringhe di query se necessario)
 				request.send(data);
@@ -650,15 +647,14 @@
 				                });
 				            };
 
-				            // Avviamo la catena di richieste a partire dal primo elemento.
+				            // Avvia la catena di richieste a partire dal primo elemento.
 				            processNextVote(0);
 				        });
 				    }
 
 			    /**
 			     * Mostra la modale e avvia la richiesta per ottenere gli studenti iscritti.
-			     * Questa funzione è simile al metodo show della classe ModificaVoto.
-			     * @param {Object} appello L'oggetto appello con corsoID e dataAppello.
+			     * Questa funzione è simile al metodo show della classe ModificaVoto
 			     */
 			    show(appello) {
 			        this.error.resetError();
@@ -694,9 +690,7 @@
 			    
 			    /**
 			     * Popola la tabella all'interno del modale con i dati degli studenti.
-			     * Questa funzione è l'equivalente di populateModal nella classe ModificaVoto,
-			     * ma per un array di studenti.
-			     * @param {Array} studenti L'array di studenti iscritti.
+			     * Questa funzione è l'equivalente di populateModal nella classe ModificaVoto
 			     */
 				populateModal(studenti) {
 			        this.tableBody.innerHTML = "";
