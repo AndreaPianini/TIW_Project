@@ -586,58 +586,74 @@
 			    
 			    /**
 			     * Imposta il listener per il salvataggio dei voti multipli.
-			     * Questa versione non usa async/await, ma un contatore per gestire le richieste.
+			     * Gestisce l'invio di più richieste AJAX e fornisce un feedback unico.
 			     */
-			    setupFormListener() {
-			        this.form.addEventListener("submit", (event) => {
-			            event.preventDefault(); // Impedisce l'invio del form tradizionale
-			            this.error.resetError();
-			            
-			            const votiInputs = this.tableBody.querySelectorAll('tr[data-matricola] .voto-input');
-			            let requestsCompleted = 0;
-			            let allVotiSubmitted = true;
-			            const votiToSubmit = Array.from(votiInputs).filter(input => input.value && input.value !== "");
-			            const totalRequests = votiToSubmit.length;
+				setupFormListener() {
+				        this.form.addEventListener("submit", (event) => {
+				            console.log("Submit event fired from InserimentoVotiMultipli form.");
+				            event.preventDefault(); // Impedisce l'invio del form tradizionale
+				            this.error.resetError();
+				            
+				            const votiSelects = this.tableBody.querySelectorAll('tr[data-matricola] .voto-select');
+				            const votiToSubmit = Array.from(votiSelects).filter(select => select.value && select.value !== "");
+				            
+				            let failedRequests = 0;
+				            let requestsCompleted = 0;
+				            const totalRequests = votiToSubmit.length;
 
-			            if (totalRequests === 0) {
-			                this.error.showError("Nessun voto da salvare.");
-			                return;
-			            }
+				            if (totalRequests === 0) {
+				                this.error.showError("Nessuno voto da salvare.");
+				                return;
+				            }
 
-			            votiToSubmit.forEach(input => {
-			                const matricola = input.parentElement.parentElement.dataset.matricola;
-			                const voto = input.value;
-			                
-			                const formData = new FormData();
-			                formData.append("studenteID", matricola);
-			                formData.append("corsoID", this.corsoIDInput.value);
-			                formData.append("dataAppello", this.dataAppelloInput.value);
-			                formData.append("voto", voto);
-			                
-			                makeAJAXCall("POST", "ModificaVoto", formData, (request) => {
-			                    if (request.readyState === XMLHttpRequest.DONE) {
-			                        requestsCompleted++;
-			                        if (request.status !== 200) {
-			                            allVotiSubmitted = false;
-			                            this.error.showError(`Errore nel salvataggio del voto per lo studente ${matricola}.`);
-			                        }
+				            // Funzione ricorsiva che elabora un voto alla volta.
+				            const processNextVote = (index) => {
+				                // Se tutte le richieste sono terminate, mostriamo il feedback finale.
+				                if (index >= totalRequests) {
+				                    if (failedRequests === 0) {
+				                        this.error.showError("Tutti i voti sono stati salvati con successo.");
+				                        this.hide();
+				                        pageOrchestrator.studentiIscritti.show(
+				                            this.corsoIDInput.value,
+				                            this.dataAppelloInput.value
+				                        );
+				                    } else {
+				                        this.error.showError(`Salvataggio completato con ${failedRequests} errori. Controlla la console per i dettagli.`);
+				                    }
+				                    return;
+				                }
 
-			                        // Controlla se tutte le richieste sono terminate
-			                        if (requestsCompleted === totalRequests) {
-			                            if (allVotiSubmitted) {
-			                                this.error.showError("Tutti i voti sono stati salvati con successo.");
-			                                this.hide();
-			                                pageOrchestrator.studentiIscritti.show(
-			                                    this.corsoIDInput.value,
-			                                    this.dataAppelloInput.value
-			                                );
-			                            }
-			                        }
-			                    }
-			                });
-			            });
-			        });
-			    }
+				                const select = votiToSubmit[index];
+				                const row = select.closest('tr');
+				                const id = row.querySelector('.studenteID-hidden-input').value;
+				                const voto = select.value;
+				                
+				                const formData = new FormData();
+				                formData.append("studenteID", id);
+				                formData.append("corsoID", this.corsoIDInput.value);
+				                formData.append("dataAppello", this.dataAppelloInput.value);
+				                formData.append("voto", voto);
+				                
+				                // Effettuiamo la chiamata AJAX per il voto corrente.
+				                makeAJAXCall("POST", "ModificaVoto", formData, (request) => {
+				                    if (request.readyState === XMLHttpRequest.DONE) {
+				                        requestsCompleted++;
+				                        if (request.status !== 200) {
+				                            failedRequests++;
+				                            console.error(`Errore nel salvataggio del voto per lo studente ${id}: status ${request.status}`);
+				                        }
+				                        
+				                        // Chiamata ricorsiva per avviare il prossimo voto solo dopo che
+				                        // la richiesta corrente è stata completata.
+				                        processNextVote(index + 1);
+				                    }
+				                });
+				            };
+
+				            // Avviamo la catena di richieste a partire dal primo elemento.
+				            processNextVote(0);
+				        });
+				    }
 
 			    /**
 			     * Mostra la modale e avvia la richiesta per ottenere gli studenti iscritti.
@@ -657,12 +673,13 @@
 			            dataAppello: appello.dataAppello 
 			        });
 
-			        makeAJAXCall("GET", "StudentiSenzaVoti?" + params.toString(), null, (request) => {
+			        makeAJAXCall("GET", "StudentiSenzaVoto?" + params.toString(), null, (request) => {
 			            if (request.readyState === XMLHttpRequest.DONE) {
 			                if (request.status === 200) {
 			                    try {
-			                        const studenti = JSON.parse(request.responseText);
-			                        self.populateModal(studenti);
+			                        // CORREZIONE QUI: Accedi alla proprietà 'iscritti'
+			                        const data = JSON.parse(request.responseText);
+			                        self.populateModal(data.iscritti); 
 			                    } catch (e) {
 			                        self.error.showError("Errore nel parsing dei dati degli studenti per l'inserimento voti.");
 			                        self.hide();
@@ -681,7 +698,7 @@
 			     * ma per un array di studenti.
 			     * @param {Array} studenti L'array di studenti iscritti.
 			     */
-			    populateModal(studenti) {
+				populateModal(studenti) {
 			        this.tableBody.innerHTML = "";
 			        
 			        if (!studenti || studenti.length === 0) {
@@ -695,8 +712,16 @@
 			        }
 
 			        studenti.forEach(studente => {
+			            // CORREZIONE: Crea la riga prima di aggiungere i suoi elementi
 			            const row = document.createElement("tr");
 			            row.dataset.matricola = studente.matricola;
+			            
+			            const idInput = document.createElement("input");
+			            idInput.type = "hidden";
+			            idInput.className = "studenteID-hidden-input"; // Aggiungi una classe per la selezione
+			            idInput.name = "studenteID";
+			            idInput.value = studente.id;
+			            row.appendChild(idInput);
 			            
 			            const matricolaCell = document.createElement("td");
 			            matricolaCell.textContent = studente.matricola;
@@ -711,13 +736,19 @@
 			            row.appendChild(cognomeCell);
 			            
 			            const votoCell = document.createElement("td");
-			            const votoInput = document.createElement("input");
-			            votoInput.type = "number";
-			            votoInput.className = "voto-input";
-			            votoInput.name = `voto-${studente.matricola}`;
-			            votoInput.min = "18";
-			            votoInput.max = "31";
-			            votoCell.appendChild(votoInput);
+			            const votoSelect = document.createElement("select");
+			            votoSelect.className = "voto-select";
+			            votoSelect.name = `voto-${studente.matricola}`;
+			            
+			            // Popola il select con i voti possibili
+			            VOTI_POSSIBILI.forEach(voto => {
+			                const option = document.createElement("option");
+			                option.value = voto;
+			                option.textContent = voto;
+			                votoSelect.appendChild(option);
+			            });
+
+			            votoCell.appendChild(votoSelect);
 			            row.appendChild(votoCell);
 			            
 			            this.tableBody.appendChild(row);
