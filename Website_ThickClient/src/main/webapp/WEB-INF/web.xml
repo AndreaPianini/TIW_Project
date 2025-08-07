@@ -45,6 +45,8 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>Checker</filter-name>
+		<url-pattern>/StudenteHome.html</url-pattern>
+    	<url-pattern>/DocenteHome.html</url-pattern>
 		<url-pattern>/VaiHomeDocente</url-pattern>
 		<url-pattern>/VaiHomeStudente</url-pattern>
 		<url-pattern>/Logout</url-pattern>
@@ -60,6 +62,7 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>DocenteChecker</filter-name>
+		<url-pattern>/DocenteHome.html</url-pattern>
 		<url-pattern>/VaiHomeDocente</url-pattern>
 		<url-pattern>/VediIscritti</url-pattern>
 		<url-pattern>/Pubblica</url-pattern>
@@ -71,6 +74,7 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>StudenteChecker</filter-name>
+		<url-pattern>/StudenteHome.html</url-pattern>
 		<url-pattern>/VaiHomeStudente</url-pattern>
 		<url-pattern>/VediVoto</url-pattern>
 		<url-pattern>/RifiutaVoto</url-pattern>
