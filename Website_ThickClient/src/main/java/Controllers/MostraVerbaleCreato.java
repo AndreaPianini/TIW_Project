@@ -71,7 +71,8 @@ public class MostraVerbaleCreato extends HttpServlet {
 		int verbaleID;
 		try {
 			verbaleID = Integer.parseInt(idVerbaleStr);
-		} catch (NumberFormatException e) {
+		} 
+		catch (NumberFormatException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Invalid verbale ID");
 			return;
@@ -90,10 +91,16 @@ public class MostraVerbaleCreato extends HttpServlet {
 		Corso corso = null;
 
 		try {
+			if (!verbaleDAO.isDocenteAutorizzato(docente.getID(), verbaleID)) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				response.getWriter().println("Non sei autorizzato a visualizzare questo verbale");
+				return;
+			}
+			
 			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
 			if (studenti.isEmpty() || valutazioni.isEmpty()) {
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-				response.getWriter().println("No students or evaluations found for this verbale");
+				response.getWriter().println("Nessuna informazione trovata per questo verbale");
 				return;
 			}
 
@@ -106,13 +113,13 @@ public class MostraVerbaleCreato extends HttpServlet {
 
 			corso = corsoDAO.getCorsoById(appello.getCorso());
 
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Database error");
 			return;
 		}
 
-		// Costruzione JSON
 		JsonObject jsonResponse = new JsonObject();
 		jsonResponse.addProperty("verbaleId", verbale.getId());
 		jsonResponse.addProperty("verbaleDataOra", verbale.getData_Ora().toString());
@@ -149,7 +156,7 @@ public class MostraVerbaleCreato extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		doGet(request, response);  // accetta GET e POST
+		doGet(request, response); 
 	}
 
 	public void destroy() {
