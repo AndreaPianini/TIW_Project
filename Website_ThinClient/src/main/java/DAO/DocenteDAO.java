@@ -150,7 +150,8 @@ public class DocenteDAO {
                 iscritti.add(stud);
                 voti.add(val);
             }
-        } finally {
+        } 
+        finally {
             if (result != null) try { result.close(); } catch (SQLException ignore) {}
             if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
         }
@@ -159,6 +160,7 @@ public class DocenteDAO {
 	
 	
  	public void modificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
+ 		
  		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
  				 + "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') "
  				 + "AND corso = ? AND data = ? AND studente = ? "
@@ -184,6 +186,7 @@ public class DocenteDAO {
  			connection.setAutoCommit(true);
  			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
  		}
+ 		
  	}
 	
  	
@@ -266,7 +269,7 @@ public class DocenteDAO {
 		}
 	}
 	
-	//Da fare - Controllo che il docente sia abilitato ad acccedere ad un corso
+	
 	public boolean isAutorizzato(int corsoID) throws SQLException {
 		
 		String query = "SELECT 1 FROM Corsi WHERE id = ? AND docente = ?";
@@ -288,6 +291,7 @@ public class DocenteDAO {
 			if (result != null) try { result.close(); } catch (SQLException ignore) {}
 			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
 		}
+		
 	}
 	
 }
