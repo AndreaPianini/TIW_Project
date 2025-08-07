@@ -783,6 +783,7 @@
 			            if (request.readyState === XMLHttpRequest.DONE) {
 			                if (request.status === 200) {
 			                    try {
+									console.log("Dati ricevuti dalla servlet:", request.responseText);
 			                        const verbali = JSON.parse(request.responseText);
 			                        self.renderVerbali(verbali);
 			                    } catch (e) {
@@ -809,12 +810,17 @@
 
 			        verbali.forEach(verbale => {
 			            const row = document.createElement("tr");
-			            const appelloCell = document.createElement("td");
-			            appelloCell.textContent = `Appello del ${verbale.dataAppello}`;
+						
+						const corsoCell = document.createElement("td");
+						corsoCell.textContent = `${verbale.nomeCorso}`;
+						row.appendChild(corsoCell);
+			            
+						const appelloCell = document.createElement("td");
+			            appelloCell.textContent = `${verbale.dataAppello}`;
 			            row.appendChild(appelloCell);
 
 			            const dataCell = document.createElement("td");
-			            dataCell.textContent = verbale.dataVerbale;
+			            dataCell.textContent = verbale.data_ora;
 			            row.appendChild(dataCell);
 
 			            const actionsCell = document.createElement("td");

@@ -78,7 +78,7 @@ public class MostraVerbali extends HttpServlet {
 		for (VerbaleRiga v : verbali) {
 			JsonObject obj = new JsonObject();
 			obj.addProperty("verbaleID", v.getId());
-			obj.addProperty("data_ora", v.getDataOra().toString());
+			obj.addProperty("data_ora", v.getDataOra().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 			obj.addProperty("nomeCorso", v.getNomeCorso());
 			obj.addProperty("dataAppello", v.getDataAppello().toString());
 			verbaliArray.add(obj);
