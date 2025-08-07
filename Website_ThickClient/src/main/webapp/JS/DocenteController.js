@@ -4,7 +4,7 @@
 
 {
 	
-	// Funzioni di utilità (copiate dal tuo codice per consistenza)
+	// AJAX Call to the server
 	function makeAJAXCall(method, url, data = null, callback) {
 		let request = new XMLHttpRequest();
 		request.onreadystatechange = function() {
@@ -27,6 +27,7 @@
 			request.send();
 		}
 	}
+	
 	
 	function dataConverter(dataOriginale) {
 	    const mesi = {

@@ -2,17 +2,28 @@
  * Studente Controller
  */
 {
-	
+	// AJAX Call to the server
 	function makeAJAXCall(method, url, data, callBack, reset = true) {
 	    var request = new XMLHttpRequest();
 	    request.onreadystatechange = function() {
 	      callBack(request)
 	    };
 	    request.open(method, url);
-	    if (typeof data === "string") {
-	        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	        request.send(data);
-	    } 
+		if (data) {
+			// Se il parametro 'data' è un elemento form, crea un FormData da esso.
+			if (data instanceof HTMLFormElement) {
+				request.send(new FormData(data));
+			// Se il parametro 'data' è già un oggetto FormData, invialo direttamente.
+			} 
+			else if (data instanceof FormData) {
+				request.send(data);
+			// Se il parametro 'data' è una stringa, invialo con il corretto Content-Type.
+			}
+	    	else if (typeof data === "string") {
+	        	request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	        	request.send(data);
+	    	} 
+		}
 		else if (data == null) {
 	        request.send();
 	    } 
@@ -20,7 +31,7 @@
 	        request.send(data);
 	    }
 		if (data !== null && reset === true) {
-			form.reset();
+			data.reset();
 		}
 	}
 	
@@ -412,9 +423,12 @@
 
     	rifiutaVoto() {
 		console.log("Rifiuto voto per il corso:", this.corso.ID, "data appello:", this.dataAppello);
-        // Serializza i dati come application/x-www-form-urlencoded
-        const params = `corsoID=${encodeURIComponent(this.corso.ID)}&dataAppello=${encodeURIComponent(dataConverter(this.dataAppello))}`;
-        makeAJAXCall("POST", "RifiutaVoto", params, (request) => {
+		
+		const formData = new FormData();
+		formData.append("corsoID", this.corso.ID);
+		formData.append("dataAppello", this.dataAppello);
+        
+        makeAJAXCall("POST", "RifiutaVoto", formData, (request) => {
             if (request.readyState === XMLHttpRequest.DONE) {
                 if (request.status === 200) {
                     this.error.showError("Voto rifiutato con successo.");
