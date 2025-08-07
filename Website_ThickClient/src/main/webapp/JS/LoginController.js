@@ -44,10 +44,10 @@
         		try {
           			var response = JSON.parse(x.responseText);
           			var user = response.user;
-          			if (user.role === "Docente") {
+          			if (user.role === "DOCENTE") {
             			window.location.href = "DocenteHome.html";
           			} 
-					else if (user.role === "Studente") {
+					else if (user.role === "STUDENTE") {
             			window.location.href = "StudenteHome.html";
           			} 
 					else {
