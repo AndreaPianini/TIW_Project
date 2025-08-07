@@ -104,7 +104,7 @@ public class Modifica extends HttpServlet {
 				return;
 			}
 			studente = studenteDAO.getStudenteInfo();
-			valutazione = studenteDAO.getVotoByAppello(corsoID, dataAppello);
+			valutazione = docenteDAO.getValutazioneByStudenteAppello(studenteID, corsoID, dataAppello);
 		} 
 		catch (SQLException e) {
 			renderPageError(request, response, "Si è verificato un errore. Riprovare");
@@ -130,7 +130,6 @@ public class Modifica extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 		doGet(request, response);
 	}
 
