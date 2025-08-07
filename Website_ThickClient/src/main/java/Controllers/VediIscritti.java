@@ -63,7 +63,8 @@ public class VediIscritti extends HttpServlet {
         try {
             corsoID = Integer.parseInt(request.getParameter("corsoID"));
             dataAppello = Date.valueOf(request.getParameter("dataAppello"));
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("Parametri corso o data appello non validi.");
             return;
@@ -79,9 +80,9 @@ public class VediIscritti extends HttpServlet {
                 response.getWriter().println("Non autorizzato a questo corso.");
                 return;
             }
-
             docenteDAO.getIscrittiByAppello(corsoID, dataAppello, iscritti, voti);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println("Errore nel recupero degli iscritti.");
             return;
@@ -93,7 +94,7 @@ public class VediIscritti extends HttpServlet {
             return;
         }
 
-        // Costruzione JSON
+        
         JsonObject json = new JsonObject();
         json.addProperty("corsoID", corsoID);
         json.addProperty("dataAppello", dataAppello.toString());
@@ -109,7 +110,7 @@ public class VediIscritti extends HttpServlet {
             studJson.addProperty("cognome", s.getCognome());
             studJson.addProperty("email", s.getEmail());
             studJson.addProperty("corsoLaurea", s.getCorsoLaurea());
-            studJson.addProperty("voto", v.getVoto().toString());
+            studJson.addProperty("voto", v.getVoto() != null ? v.getVoto().toString() : null);
             studJson.addProperty("stato", v.getStatoValutazione().toString());
             iscrittiArray.add(studJson);
         }
@@ -120,6 +121,7 @@ public class VediIscritti extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(jsonString);
+        
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -129,7 +131,8 @@ public class VediIscritti extends HttpServlet {
     public void destroy() {
         try {
             if (connection != null) connection.close();
-        } catch (SQLException ignored) {}
+        } 
+        catch (SQLException ignored) {}
     }
 }
 

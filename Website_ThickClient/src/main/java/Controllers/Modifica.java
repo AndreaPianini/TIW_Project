@@ -117,7 +117,8 @@ public class Modifica extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().write(jsonString);
 
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Errore database.");
 		}

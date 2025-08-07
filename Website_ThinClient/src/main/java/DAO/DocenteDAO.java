@@ -93,7 +93,6 @@ public class DocenteDAO {
 	}
 	
 	
-    
     public void getIscrittiByAppello(int corsoID, Date dataAppello,
                                      String sortBy, String order,
                                      ArrayList<Studente> iscritti,
@@ -150,15 +149,46 @@ public class DocenteDAO {
                 iscritti.add(stud);
                 voti.add(val);
             }
-        } finally {
+        } 
+        finally {
             if (result != null) try { result.close(); } catch (SQLException ignore) {}
             if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
         }
     }
 
-	
-	
+
+    public Valutazione getValutazioneByStudenteAppello(int studenteID, int corsoID, Date dataAppello) throws SQLException{
+    	
+    	String query = "SELECT voto, stato_valutazione "
+				 	 + "FROM iscrizioni "
+				 	 + "WHERE studente = ? AND corso = ? AND data = ?";
+		PreparedStatement pstatement = null;
+		ResultSet result = null;
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1, studenteID);
+			pstatement.setInt(2, corsoID);
+			pstatement.setDate(3, dataAppello);
+			result = pstatement.executeQuery();
+			Valutazione valutazione = null;
+			if (result.next()) {
+				valutazione = new Valutazione();
+				String votoStr = result.getString("voto");
+				valutazione.setVoto(votoStr);
+				valutazione.setStatoValutazione(result.getString("stato_valutazione"));
+			}
+			return valutazione;
+		} 
+		finally {
+			if (result != null) try { result.close(); } catch (SQLException ignore) {}
+			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+		}
+		
+    }
+    
+    
  	public void modificaVoto(Valutazione voto, int corso, Date data, int studID) throws SQLException{
+ 		
  		String query = "UPDATE Iscrizioni SET voto = ?, stato_valutazione = 'INSERITO' "
  				 + "WHERE (stato_valutazione = 'NON_INSERITO' OR stato_valutazione = 'INSERITO') "
  				 + "AND corso = ? AND data = ? AND studente = ? "
@@ -184,6 +214,7 @@ public class DocenteDAO {
  			connection.setAutoCommit(true);
  			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
  		}
+ 		
  	}
 	
  	
@@ -266,7 +297,7 @@ public class DocenteDAO {
 		}
 	}
 	
-	//Da fare - Controllo che il docente sia abilitato ad acccedere ad un corso
+	
 	public boolean isAutorizzato(int corsoID) throws SQLException {
 		
 		String query = "SELECT 1 FROM Corsi WHERE id = ? AND docente = ?";
@@ -288,6 +319,7 @@ public class DocenteDAO {
 			if (result != null) try { result.close(); } catch (SQLException ignore) {}
 			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
 		}
+		
 	}
 	
 }
