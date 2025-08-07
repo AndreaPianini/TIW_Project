@@ -117,6 +117,29 @@ public class VerbaleDAO {
 	        if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
 	    }
 	}
+
+	
+	public boolean isDocenteAutorizzato(int docenteID, int verbaleID) throws SQLException {
+		
+		String query = "SELECT 1 "
+					 + "FROM Iscrizioni i JOIN Corsi c ON i.corso = c.id "
+					 + "WHERE c.docente = ? AND i.verbale = ? ";
+		PreparedStatement pstatement = null;
+		ResultSet result = null;
+		try {
+			pstatement = con.prepareStatement(query);
+			pstatement.setInt(1, docenteID);
+			pstatement.setInt(2, verbaleID);
+			result = pstatement.executeQuery();
+			return result.next(); // se esiste almeno una riga, il docente è autorizzato
+		} 
+		finally {
+			if (result != null) try { result.close(); } catch (SQLException ignore) {}
+			if (pstatement != null) try { pstatement.close(); } catch (SQLException ignore) {}
+		}
+		
+	}
+	
 	
 }
 

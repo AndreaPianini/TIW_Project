@@ -97,6 +97,10 @@ public class MostraVerbaleCreato extends HttpServlet {
 		
 		verbale.setId(verbaleID);
 		try {
+			if (!verbaleDAO.isDocenteAutorizzato(docente.getID(), verbaleID)) {
+				renderPageError(request, response, "Non sei autorizzato a visualizzare questo verbale.");
+				return;
+			}
 			verbaleDAO.getStudentiAndInfoByVerbale(verbale, studenti, valutazioni);
 		} 
 		catch (SQLException e) {
@@ -138,6 +142,7 @@ public class MostraVerbaleCreato extends HttpServlet {
         ctx.setVariable("valutazioni", valutazioni);
         ctx.setVariable("appello", appello);
 		templateEngine.process(path, ctx, response.getWriter());
+		
 	}
 	
 	
