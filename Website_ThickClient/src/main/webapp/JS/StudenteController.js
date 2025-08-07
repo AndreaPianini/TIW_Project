@@ -13,7 +13,7 @@
 	    	request.send();
 	    } 
 		else {
-	    	request.send(new FormData(formElement));
+	    	request.send(formElement);
 	    }
 		if (formElement !== null && reset === true) {
 			formElement.reset();
@@ -380,44 +380,22 @@
 	    }
 
     	rifiutaVoto() {
-			// Crea un form invisibile
-			   const form = document.createElement("form");
-			   form.style.display = "none";
-
-			   // Input hidden per corsoID
-			   const inputCorso = document.createElement("input");
-			   inputCorso.type = "hidden";
-			   inputCorso.name = "corsoID";
-			   inputCorso.value = this.corso.ID;
-			   form.appendChild(inputCorso);
-
-			   // Input hidden per dataAppello
-			   const inputData = document.createElement("input");
-			   inputData.type = "hidden";
-			   inputData.name = "dataAppello";
-			   inputData.value = this.dataAppello;
-			   form.appendChild(inputData);
-
-		   // Aggiungi il form al body
-		      document.body.appendChild(form);
-	        // Crea FormData con i parametri richiesti
-			
-	        const formData = new FormData();
-	        formData.append("corsoID", this.corso.ID);
-	        formData.append("dataAppello", this.dataAppello);
-	        makeAJAXCall("POST", "RifiutaVoto", formData, (request) => {
-	            if (request.readyState === XMLHttpRequest.DONE) {
-	                if (request.status === 200) {
-	                    this.error.showError("Voto rifiutato con successo.");
-	                    this.hide();
-	                } 
-					else {
-	                    this.error.showError(request.responseText || "Errore nel rifiuto del voto.");
-	                }
-					document.body.removeChild(form)
-	            }
-	        });
-    	}
+		console.log("Rifiuto voto per il corso:", this.corso.ID, "data appello:", this.dataAppello);
+        const formData = new FormData();
+        formData.append("corsoID", this.corso.ID);
+        formData.append("dataAppello", dataConverter(this.dataAppello));
+        makeAJAXCall("POST", "RifiutaVoto", formData, (request) => {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                if (request.status === 200) {
+                    this.error.showError("Voto rifiutato con successo.");
+                    this.hide();
+                } 
+				else {
+                    this.error.showError(request.responseText || "Errore nel rifiuto del voto.");
+                }
+            }
+        }, false);
+    }
 
     hide() {
         this.valutazioneBox.style.display = "none";

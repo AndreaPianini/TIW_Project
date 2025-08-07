@@ -58,10 +58,14 @@ public class RifiutaVoto extends HttpServlet {
 		Integer corsoID = null;
 		Date dataAppello = null;
 		try {
+			System.out.println("corsoID: " + request.getParameter("corsoID"));
+			System.out.println("dataAppello: " + request.getParameter("dataAppello"));
+
 			corsoID = Integer.parseInt(request.getParameter("corsoID"));
 			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
 		} 
 		catch (Exception e) {
+			e.printStackTrace();
 			corsoID = null;
 			dataAppello = null;
 		}
