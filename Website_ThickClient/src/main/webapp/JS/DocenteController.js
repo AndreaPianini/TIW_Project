@@ -59,7 +59,7 @@
 	
 	
 	
-	// --- Classi per la logica della pagina ---
+	// Classi per la logica della pagina
 	
 	class PageOrchestrator {
 	        init() {
@@ -712,7 +712,6 @@
 			        }
 
 			        studenti.forEach(studente => {
-			            // CORREZIONE: Crea la riga prima di aggiungere i suoi elementi
 			            const row = document.createElement("tr");
 			            row.dataset.matricola = studente.matricola;
 			            
