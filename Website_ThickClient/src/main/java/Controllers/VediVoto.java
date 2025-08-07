@@ -56,7 +56,13 @@ public class VediVoto extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
-		Studente studente = (Studente) session.getAttribute("user");
+        Studente studente = (Studente) session.getAttribute("user");
+        if (studente == null || !studente.getRole().equals("STUDENTE")) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
+			return;
+		}
+        
 		StudenteDAO studenteDAO = new StudenteDAO(connection, studente.getID());
 		CorsoDAO corsoDAO = new CorsoDAO(connection);
 		Integer corsoID = null;

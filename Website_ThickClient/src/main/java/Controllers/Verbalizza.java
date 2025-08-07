@@ -18,8 +18,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonArray;
 
 import BEANS.Docente;
 import DAO.DocenteDAO;
@@ -32,6 +30,7 @@ public class Verbalizza extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 
+	
 	public void init() throws ServletException {
 		try {
 			ServletContext context = getServletContext();
@@ -47,13 +46,15 @@ public class Verbalizza extends HttpServlet {
 		}
 	}
 
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
 		Docente docente = (Docente) session.getAttribute("user");
-		if (docente == null) {
+		if (docente == null || !docente.getRole().equals("DOCENTE")) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
 			return;
 		}
 
@@ -68,10 +69,16 @@ public class Verbalizza extends HttpServlet {
 			response.getWriter().println("Corso o data dell'appello non validi.");
 			return;
 		}
-
+		
+		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		int verbaleID = -1;
 		try {
-			DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+			if(!docenteDAO.isAutorizzato(corsoID)) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.getWriter().println("Non sei autorizzato a verbalizzare per questo corso.");
+				return;
+			}
+			
 			verbaleID = docenteDAO.verbalizzaValutazioni(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {
@@ -86,12 +93,12 @@ public class Verbalizza extends HttpServlet {
 			return;
 		}
 
-		// Rispondi con ID verbale in JSON
 		String json = new Gson().toJson(verbaleID);
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
+		
 	}
 
 	public void destroy() {

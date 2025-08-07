@@ -56,6 +56,11 @@ public class RifiutaVoto extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Studente studente = (Studente) session.getAttribute("user");
+		if (studente == null || !studente.getRole().equals("STUDENTE")) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Utente non autenticato.");
+			return;
+		}
 		
 		Integer corsoID = null;
 		Date dataAppello = null;
@@ -67,7 +72,6 @@ public class RifiutaVoto extends HttpServlet {
 			dataAppello = Date.valueOf(request.getParameter("dataAppello"));
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
 			corsoID = null;
 			dataAppello = null;
 		}
