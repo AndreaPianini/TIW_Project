@@ -98,7 +98,6 @@ public class DocenteDAO {
                                      ArrayList<Studente> iscritti,
                                      ArrayList<Valutazione> voti) throws SQLException {
 
-        Set<String> allowedSort = Set.of("matricola", "cognome", "nome", "email", "corsoLaurea", "voto", "stato");      
 
         String query = "SELECT "
                      + "s.matricola         AS matricola, "

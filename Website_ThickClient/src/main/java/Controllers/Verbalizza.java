@@ -1,8 +1,10 @@
 package Controllers;
 
 import jakarta.servlet.ServletContext;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ import DAO.DocenteDAO;
 
 
 @WebServlet("/Verbalizza")
+@MultipartConfig
 public class Verbalizza extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
