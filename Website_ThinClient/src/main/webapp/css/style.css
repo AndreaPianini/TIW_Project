@@ -24,7 +24,7 @@ body {
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(60, 80, 180, 0.10), 0 1.5px 4px rgba(0,0,0,0.04);
     width: 100%;
-    max-width: 900px;
+    max-width: 1300px;
     margin-bottom: 40px;
 }
 
@@ -140,22 +140,6 @@ button[type="submit"]:hover {
     background: #b6c6e6;
     color: #2a3a5e;
 }
-
-/* a.btn-secondary { */
-/*     text-decoration: none; */
-/*     padding: 0.6rem 1.3rem; */
-/*     border-radius: 6px; */
-/*     font-size: 1.05rem; */
-/*     font-weight: 600; */
-/*     background: #e3eafc; */
-/*     color: #2a3a5e; */
-/*     border: 1px solid #b6c6e6; */
-/*     transition: background 0.2s, color 0.2s; */
-/* } */
-/* a.btn-secondary:hover { */
-/*     background: #b6c6e6; */
-/*     color: #2a3a5e; */
-/* } */
 
 /* Messaggi di errore */
 .error-message {
