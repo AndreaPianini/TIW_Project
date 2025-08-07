@@ -27,6 +27,16 @@ INSERT INTO Utenti (id, password, nome, cognome, email) VALUES
 (8, 'pwd8', 'Stefano', 'Viola', 'stefano.viola@uni.it'),
 (9, 'pwd9', 'Elena', 'Marrone', 'elena.marrone@uni.it'),
 (10, 'pwd10', 'Francesca', 'Grigi', 'francesca.grigi@uni.it');
+(11, 'pwd11', 'Alessandro', 'Viotti', 'alessandro.viotti@uni.it'),
+(12, 'pwd12', 'Martina', 'Ferrari', 'martina.ferrari@uni.it'),
+(13, 'pwd13', 'Davide', 'Corti', 'davide.corti@uni.it'),
+(14, 'pwd14', 'Sara', 'Longhi', 'sara.longhi@uni.it'),
+(15, 'pwd15', 'Nicola', 'Russo', 'nicola.russo@uni.it'),
+(16, 'pwd16', 'Veronica', 'Fontana', 'veronica.fontana@uni.it'),
+(17, 'pwd17', 'Federico', 'Sala', 'federico.sala@uni.it'),
+(18, 'pwd18', 'Giulia', 'Valli', 'giulia.valli@uni.it'),
+(19, 'pwd19', 'Riccardo', 'Galli', 'riccardo.galli@uni.it'),
+(20, 'pwd20', 'Chiara', 'Moretti', 'chiara.moretti@uni.it');
 
 -- DOCENTI
 INSERT INTO Docenti (id) VALUES (1), (2), (3), (4), (5);
@@ -38,6 +48,17 @@ INSERT INTO Studenti (id, matricola, corso_laurea) VALUES
 (8, 'S1003', 'Matematica'),
 (9, 'S1004', 'Ingegneria'),
 (10, 'S1005', 'Biologia');
+(11, 'S1006', 'Fisica'),
+(12, 'S1007', 'Matematica'),
+(13, 'S1008', 'Informatica'),
+(14, 'S1009', 'Biologia'),
+(15, 'S1010', 'Ingegneria'),
+(16, 'S1011', 'Biotecnologie'),
+(17, 'S1012', 'Chimica'),
+(18, 'S1013', 'Filosofia'),
+(19, 'S1014', 'Economia'),
+(20, 'S1015', 'Lettere');
+
 
 -- CORSI (Corsi con 0, 1, 2, 3 appelli)
 INSERT INTO Corsi (id, nome, cfu, docente) VALUES
@@ -51,6 +72,7 @@ INSERT INTO Corsi (id, nome, cfu, docente) VALUES
 (108, 'Chimica', 6, 3),           -- 0 appelli
 (109, 'Programmazione', 12, 4),   -- 2 appelli
 (110, 'Matematica Discreta', 6, 5); -- 1 appello
+
 
 -- APPELLI (diverso numero per corso: 3, 2, 1, 0)
 INSERT INTO Appelli (corso, data) VALUES
@@ -79,6 +101,16 @@ INSERT INTO StudSegueCorso (Studente, Corso) VALUES
 (8, 105), (8, 107), (8, 109),
 (9, 101), (9, 109), (9, 110),
 (10, 105), (10, 106), (10, 110);
+(11, 101), (11, 105),
+(12, 102), (12, 107),
+(13, 101), (13, 103),
+(14, 104), (14, 109),
+(15, 105), (15, 110),
+(16, 106), (16, 108),
+(17, 102), (17, 109),
+(18, 103), (18, 107),
+(19, 105), (19, 108),
+(20, 106), (20, 110);
 
 -- ISCRIZIONI (alcuni con voto NULL e stato NON_INSERITO, alcuni VERBALIZZATI solo se associati a verbale)
 INSERT INTO Iscrizioni (studente, corso, data, voto, stato_valutazione, verbale) VALUES
@@ -116,4 +148,22 @@ INSERT INTO Iscrizioni (studente, corso, data, voto, stato_valutazione, verbale)
 -- CORSO 110 (1 appello, nessun verbale)
 (9, 110, '2025-06-22', NULL, 'NON_INSERITO', NULL),
 (10, 110, '2025-06-22', '19', 'INSERITO', NULL);
+
+(11, 101, '2025-09-01', NULL, 'NON_INSERITO', NULL),
+(11, 105, '2025-09-05', NULL, 'NON_INSERITO', NULL),
+(12, 102, '2025-07-20', NULL, 'NON_INSERITO', NULL),
+(12, 107, '2025-06-16', NULL, 'NON_INSERITO', NULL),
+(13, 101, '2025-07-15', NULL, 'NON_INSERITO', NULL),
+(13, 103, '2025-06-05', NULL, 'NON_INSERITO', NULL),
+(14, 109, '2025-08-01', NULL, 'NON_INSERITO', NULL),
+(15, 105, '2025-07-27', NULL, 'NON_INSERITO', NULL),
+(15, 110, '2025-06-22', NULL, 'NON_INSERITO', NULL),
+(16, 106, '2025-06-14', NULL, 'NON_INSERITO', NULL),
+(17, 102, '2025-06-03', NULL, 'NON_INSERITO', NULL),
+(17, 109, '2025-06-20', NULL, 'NON_INSERITO', NULL),
+(18, 103, '2025-06-05', NULL, 'NON_INSERITO', NULL),
+(18, 107, '2025-06-16', NULL, 'NON_INSERITO', NULL),
+(19, 105, '2025-09-05', NULL, 'NON_INSERITO', NULL),
+(20, 106, '2025-07-29', NULL, 'NON_INSERITO', NULL),
+(20, 110, '2025-06-22', NULL, 'NON_INSERITO', NULL);
 
