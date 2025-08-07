@@ -354,7 +354,7 @@
 		                    haVotiDaVerbalizzare = true;
 		                }
 						
-						if(studente.stato === 'INSERITO' || studente.stato === 'NON_INSERITO') {
+						if(studente.stato === 'INSERITO' || studente.stato === 'NON INSERITO') {
 		                const actionsCell = document.createElement("td");
 		                const modificaBtn = document.createElement("button");
 		                modificaBtn.type = "button";
