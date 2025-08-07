@@ -90,6 +90,10 @@ public class Pubblica extends HttpServlet {
 		
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		try {
+			if (!docenteDAO.isAutorizzato((int)corsoID)) {
+				renderPageError(request, response, "Non sei abilitato a modificare questo corso.");
+				return;
+			}
 			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {

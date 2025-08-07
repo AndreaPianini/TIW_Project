@@ -70,6 +70,11 @@ public class Pubblica extends HttpServlet {
 
 		DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
 		try {
+			if(!docenteDAO.isAutorizzato(corsoID)) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.getWriter().println("Non sei autorizzato a verbalizzare per questo corso.");
+				return;
+			}
 			docenteDAO.pubblicaValutazioni(corsoID, dataAppello);
 		} 
 		catch (SQLException e) {

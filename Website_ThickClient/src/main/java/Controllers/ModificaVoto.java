@@ -95,6 +95,11 @@ public class ModificaVoto extends HttpServlet {
 
 		try {
 			DocenteDAO docenteDAO = new DocenteDAO(connection, docente.getID());
+			if(!docenteDAO.isAutorizzato(corsoID)) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.getWriter().println("Non sei autorizzato a verbalizzare per questo corso.");
+				return;
+			}
 			docenteDAO.modificaVoto(valutazione, corsoID, dataAppello, studID);
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

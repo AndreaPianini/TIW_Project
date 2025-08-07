@@ -108,6 +108,10 @@ public class Modifica extends HttpServlet {
 				renderPageError(request, response, "Non sei abilitato a modificare questo corso.");
 				return;
 			}
+			if (!studenteDAO.checkRegistrazione(corsoID, dataAppello)) {
+	            renderPageError(request, response, "Studente non iscritto all'appello.");
+	            return;
+	        }
 			studente = studenteDAO.getStudenteInfo();
 			valutazione = docenteDAO.getValutazioneByStudenteAppello(studenteID, corsoID, dataAppello);
 		} 

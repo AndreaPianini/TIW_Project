@@ -113,6 +113,10 @@ public class ModificaVoto extends HttpServlet {
 	    }
 
 	    try {
+	    	if (!docenteDAO.isAutorizzato(corsoID)) {
+                renderPageError(request, response, "Non sei autorizzato a modificare questo corso.");
+                return;
+            }
 	        docenteDAO.modificaVoto(valutazione, corsoID, dataAppello, studID);
 	    } 
 	    catch (SQLException e) {
