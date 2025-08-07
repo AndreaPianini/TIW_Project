@@ -36,10 +36,11 @@ INSERT INTO Utenti (id, password, nome, cognome, email) VALUES
 (17, 'pwd17', 'Federico', 'Sala', 'federico.sala@uni.it'),
 (18, 'pwd18', 'Giulia', 'Valli', 'giulia.valli@uni.it'),
 (19, 'pwd19', 'Riccardo', 'Galli', 'riccardo.galli@uni.it'),
-(20, 'pwd20', 'Chiara', 'Moretti', 'chiara.moretti@uni.it');
+(20, 'pwd20', 'Chiara', 'Moretti', 'chiara.moretti@uni.it'),
+(99, 'pwd99', 'Marco', 'Pianini', 'marco.pianini@uni.it');
 
 -- DOCENTI
-INSERT INTO Docenti (id) VALUES (1), (2), (3), (4), (5);
+INSERT INTO Docenti (id) VALUES (1), (2), (3), (4), (5), (99);
 
 -- STUDENTI
 INSERT INTO Studenti (id, matricola, corso_laurea) VALUES
