@@ -83,8 +83,13 @@
 	            const logoutBtn = document.getElementById("logout-btn");
 	            logoutBtn.addEventListener("click", () => {
 	                makeAJAXCall("POST", "Logout", null, (request) => {
-	                    if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-	                        window.location.href = "login.html";
+						if (request.readyState === XMLHttpRequest.DONE) {
+	                    	if (request.status === 200) {
+	                            window.location.href = "Login.html"; // Reindirizza alla pagina di login
+	                        } 
+							else {
+	                            this.error.showError("Errore durante il logout: " + request.status);
+	                        }
 	                    }
 	                });
 	            });
@@ -348,20 +353,21 @@
 		                if (studente.stato === 'PUBBLICATO') {
 		                    haVotiDaVerbalizzare = true;
 		                }
-
+						
+						if(studente.stato === 'INSERITO' || studente.stato === 'NON_INSERITO') {
 		                const actionsCell = document.createElement("td");
 		                const modificaBtn = document.createElement("button");
 		                modificaBtn.type = "button";
 		                modificaBtn.className = "btn-primary";
 		                modificaBtn.textContent = "Modifica";
 		                modificaBtn.addEventListener("click", () => {
-		                    pageOrchestrator.modificaVoto.show(studente.id, corsoID, dataAppello);
+		                    pageOrchestrator.modificaVoto.show(studente, corsoID, dataAppello);
 		                });
 		                actionsCell.appendChild(modificaBtn);
 		                row.appendChild(actionsCell);
 		                
-		                this.tableBody.appendChild(row);
-						
+						}
+						this.tableBody.appendChild(row);
 						// Aggiungi listener per l'ordinamento delle colonne
 						const tableHeaders = document.querySelectorAll('#studenti-iscritti-table th[id^="sort-"]');
 						tableHeaders.forEach(header => {
@@ -466,6 +472,8 @@
 								const data = JSON.parse(request.responseText);
 		                        // Reindirizzamento o refresh della pagina degli iscritti
 		                        self.show(appello.corsoID, appello.dataAppello);
+								
+								pageOrchestrator.verbali.show();
 		                        // E, come richiesto, mostra i dettagli del verbale creato
 		                        pageOrchestrator.verbali.showDettagli(data);
 		                        
@@ -481,6 +489,10 @@
 					this.tableBody.innerHTML = "";
 				}
 			}
+			
+			const VOTI_POSSIBILI = [
+						    "ASSENTE", "RIMANDATO", "RIPROVATO", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "30L"
+						];
 			
 			class ModificaVoto {
 				constructor(errorHandler) {
@@ -516,43 +528,24 @@
 					});
 				}
 
-				show(studenteID, corsoID, dataAppello) {
-		            this.error.resetError();
+				show(studente, corsoID, dataAppello) {
+					this.error.resetError();
 		            this.modale.style.display = "block";
 		            
-		            let self = this;
-		            const params = new URLSearchParams({ studenteID, corsoID, dataAppello });
-		            
-		            makeAJAXCall("GET", "Modifica?" + params.toString(), null, (request) => {
-		                if (request.readyState === XMLHttpRequest.DONE) {
-		                    if (request.status === 200) {
-		                        try {
-		                            const data = JSON.parse(request.responseText);
-		                            self.populateModal(data);
-		                        } catch (e) {
-		                            self.error.showError("Errore nel parsing dei dati per la modifica.");
-		                            self.hide();
-		                        }
-		                    } else {
-		                        self.error.showError("Errore nel caricamento dei dati per la modifica: " + request.status);
-		                        self.hide();
-		                    }
-		                }
-		            });
+		            // Popola la modale direttamente con i dati forniti e la lista hardcoded
+		            this.populateModal(studente, corsoID, dataAppello);
 				}
 
-		        populateModal(data) {
-		            const studente = data.studente;
-		            const votoCorrente = data.valutazione;
-		            const votiPossibili = data.votiPossibili;
+		        populateModal(studente, corsoID, dataAppello) {
+		            const votoCorrente = studente.voto;
 
 		            this.studenteIDInput.value = studente.id;
-		            this.corsoIDInput.value = data.corsoID;
-		            this.dataAppelloInput.value = data.dataAppello;
+		            this.corsoIDInput.value = corsoID;
+		            this.dataAppelloInput.value = dataAppello;
 		            this.studenteInfoSpan.textContent = `${studente.nome} ${studente.cognome}`;
 		            
-		            this.votoSelect.innerHTML = "";
-		            votiPossibili.forEach(voto => {
+					this.votoSelect.innerHTML = "";
+		            VOTI_POSSIBILI.forEach(voto => {
 		                const option = document.createElement("option");
 		                option.value = voto;
 		                option.textContent = voto;
