@@ -98,6 +98,7 @@
 		resetError() {
 			this.errorText.textContent = "";
             this.errorMessage.style.display = "none";
+			this.errorMessage.setClassName = "error-message";
         }
 	}
 
@@ -432,8 +433,12 @@
             if (request.readyState === XMLHttpRequest.DONE) {
                 if (request.status === 200) {
                     this.error.showError("Voto rifiutato con successo.");
+                    this.error.errorMessage.style.backgroundColor = "#d4edda"; // Verde chiaro
+                    this.error.errorMessage.style.color = "#155724"; // Verde scuro
+					this.error.errorMessage.style.borderColor = "#c3e6cb"; // Verde scuro
                     this.hide();
-                } else {
+                } 
+                else {
                     this.error.showError(request.responseText || "Errore nel rifiuto del voto.");
                 }
             }
